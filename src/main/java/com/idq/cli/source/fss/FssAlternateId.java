@@ -28,7 +28,7 @@ public class FssAlternateId extends SourceMapping<ClientIdentifier, InactiveStat
         implements MemberMapping.AlternateId<ClientIdentifier, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("022", "m_Tgt_C_S_FSS_Pty_Rle_Alt_Id", SourceSystem.FSS,
-            List.of("C_S_FSS_PTY_RLE_ALT_ID"), List.of("V_FSS_ETL_SRC", "STG_FSS_PTY_INACTIVE_STS"));
+            List.of("C_S_FSS_PTY_RLE_ALT_ID"), List.of(FssSources.EtlSrc.class, FssTargets.InactiveStatus.class));
 
     public FssAlternateId(FssQueries queries) {
         super(INFO, queries::fetchClientIdentifiers,

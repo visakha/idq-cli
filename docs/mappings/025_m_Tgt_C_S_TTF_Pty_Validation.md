@@ -56,3 +56,6 @@ No `C_S_*` target; status key = `LPAD(CLIENTS_ID,10)`, `ROWID_SYSTEM` = `TTF`. U
 ## Java implementation
 
 * `TtfPartyValidation.nameExceptionCode`, `transform`; `InactiveStatus.Changes` / `output`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TtfSources.EtlSrc`
+  (`V_TTF_ETL_SRC`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`), `TtfTargets.InactiveStatus`
+  (`STG_TTF_PTY_INACTIVE_STS`).

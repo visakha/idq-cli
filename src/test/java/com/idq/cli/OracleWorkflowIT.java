@@ -3,9 +3,12 @@ package com.idq.cli;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.idq.cli.core.MappingResult;
+import com.idq.cli.config.ReportSettings;
+import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.mock.SampleData;
 import com.idq.cli.workflow.MappingCatalog;
 import com.idq.cli.workflow.WorkflowRunner;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -20,12 +23,34 @@ import org.springframework.boot.test.context.SpringBootTest;
 /// ```
 @Tag("oracle")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        properties = {"spring.shell.interactive.enabled=false", "spring.shell.context.close=false"})
+        properties = {"spring.shell.interactive.enabled=false", "spring.shell.context.close=false",
+                "idq.report.base-dir=target/adhoc-it"})
 class OracleWorkflowIT {
 
     @Autowired MappingCatalog catalog;
     @Autowired SampleData sampleData;
     @Autowired WorkflowRunner runner;
+    @Autowired ReportSettings reports;
+
+    /// `run-etl` for ECI on mock data: every target table gets an audit report whose sections could all be read.
+    ///
+    /// ```
+    /// mvnw test -Dtest=OracleWorkflowIT#runWritesAuditReports [-Dsource=TRS]
+    /// ```
+    @Test
+    void runWritesAuditReports() throws Exception {
+        var source = SourceSystem.valueOf(System.getProperty("source", "ECI"));
+        sampleData.fillMockAll(catalog.of(source).stream().map(m -> m.info().name()).toList());
+        var run = runner.run(source);
+        run.output().forEach(System.out::println);
+        try (var files = Files.list(reports.dirFor(source))) {
+            var reportFiles = files.filter(f -> f.getFileName().toString().contains("_$Java$_")).toList();
+            assertThat(reportFiles).isNotEmpty();
+            for (var file : reportFiles) {
+                assertThat(Files.readString(file)).as(file.toString()).doesNotContain("could not be read");
+            }
+        }
+    }
 
     @Test
     void everyMappingRunsOnMockData() {

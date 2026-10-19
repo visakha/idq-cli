@@ -97,3 +97,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Alt_Id_pkey_test`.
 * `TrsAlternateId.normalize` = the normalizer (one `Candidate` per type), `IdentifierRules` = the rules,
   `transform` routes candidates to `TrsTargets.AlternateId` or `BadRecords`.
 * `Lookups(validSsns)` is the `lkp_Valid_SSN` cache.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DCvDcMciIndv`
+  (`STG_TRS_D_CV_DC_MCI_INDV`), `TrsSources.DDcIndv` (`STG_TRS_D_DC_INDV`), `TrsSources.DCvDcMrgSprtIndv`
+  (`STG_TRS_D_CV_DC_MRG_SPRT_INDV`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`), `TrsSources.HDcIndv`
+  (`STG_TRS_H_DC_INDV`).

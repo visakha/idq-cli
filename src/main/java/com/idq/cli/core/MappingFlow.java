@@ -5,11 +5,12 @@ import com.idq.cli.domain.MemberMapping;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Consumer;
 
 /// Fluent driver of one mapping run:
 ///
 /// ```java
-/// MappingFlow.of(mapping).read().transform(ctx).writeWith(writer);
+/// MappingFlow.of(mapping).read().peek(audit).transform(ctx).writeWith(writer);
 /// ```
 public final class MappingFlow {
 
@@ -26,6 +27,12 @@ public final class MappingFlow {
     }
 
     public record Transformer<I, L>(Reader<I, L> reader, List<I> rows, L lookups) {
+        /// Hands the `IdqMapInitQuery` rows to an observer (the audit trail) before transforming them.
+        public Transformer<I, L> peek(Consumer<List<I>> observer) {
+            observer.accept(rows);
+            return this;
+        }
+
         public Writer transform(EtlContext ctx) {
             return new Writer(reader.mapping().info().name(), reader.started(), rows.size(),
                     reader.mapping().transform(rows, lookups, ctx));

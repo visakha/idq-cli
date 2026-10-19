@@ -33,7 +33,8 @@ public class WicParty extends SourceMapping<ClientDemographics, InactiveStatus.L
         implements MemberMapping.Demographics<ClientDemographics, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("030", "m_Tgt_C_S_WIC_Pty", SourceSystem.WIC,
-            List.of("C_S_WIC_PTY", "C_S_WIC_PTY_RLE"), List.of("V_WIC_ETL_SRC", "STG_WIC_PTY_INACTIVE_STS"));
+            List.of("C_S_WIC_PTY", "C_S_WIC_PTY_RLE"), List.of(WicSources.EtlSrc.class,
+            WicTargets.InactiveStatus.class));
 
     /// Gender, ethnicity and race exceptions only for `CLIENT` rows; language for all rows.
     static final PartyPattern.Spec SPEC = new PartyPattern.Spec("WIC", RaceSource.INDICATORS, true, false,

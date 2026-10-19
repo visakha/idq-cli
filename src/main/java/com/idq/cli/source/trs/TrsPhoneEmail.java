@@ -38,7 +38,7 @@ public class TrsPhoneEmail extends SourceMapping<CaseContact, NoLookups>
 
     public static final MappingInfo INFO = MappingInfo.of("006", "m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr",
             SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_PHN", "C_S_TRS_PTY_RLE_EADDR"),
-            List.of("STG_TRS_D_DC_CASES", "STG_TRS_DC_CASE_INDV", "STG_TRS_VALID_MEMBERS"));
+            List.of(TrsSources.DDcCases.class, TrsSources.DcCaseIndv.class, TrsTargets.ValidMember.class));
 
     public static final String TELEPHONE = "Telephone";
 

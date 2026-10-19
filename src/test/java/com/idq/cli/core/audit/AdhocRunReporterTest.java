@@ -1,0 +1,84 @@
+package com.idq.cli.core.audit;
+
+import static com.idq.cli.Fixtures.DAY;
+import static com.idq.cli.Fixtures.ctx;
+import static com.idq.cli.Fixtures.queries;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.idq.cli.config.EtlProcess;
+import com.idq.cli.config.ReportSettings;
+import com.idq.cli.core.InactiveStatus;
+import com.idq.cli.core.MappingResult;
+import com.idq.cli.core.audit.EtlEvent.RowSample;
+import com.idq.cli.core.audit.EtlEvent.RunId;
+import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.source.eci.EciQueries;
+import com.idq.cli.source.eci.EciQueries.FamilyRelation;
+import com.idq.cli.source.eci.EciRelationship;
+import com.idq.cli.source.eci.EciSources;
+import com.idq.cli.source.eci.EciTargets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+/// The audit report of a Java run of `m_Tgt_C_S_ECI_Pty_Rle_Rel`, built from the events the workflow publishes.
+class AdhocRunReporterTest {
+
+    @TempDir
+    Path dir;
+
+    final RunId run = new RunId(SourceSystem.ECI, EtlProcess.JAVA, LocalDateTime.of(2026, 10, 19, 9, 54, 12));
+
+    @Test
+    void writesOneMarkdownReportPerTargetTable() throws Exception {
+        var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200));
+        var info = EciRelationship.INFO;
+        var relation = new FamilyRelation("To Child", 7L, "F", 42L, "1", DAY, DAY);
+        var output = new EciRelationship(queries(EciQueries.class)).transform(List.of(relation),
+                new EciRelationship.Lookups(InactiveStatus.Lookup.NONE, Map.of()), ctx(info));
+        var family = new EciSources.DFamily(7L, 42L, 1, "F", null, null, "Mia", "Lee", null, DAY, 1, 0, DAY, null,
+                "mock", "mock", DAY);
+
+        reporter.on(new EtlEvent.RunStarted(run));
+        reporter.on(new EtlEvent.SourceTablesCaptured(run, info, List.of(
+                new RowSample("STG_ECI_D_FAMILY", EciSources.DFamily.class, 1, List.of(family), "before"),
+                new RowSample("STG_ECI_SN_CHILD", EciSources.SnChild.class, 0, List.of(), "before"))));
+        reporter.on(new EtlEvent.InitQueryCaptured(run, info,
+                new RowSample("IdqMapInitQuery", FamilyRelation.class, 1, List.of(relation), "returned")));
+        reporter.on(new EtlEvent.TargetsWritten(run, info, List.of(new RowSample("C_S_ECI_PTY_RLE_REL",
+                EciTargets.Relationship.class, 1, output.rows(EciTargets.Relationship.class), "read back"))));
+        reporter.on(new EtlEvent.MappingFinished(run, info, new MappingResult(info.name(),
+                MappingResult.Status.SUCCEEDED, 1, Map.of("C_S_ECI_PTY_RLE_REL", 1), 0, Duration.ofMillis(5), null)));
+        reporter.on(new EtlEvent.RunCompleted(run, List.of()));
+
+        var report = dir.resolve("adhoc_runs_ECI").resolve("C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_9_54_AM.md");
+        assertThat(report).exists();
+        var md = Files.readString(report);
+        assertThat(md)
+                .contains("# C_S_ECI_PTY_RLE_REL - ECI adhoc run (Java)")
+                .contains("| 018 | m_Tgt_C_S_ECI_Pty_Rle_Rel | SUCCEEDED | 1 | C_S_ECI_PTY_RLE_REL=1 | 0 | 5 |  |")
+                .contains("#### STG_ECI_D_FAMILY (`EciSources.DFamily`)", "| ID_FAMILY | ID_CHILD | FAMILY_CD |")
+                .contains("| 7 | 42 | 1 | F |  |  | Mia | Lee |", "#### STG_ECI_SN_CHILD", "_no rows_")
+                .contains("### IdqMapInitQuery (`EciQueries.FamilyRelation`)",
+                        "| RELATION_DIRECTION | ID_FAMILY | FAMILY_GENDER | ID_CHILD |", "| To Child | 7 | F | 42 |")
+                .contains("#### C_S_ECI_PTY_RLE_REL (`EciTargets.Relationship`)", "| PKEY_SRC_OBJECT |",
+                        "PTY_RLE_FK_1", "| 0000000007F\\|Member\\|0000000042\\|Member\\|MTH |")
+                .doesNotContain("$");
+        assertThat(md.chars().allMatch(c -> c < 128)).isTrue();
+    }
+
+    @Test
+    void sameMinuteRunsDoNotOverwriteEachOther() throws Exception {
+        var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200));
+        var first = reporter.file(run, "C_S_ECI_PTY");
+        Files.createDirectories(first.getParent());
+        Files.writeString(first, "earlier run");
+        assertThat(reporter.file(run, "C_S_ECI_PTY").getFileName())
+                .hasToString("C_S_ECI_PTY_$Java$_19_10_2026_9_54_AM_2.md");
+    }
+}

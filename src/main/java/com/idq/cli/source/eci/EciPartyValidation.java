@@ -10,6 +10,7 @@ import com.idq.cli.core.Infa;
 import com.idq.cli.core.MappingOutput;
 import com.idq.cli.core.exception.BadRecord;
 import com.idq.cli.core.reference.LookupRows;
+import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.rules.NameStandardization;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping;
@@ -31,9 +32,9 @@ public class EciPartyValidation extends SourceMapping<PartyName, EciPartyValidat
         implements MemberMapping.Demographics<PartyName, EciPartyValidation.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("013", "m_Tgt_C_S_ECI_Pty_Validation", SourceSystem.ECI,
-            List.of("STG_ECI_PTY_INACTIVE_STS", "STG_ECI_PTY_INACTIVE_LOG"),
-            List.of("STG_ECI_D_CHILD", "STG_ECI_D_FAMILY", "C_B_PTY_XREF", "STG_ECI_PTY_INACTIVE_STS",
-                    "V_ECI_ETL_LU_DUP_CASES", "V_ECI_ETL_LU_FAMILY_VALIDATION"));
+            List.of("STG_ECI_PTY_INACTIVE_STS", "STG_ECI_PTY_INACTIVE_LOG"), List.of(EciSources.DChild.class,
+            EciSources.DFamily.class, MdmBaseTables.PartyXref.class, EciTargets.InactiveStatus.class,
+            EciSources.EtlLuDupCases.class, EciSources.EtlLuFamilyValidation.class));
 
     /// @param duplicateCases `<source table>|<id>` of parties whose every case is a duplicate (reason 8)
     /// @param familyFlags    `<source table>|<id>` of family members with any family validation status

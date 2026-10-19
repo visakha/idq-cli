@@ -50,8 +50,25 @@ shows the latched context, e.g. `TRS+C_S_TRS_PTY+m_Tgt_C_S_TRS_Pty_OnGoing>`.
 | `show-sample-data` | Sample rows of the latched mapping's IdqMapInitQuery |
 | `fill-sample-mock-data` | Faker rows via `fill_sample_mock_data_<mapping>` |
 | `fill-sample-real-data` | Placeholder (`RealSampleData`) |
-| `run-etl` | Latched mapping, or the whole workflow of the latched source |
+| `run-etl` | Whole workflow of the latched source (mock rows first when `mock_data=true`), then audit reports |
 | `run-unit-tests` | PKEY unit test of the latched mapping |
+
+## Entity models and audit reports
+
+Every table has a Spring Data JDBC `@Table` record (no JPA):
+
+| Kind | Where | Example |
+|---|---|---|
+| `IdqMapInitQuery` rows | records next to their `@Query` in `<Src>Queries` | `EciQueries.FamilyRelation` |
+| Source tables / views | `<Src>Sources` | `EciSources.DFamily` (`STG_ECI_D_FAMILY`) |
+| Target `C_S_*` tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
+| MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
+
+`MappingInfo.sourceEntities` lists the source entities of each mapping. During a run `EtlAudit` publishes Spring
+events (`EtlEvent`): source tables before each mapping, the `IdqMapInitQuery` rows, and the target rows read back by
+`PKEY_SRC_OBJECT` (with `etl_process=IDQ`: the target tables after the workflow). `AdhocRunReporter` listens and
+writes one Markdown file per target table, e.g. `adhoc_runs_ECI/C_S_ECI_PTY_RLE_$Java$_19_10_2026_9_54_AM.md`.
+Quote the name in a shell because of the `$` signs.
 
 ## REST API
 
@@ -64,10 +81,13 @@ Port `8085`, base path `/api/etl`; every CLI command has an endpoint (table in `
 |---|---|---|
 | `etl_process` | `JAVA` | `JAVA` runs the ported mappings, `IDQ` runs `infacmd` |
 | `mock_infacmd` | `true` | With `IDQ`, log the infacmd call instead of running `idq.infacmd.script` |
-| `mock_data` | `true` | Mock rows are generated before a run |
+| `mock_data` | `true` | `run-etl` fills every mapping's source tables with mock rows before the run |
 | `idq.mock.rows-per-table` | `20` | Mock rows per source table |
 | `idq.bootstrap-missing-objects` | `true` | Create (never drop) tables of `db/missing-objects.sql` that do not exist |
 | `idq.clearable-tables-file` | `classpath:db/clearable-tables.txt` | Whitelist of tables a mapping may empty |
+| `idq.report.enabled` | `true` | Write the `adhoc_runs_<SOURCE>` audit reports |
+| `idq.report.base-dir` | `.` | Directory that holds the `adhoc_runs_<SOURCE>` folders |
+| `idq.report.max-rows` | `200` | Rows shown per table in a report (max 1000; totals are always shown) |
 | `idq.wallet-dir`, `IDQ_DB_USER`, `IDQ_DB_PASSWORD` | `docs/wallet`, ADMIN | OCI wallet and credentials |
 
 ## Notes

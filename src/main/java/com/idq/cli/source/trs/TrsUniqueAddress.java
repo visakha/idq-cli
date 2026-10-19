@@ -29,7 +29,7 @@ public class TrsUniqueAddress extends SourceMapping<DistinctAddress, NoLookups>
         implements MemberMapping.Address<DistinctAddress, NoLookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("011", "m_Tgt_C_S_TRS_Addr_1", SourceSystem.TRS,
-            List.of("STG_TRS_D_UNQ_ADDR"), List.of("STG_TRS_D_INDV_ADDR", "STG_TRS_CD_REF"));
+            List.of("STG_TRS_D_UNQ_ADDR"), List.of(TrsSources.DIndvAddr.class, TrsSources.CdRef.class));
 
     private final AddressValidator validator;
 

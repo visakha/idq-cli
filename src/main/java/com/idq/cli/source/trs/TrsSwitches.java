@@ -26,8 +26,8 @@ public class TrsSwitches extends SourceMapping<MemberSwitches, NoLookups>
         implements MemberMapping.ManagedAttribute<MemberSwitches, NoLookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("007", "m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_MNG_ATTR"),
-            List.of("STG_TRS_D_DC_INDV", "STG_TRS_D_CV_DC_MCI_INDV", "STG_TRS_VALID_MEMBERS"));
+            List.of("C_S_TRS_PTY_MNG_ATTR"), List.of(TrsSources.DDcIndv.class, TrsSources.DCvDcMciIndv.class,
+            TrsTargets.ValidMember.class));
 
     public TrsSwitches(TrsQueries queries) {
         super(INFO, queries::fetchMemberSwitches, NoLookups::none);

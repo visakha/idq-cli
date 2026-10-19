@@ -56,3 +56,5 @@ Unit test: `FssPkeyTest#m_Tgt_C_S_FSS_Pty_Rle_Rel_pkey_test`.
 ## Java implementation
 
 * `FssRelationship.relationCode`, `codeType`, `fromRole`, `toRole`, `pkey`; entity `FssTargets.Relationship`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `FssSources.EtlSrcRelations`
+  (`V_FSS_ETL_SRC_RELATIONS`), `FssTargets.InactiveStatus` (`STG_FSS_PTY_INACTIVE_STS`).

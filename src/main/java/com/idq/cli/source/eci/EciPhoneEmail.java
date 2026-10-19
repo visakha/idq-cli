@@ -34,7 +34,7 @@ public class EciPhoneEmail extends SourceMapping<FamilyContact, InactiveStatus.L
 
     public static final MappingInfo INFO = MappingInfo.of("017", "m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr",
             SourceSystem.ECI, List.of("C_S_ECI_PTY_RLE_PHN", "C_S_ECI_PTY_RLE_EADDR"),
-            List.of("V_ECI_ETL_SRC_FAMILY_PHONE", "STG_ECI_PTY_INACTIVE_STS"));
+            List.of(EciSources.EtlSrcFamilyPhone.class, EciTargets.InactiveStatus.class));
 
     public EciPhoneEmail(EciQueries queries) {
         super(INFO, queries::fetchFamilyContacts,

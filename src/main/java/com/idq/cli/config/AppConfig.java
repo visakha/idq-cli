@@ -3,6 +3,7 @@ package com.idq.cli.config;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,14 @@ public class AppConfig {
                         env.getProperty("idq.infacmd.domain", ""),
                         env.getProperty("idq.infacmd.service", ""),
                         env.getProperty("idq.infacmd.application", "")));
+    }
+
+    @Bean
+    ReportSettings reportSettings(Environment env) {
+        return new ReportSettings(
+                env.getProperty("idq.report.enabled", Boolean.class, true),
+                Path.of(env.getProperty("idq.report.base-dir", ".")),
+                Math.min(env.getProperty("idq.report.max-rows", Integer.class, 200), 1000));
     }
 
     @Bean

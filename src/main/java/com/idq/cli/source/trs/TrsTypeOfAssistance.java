@@ -28,7 +28,7 @@ public class TrsTypeOfAssistance extends SourceMapping<AssistanceSegment, NoLook
         implements MemberMapping.Role<AssistanceSegment, NoLookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("008", "m_Tgt_C_S_TRS_Pty_Rle_TOA", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_RLE_TOA"), List.of("STG_TRS_D_CV_MCI_EDG_INDV_TOA", "STG_TRS_VALID_MEMBERS"));
+            List.of("C_S_TRS_PTY_RLE_TOA"), List.of(TrsSources.DCvMciEdgIndvToa.class, TrsTargets.ValidMember.class));
 
     public TrsTypeOfAssistance(TrsQueries queries) {
         super(INFO, queries::fetchAssistanceSegments, NoLookups::none);

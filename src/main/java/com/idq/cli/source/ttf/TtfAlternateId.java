@@ -26,7 +26,7 @@ public class TtfAlternateId extends SourceMapping<ClientIdentifier, InactiveStat
         implements MemberMapping.AlternateId<ClientIdentifier, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("027", "m_Tgt_C_S_TTF_Pty_Rle_Alt_Id", SourceSystem.TTF,
-            List.of("C_S_TTF_PTY_RLE_ALT_ID"), List.of("V_TTF_ETL_SRC", "STG_TTF_PTY_INACTIVE_STS"));
+            List.of("C_S_TTF_PTY_RLE_ALT_ID"), List.of(TtfSources.EtlSrc.class, TtfTargets.InactiveStatus.class));
 
     public static final String ALT_ID_TYPE = "024";
 

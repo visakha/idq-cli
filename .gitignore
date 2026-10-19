@@ -34,3 +34,6 @@ build/
 
 ### Logs ###
 *.log
+
+### Adhoc-run audit reports ###
+adhoc_runs_*/

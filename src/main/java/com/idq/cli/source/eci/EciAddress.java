@@ -32,8 +32,8 @@ public class EciAddress extends SourceMapping<FamilyAddress, InactiveStatus.Look
         implements MemberMapping.Address<FamilyAddress, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("015", "m_Tgt_C_S_ECI_Pty_Addr", SourceSystem.ECI,
-            List.of("C_S_ECI_PTY_RLE_ADDR", "DQM_ADDRESS"),
-            List.of("V_ECI_ETL_SRC_FAMILY_ADDRESS", "STG_ECI_PTY_INACTIVE_STS"));
+            List.of("C_S_ECI_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(EciSources.EtlSrcFamilyAddress.class,
+            EciTargets.InactiveStatus.class));
 
     private final AddressValidator validator;
 

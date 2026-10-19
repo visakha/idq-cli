@@ -9,6 +9,7 @@ import com.idq.cli.core.Infa;
 import com.idq.cli.core.MappingOutput;
 import com.idq.cli.core.exception.BadRecord;
 import com.idq.cli.core.reference.LookupRows;
+import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.rules.NameStandardization;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping;
@@ -27,8 +28,8 @@ public class WicPartyValidation extends SourceMapping<ClientName, WicPartyValida
         implements MemberMapping.Demographics<ClientName, WicPartyValidation.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("029", "m_Tgt_C_S_WIC_Pty_Validation", SourceSystem.WIC,
-            List.of("STG_WIC_PTY_INACTIVE_STS", "STG_WIC_PTY_INACTIVE_LOG"),
-            List.of("V_WIC_ETL_SRC", "C_B_PTY_XREF", "STG_WIC_PTY_INACTIVE_STS"));
+            List.of("STG_WIC_PTY_INACTIVE_STS", "STG_WIC_PTY_INACTIVE_LOG"), List.of(WicSources.EtlSrc.class,
+            MdmBaseTables.PartyXref.class, WicTargets.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, Integer> hubStates) {}
 
