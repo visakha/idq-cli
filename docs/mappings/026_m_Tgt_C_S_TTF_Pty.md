@@ -1,0 +1,62 @@
+# 026 m_Tgt_C_S_TTF_Pty
+
+| | |
+|---|---|
+| Source system | TTF, after 025 |
+| Sub-domain | Demographics (plus Role) |
+| Targets | `C_S_TTF_PTY`, `C_S_TTF_PTY_RLE`, `EXC_STG_BAD_REC_MEMB` |
+| Java | `com.idq.cli.source.ttf.TtfParty` |
+
+## Business purpose
+
+Publishes the demographics and member role of active TTF clients. TTF reports gender as a numeric id and a single
+combined race / ethnicity id.
+
+```mermaid
+flowchart LR
+  V["V_TTF_ETL_SRC"] --> A["active clients"]
+  A --> G["gender 33 F, 34 M, else U<br/>ethnicity = 55 when race id 55"]
+  G --> P["PartyPattern: names,<br/>birth date, gender,<br/>ethnicity, race code"]
+  P --> T1["C_S_TTF_PTY"]
+  P --> T2["C_S_TTF_PTY_RLE"]
+  P --> E["exceptions"]
+```
+
+## IdqMapInitQuery
+
+### TTF-026 Client demographics
+
+All rows of the TTF view. No filter in IDQ.
+
+Entity: `TtfQueries.ClientDemographics` - named query: `TtfQueries#fetchClientDemographics`.
+
+```sql
+SELECT submitdate, load_date, clients_id, pty_src_key, firstname, lastname, middlename, dob,
+       TO_CHAR(sexid) AS sexid, raceethnicityid
+FROM v_ttf_etl_src
+```
+
+## Business rules
+
+1. Gender: `SEXID` 33 -> `F`, 34 -> `M`, otherwise `U` (which the gender rule maps to `NULL`).
+2. Ethnicity = `55` when `RACEETHNICITYID = '55'`, else `NULL`; race = `RACEETHNICITYID` translated with
+   `V_LOOKUP_CODE_VALUE` (`RACE`).
+3. `PartyPattern` spec TTF: race by code, no language or suffix rule, every exception for every row.
+4. Period start of the party = run time; party role period start = submit date; birth date = validated.
+
+## PKEY formulation
+
+| Target | PKEY_SRC_OBJECT | Example |
+|---|---|---|
+| `C_S_TTF_PTY` | `TRIM(PTY_SRC_KEY)` | `0000000031` |
+| `C_S_TTF_PTY_RLE` | `<party key>|Member` | `0000000031|Member` |
+
+Unit test: `TtfPkeyTest#m_Tgt_C_S_TTF_Pty_pkey_test`.
+
+## Retired / not ported
+
+* Version / duplicate rank in `exp_Party_Consolidation` - MDM timeline.
+
+## Java implementation
+
+* `TtfParty.gender`, `ethnicity`, `transform`; entities `TtfTargets.Party`, `TtfTargets.PartyRole`.

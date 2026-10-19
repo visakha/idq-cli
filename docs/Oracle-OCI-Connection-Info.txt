@@ -1,0 +1,8 @@
+Oracle-OCI-Connection-Info
+
+OCI_ORACLE_USER='ADMIN'
+OCI_ORACLE_PASSWORD='OraDBAllG00d_'
+OCI_ORACLE_DSN='oci4idq_low'
+OCI_ORACLE_WALLET_DIR='C:/Users/vamsi/wrk-py/hhs-idq/trs/wallet'
+OCI_ORACLE_CLIENT_DIR='C:/Users/vamsi/wrk-py/hhs-idq/trs/.tools/instantclient_23_26'
+OCI_ORACLE_WALLET_PASSWORD='oraTime_n0w'
