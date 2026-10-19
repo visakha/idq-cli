@@ -73,6 +73,40 @@ class AdhocRunReporterTest {
     }
 
     @Test
+    void mockDataOfTheRunIsWrittenAsSqlNextToTheReport() throws Exception {
+        var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200));
+        var info = EciRelationship.INFO;
+        reporter.on(new MockDataGenerated(MockDataGenerated.REFERENCE_DATA, "Test_001",
+                List.of("INSERT INTO LOOKUP_CODE_VALUE (CODE_TYPE) VALUES ('REL_TP');")));
+        reporter.on(new MockDataGenerated(info.name(), "Test_001", List.of(
+                "DELETE FROM STG_ECI_D_FAMILY WHERE ID_FAMILY BETWEEN 9100000000 AND 9100999999;",
+                "INSERT INTO STG_ECI_D_FAMILY (ID_FAMILY, FIRST_NAME) VALUES (9100000001, 'Test_001-Mia');")));
+
+        for (var second : List.of(false, true)) {
+            var started = run.started().plusMinutes(second ? 1 : 0);
+            var thisRun = new RunId(SourceSystem.ECI, EtlProcess.JAVA, started);
+            reporter.on(new EtlEvent.RunStarted(thisRun));
+            reporter.on(new EtlEvent.MappingFinished(thisRun, info, new MappingResult(info.name(),
+                    MappingResult.Status.SUCCEEDED, 0, Map.of(), 0, Duration.ZERO, null)));
+            reporter.on(new EtlEvent.RunCompleted(thisRun, List.of()));
+        }
+
+        var reports = dir.resolve("adhoc_runs_ECI");
+        var sql = reports.resolve("C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_9_54_AM.sql");
+        assertThat(Files.readString(sql))
+                .contains("-- mock-data-pre-fix: Test_001", "-- reference data (ReferenceMockData.seed)",
+                        "INSERT INTO LOOKUP_CODE_VALUE (CODE_TYPE) VALUES ('REL_TP');",
+                        "-- fill_sample_mock_data_m_Tgt_C_S_ECI_Pty_Rle_Rel",
+                        "VALUES (9100000001, 'Test_001-Mia');")
+                .endsWith("COMMIT;\n");
+        assertThat(Files.readString(reports.resolve("C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_9_54_AM.md")))
+                .contains("| mock data SQL | `C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_9_54_AM.sql` |");
+        assertThat(reports.resolve("C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_9_55_AM.sql")).doesNotExist();
+        assertThat(Files.readString(reports.resolve("C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_9_55_AM.md")))
+                .contains("| mock data SQL | none (no mock data generated for these mappings) |");
+    }
+
+    @Test
     void sameMinuteRunsDoNotOverwriteEachOther() throws Exception {
         var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200));
         var first = reporter.file(run, "C_S_ECI_PTY");

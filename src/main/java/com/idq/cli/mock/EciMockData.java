@@ -1,6 +1,7 @@
 package com.idq.cli.mock;
 
 import static com.idq.cli.mock.MockTables.row;
+import static com.idq.cli.mock.MockTables.text;
 
 import com.idq.cli.config.EtlSettings;
 import java.time.LocalDateTime;
@@ -42,17 +43,17 @@ public class EciMockData {
             int i = (int) (id - ID);
             var gender = faker.options().option("M", "F");
             tables.insert("STG_ECI_D_CHILD", row("ID_CHILD", id, "CHILD_SSN", i % 4 == 0 ? "000123456"
-                    : "%09d".formatted(123_450_000 + i), "FIRST_NAME", i == 2 ? null : faker.name().firstName(),
-                    "LAST_NAME", faker.name().lastName(), "MIDDLE_INITIAL", "A", "DOB", past(3), "GENDER", gender,
+                    : "%09d".formatted(123_450_000 + i), "FIRST_NAME", i == 2 ? null : text(faker.name().firstName()),
+                    "LAST_NAME", text(faker.name().lastName()), "MIDDLE_INITIAL", "A", "DOB", past(3), "GENDER", gender,
                     "BIRTH_WT_LB", 7, "BIRTH_WT_OZ", 4, "LANGUAGE_CD", i % 5 == 0 ? "99" : "1", "ETHNICITY", 1,
                     "RACE_WHITE", 1, "RACE_AA", i % 3 == 0 ? 1 : 0, "RACE_ASIAN", 0, "RACE_PI", 0, "RACE_AN", 0,
                     "DATE_CREATED", past(2), "DATE_MODIFIED", past(1), "CREATED_BY", "mock", "MODIFIED_BY", "mock",
                     "LOAD_DATE", LocalDateTime.now()));
             tables.insert("STG_ECI_SN_CHILD", row("ID_CHILD", id, "GENDER", gender));
             tables.insert("STG_ECI_D_FAMILY", row("ID_FAMILY", id, "ID_CHILD", id, "FAMILY_CD", 1, "GENDER", "F",
-                    "FIRST_NAME", faker.name().firstName(), "LAST_NAME", faker.name().lastName(), "MIDDLE_INITIAL",
-                    null, "DOB", past(40), "DATE_CREATED", past(2), "DATE_MODIFIED", null, "LOAD_DATE",
-                    LocalDateTime.now()));
+                    "FIRST_NAME", text(faker.name().firstName()), "LAST_NAME", text(faker.name().lastName()),
+                    "MIDDLE_INITIAL", null, "DOB", past(40), "DATE_CREATED", past(2), "DATE_MODIFIED", null,
+                    "LOAD_DATE", LocalDateTime.now()));
         }
     }
 
@@ -69,10 +70,10 @@ public class EciMockData {
         for (var id : ids()) {
             int i = (int) (id - ID);
             tables.insert("V_ECI_ETL_SRC_FAMILY_ADDRESS", row("SOURCE_TABLE", i % 2 == 0 ? "ECI_FAMILY" : "ECI_CHILD",
-                    "ID", id, "ID_FAMILY_ADDRESS", 500 + i, "ADDRESS1", faker.address().streetAddress(), "ADDRESS2",
-                    i % 3 == 0 ? "Suite 4" : null, "ADDRESS_CD", i % 6 == 0 ? 9 : 1, "CITY_NAME", "Austin",
-                    "COUNTY_NAME", "Travis", "STATE_ABBREV", "TX", "ZIP_CODE", "78701", "ZIP_SFX", "1234",
-                    "LAST_UPDATE_DATE", past(1)));
+                    "ID", id, "ID_FAMILY_ADDRESS", 500 + i, "ADDRESS1", text(faker.address().streetAddress()),
+                    "ADDRESS2", text(i % 3 == 0 ? "Suite 4" : null), "ADDRESS_CD", i % 6 == 0 ? 9 : 1,
+                    "CITY_NAME", text("Austin"), "COUNTY_NAME", text("Travis"), "STATE_ABBREV", "TX",
+                    "ZIP_CODE", "78701", "ZIP_SFX", "1234", "LAST_UPDATE_DATE", past(1)));
         }
     }
 
@@ -102,7 +103,7 @@ public class EciMockData {
             tables.insert("V_ECI_ETL_SRC_FAMILY_PHONE", phone);
             var email = new java.util.HashMap<>(common);
             email.putAll(row("ID_FAMILY_PHONE", "E" + i, "PHONE_EMAIL_TYPE", "EADDRESS", "PHONE_EMAIL",
-                    i % 5 == 0 ? "broken@" : faker.internet().emailAddress()));
+                    text(i % 5 == 0 ? "broken@" : faker.internet().emailAddress())));
             tables.insert("V_ECI_ETL_SRC_FAMILY_PHONE", email);
         }
     }

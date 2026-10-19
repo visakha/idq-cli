@@ -9,6 +9,7 @@ A Spring Boot 4 / Java 27 replacement for the Informatica IDQ stage-load workflo
 (`docs/wf_*.xml`: TRS, ECI, FSS, TTF, WIC; 33 mappings). Spring Data JDBC only, with a spring-shell CLI and a REST API
 that mirrors it.
 
+* User guide (CLI and REST, by task): [user-guide-cli.md](user-guide-cli.md).
 * Mapping documentation: [docs/mappings/README.md](docs/mappings/README.md), one `NNN_<mapping>.md` per mapping.
 * Code layout: `domain` (interfaces per sub-domain), `source/<sys>` (one class per mapping, named queries in
   `<Sys>Queries`, targets in `<Sys>Targets`), `core` (mapplets, rules, target structure, Informatica functions),
@@ -34,11 +35,11 @@ mvn test -Dtest=OracleWorkflowIT -Dmappings=m_Tgt_C_S_TTF_Pty,m_Tgt_C_S_TTF_Pty_
 
 ```bat
 mvn -q spring-boot:run
-java -jar target\idq-cli-*.jar -Detl_process=JAVA
+java -Detl_process=JAVA -jar target\cli-0.0.1-SNAPSHOT.jar
 ```
 
-Properties go on the command line as `-D...` (not `--prop=...`, which spring-shell reads as a command). The prompt
-shows the latched context, e.g. `TRS+C_S_TRS_PTY+m_Tgt_C_S_TRS_Pty_OnGoing>`.
+Properties go on the command line as `-D...` before `-jar` (not `--prop=...`, which spring-shell reads as a
+command). The prompt shows the latched context, e.g. `TRS+C_S_TRS_PTY+m_Tgt_C_S_TRS_Pty_OnGoing>`.
 
 | Command | Purpose |
 |---|---|
@@ -67,7 +68,8 @@ Every table has a Spring Data JDBC `@Table` record (no JPA):
 `MappingInfo.sourceEntities` lists the source entities of each mapping. During a run `EtlAudit` publishes Spring
 events (`EtlEvent`): source tables before each mapping, the `IdqMapInitQuery` rows, and the target rows read back by
 `PKEY_SRC_OBJECT` (with `etl_process=IDQ`: the target tables after the workflow). `AdhocRunReporter` listens and
-writes one Markdown file per target table, e.g. `adhoc_runs_ECI/C_S_ECI_PTY_RLE_$Java$_19_10_2026_9_54_AM.md`.
+writes one Markdown file per target table, e.g. `adhoc_runs_ECI/C_S_ECI_PTY_RLE_$Java$_19_10_2026_9_54_AM.md`,
+plus a `.sql` with the same name holding the statements that generated the run's mock data.
 Quote the name in a shell because of the `$` signs.
 
 ## REST API
@@ -83,6 +85,7 @@ Port `8085`, base path `/api/etl`; every CLI command has an endpoint (table in `
 | `mock_infacmd` | `true` | With `IDQ`, log the infacmd call instead of running `idq.infacmd.script` |
 | `mock_data` | `true` | `run-etl` fills every mapping's source tables with mock rows before the run |
 | `idq.mock.rows-per-table` | `20` | Mock rows per source table |
+| `mock-data-pre-fix` | (empty) | Prefix for free-text mock values: `Test_001` gives `Test_001-JaneDoe@gmail.com` |
 | `idq.bootstrap-missing-objects` | `true` | Create (never drop) tables of `db/missing-objects.sql` that do not exist |
 | `idq.clearable-tables-file` | `classpath:db/clearable-tables.txt` | Whitelist of tables a mapping may empty |
 | `idq.report.enabled` | `true` | Write the `adhoc_runs_<SOURCE>` audit reports |

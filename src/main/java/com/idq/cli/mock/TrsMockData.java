@@ -1,6 +1,7 @@
 package com.idq.cli.mock;
 
 import static com.idq.cli.mock.MockTables.row;
+import static com.idq.cli.mock.MockTables.text;
 
 import com.idq.cli.config.EtlSettings;
 import java.time.LocalDateTime;
@@ -59,9 +60,9 @@ public class TrsMockData {
     private void individuals(String table, boolean daily) {
         for (var id : individuals()) {
             int i = (int) (id - INDV);
-            tables.insert(table, row("INDV_ID", id, "HISTORY_SEQ", 1, "FIRST_NAME", i == 3 ? null : faker.name()
-                    .firstName(), "MID_NAME", faker.name().firstName().substring(0, 1), "LAST_NAME",
-                    faker.name().lastName(), "SUFX_NAME", i % 5 == 0 ? "JR" : null, "PREFIX_NAME", "MR",
+            tables.insert(table, row("INDV_ID", id, "HISTORY_SEQ", 1, "FIRST_NAME", i == 3 ? null : text(faker.name()
+                    .firstName()), "MID_NAME", text(faker.name().firstName().substring(0, 1)), "LAST_NAME",
+                    text(faker.name().lastName()), "SUFX_NAME", i % 5 == 0 ? "JR" : null, "PREFIX_NAME", "MR",
                     "GENDER_CD", i % 7 == 0 ? "X" : faker.options().option("M", "F"), "RACE_CD",
                     i % 6 == 0 ? "Z" : "W", "ETHNICITY_CD", "H", "SSA_VALIDATION_SW", "Y", "FILE_CLEARANCE_SW", "Y",
                     "INACTIVE_IND", "N", "DELETE_SW", "N", "DOB_DT", i == 4 ? LocalDateTime.now().plusYears(1)
@@ -99,8 +100,8 @@ public class TrsMockData {
         validMembers();
         for (var id : individuals()) {
             for (int seq = 1; seq <= 2; seq++) {
-                var alias = row("INDV_ID", id, "FIRST_NAME", faker.name().firstName() + (seq == 2 ? "0n" : ""),
-                        "MID_NAME", null, "LAST_NAME", faker.name().lastName(), "CREATE_DT", pastDate(2),
+                var alias = row("INDV_ID", id, "FIRST_NAME", text(faker.name().firstName() + (seq == 2 ? "0n" : "")),
+                        "MID_NAME", null, "LAST_NAME", text(faker.name().lastName()), "CREATE_DT", pastDate(2),
                         "SEQUENCE_NUM", seq, "SEQ_NUM", seq);
                 tables.insert(id % 2 == 0 ? "STG_TRS_D_DC_ALIAS" : "STG_TRS_D_CV_DC_MCI_ALIAS", alias);
             }
@@ -139,7 +140,7 @@ public class TrsMockData {
                     i % 7 == 0 ? "512-555-12" : "512555%04d".formatted(1000 + i),
                     "WORK_PH_NUM", i % 3 == 0 ? "2145551234" : null,
                     "WORK_PH_NUM_EXT", i % 3 == 0 ? 12 : null, "OTHER_PH_NUM", i % 4 == 0 ? "8005550000" : null,
-                    "EMAIL", i % 5 == 0 ? "not an email" : faker.internet().emailAddress()));
+                    "EMAIL", text(i % 5 == 0 ? "not an email" : faker.internet().emailAddress())));
             tables.insert("STG_TRS_DC_CASE_INDV", row("CASE_NUM", caseNum, "INDV_ID", id));
         }
     }
@@ -203,18 +204,18 @@ public class TrsMockData {
             var begin = pastDate(3);
             tables.insert("STG_TRS_D_INDV_ADDR", row("INDV_ID", id, "CASE_NUM", CASE + i, "EDG_NUM", EDG + i,
                     "ADDR_TYPE_CD", i % 2 == 0 ? "MA" : "PH", "ADDR_ST_NUM", String.valueOf(100 + i),
-                    "ADDR_ST_NM", "MOCK " + faker.address().streetName().toUpperCase(), "ADDR_ST_TYPE_CD", "ST",
+                    "ADDR_ST_NM", text("MOCK " + faker.address().streetName().toUpperCase()), "ADDR_ST_TYPE_CD", "ST",
                     "ADDR_ST_DIR_CD", "NO", "ADDR_APT_NUM", i % 3 == 0 ? String.valueOf(i) : null,
-                    "ADDR_DWELLING_TYPE_CD", i % 3 == 0 ? "APT" : null, "ADDR_CITY", "AUSTIN", "ADDR_STATE_CD", "TX",
-                    "ADDR_ZIP5", "787" + "%02d".formatted(i % 100), "ADDR_ZIP4", "1234", "EFF_BEGIN_DT", begin,
-                    "EFF_END_DT", null, "CREATE_DT", pastDate(1), "UPDATE_DT", null));
+                    "ADDR_DWELLING_TYPE_CD", i % 3 == 0 ? "APT" : null, "ADDR_CITY", text("AUSTIN"),
+                    "ADDR_STATE_CD", "TX", "ADDR_ZIP5", "787" + "%02d".formatted(i % 100), "ADDR_ZIP4", "1234",
+                    "EFF_BEGIN_DT", begin, "EFF_END_DT", null, "CREATE_DT", pastDate(1), "UPDATE_DT", null));
         }
     }
 
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Addr_2() {
         fill_sample_mock_data_m_Tgt_C_S_TRS_Addr_1();
         validMembers();
-        tables.execute("DELETE FROM STG_TRS_D_UNQ_ADDR WHERE ADDR_ID LIKE '%|MOCK %'", java.util.Map.of());
+        tables.execute("DELETE FROM STG_TRS_D_UNQ_ADDR WHERE ADDR_ID LIKE '%MOCK %'", java.util.Map.of());
         tables.execute("""
                 INSERT INTO STG_TRS_D_UNQ_ADDR (ADDR_ID, ADDR_LN_1, ADDR_LN_2, CITY, STATE, CNTRY_CD, PSTL_CD,
                     PSTL_CD_EXT, SRC_ADDR_LN_1, SRC_CITY, SRC_STATE, SRC_CNTRY, SRC_PSTL_CD, SRC_PSTL_CD_EXT)

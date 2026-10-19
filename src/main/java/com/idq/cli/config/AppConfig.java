@@ -21,6 +21,7 @@ public class AppConfig {
                 env.getProperty("mock_infacmd", Boolean.class, true),
                 env.getProperty("mock_data", Boolean.class, true),
                 env.getProperty("idq.mock.rows-per-table", Integer.class, 20),
+                env.getProperty("mock-data-pre-fix", "").strip(),
                 env.getProperty("idq.bootstrap-missing-objects", Boolean.class, true),
                 clearableTables(resources, env.getProperty("idq.clearable-tables-file",
                         "classpath:db/clearable-tables.txt")),
