@@ -1,6 +1,7 @@
 package com.idq.cli.mock;
 
 import static com.idq.cli.mock.MockTables.row;
+import static com.idq.cli.mock.MockTables.text;
 
 import com.idq.cli.config.EtlSettings;
 import java.time.LocalDateTime;
@@ -45,14 +46,15 @@ public class ViewMockData {
             long id = ID + i;
             tables.insert("V_FSS_ETL_SRC", row("SOURCE_TYPE", i % 3 == 0 ? "REGIST" : "CLIENT", "DT_CREATED",
                     past(3), "DT_LAST_UPDATE", past(1), "STG_UPDATE_DATE", LocalDateTime.now(), "ID_CLIENT", id,
-                    "PTY_SRC_KEY", key(id), "NM_FIRST", i == 2 ? null : faker.name().firstName(), "NM_LAST",
-                    faker.name().lastName(), "NM_MIDDLE", null, "CD_SUFFIX", i % 4 == 0 ? "XX" : "JR", "DT_DOB",
+                    "PTY_SRC_KEY", key(id), "NM_FIRST", i == 2 ? null : text(faker.name().firstName()), "NM_LAST",
+                    text(faker.name().lastName()), "NM_MIDDLE", null, "CD_SUFFIX", i % 4 == 0 ? "XX" : "JR", "DT_DOB",
                     past(30), "CD_GENDER", faker.options().option("M", "F"), "LANGUAGE_CD", "ENG", "CD_HISPANIC",
                     "H", "RACE_WHITE", 1, "RACE_AA", 0, "RACE_ASIAN", 0, "RACE_PI", 0, "RACE_AN", 0, "ADDR_LINE1",
-                    faker.address().streetAddress(), "ADDR_CITY", "Austin", "ADDR_STATE", "TX", "ADDR_ZIP", "78701",
-                    "CD_CNTY", "227", "NBR_PHONE", "512555%04d".formatted(i), "NBR_PHONE_EXT", i % 5 == 0 ? "1" : null,
-                    "ADDR_EMAIL", faker.internet().emailAddress(), "DTL__CAPXACTION", "I", "CLIENT_DTL__CAPXACTION",
-                    "I", "ID_REGISTRATION_CLIENT", 600 + i, "ID_REGISTRATION", 700 + i,
+                    text(faker.address().streetAddress()), "ADDR_CITY", text("Austin"), "ADDR_STATE", "TX",
+                    "ADDR_ZIP", "78701", "CD_CNTY", "227", "NBR_PHONE", "512555%04d".formatted(i),
+                    "NBR_PHONE_EXT", i % 5 == 0 ? "1" : null,
+                    "ADDR_EMAIL", text(faker.internet().emailAddress()), "DTL__CAPXACTION", "I",
+                    "CLIENT_DTL__CAPXACTION", "I", "ID_REGISTRATION_CLIENT", 600 + i, "ID_REGISTRATION", 700 + i,
                     "LAST_ACTIVE_CLIENT_REGISTRATION_YN", "Y", "LAST_INACTV_CLIENT_YN", "N"));
             if (i % 2 == 0) {
                 for (var direction : new String[] {"To Child", "From Child"}) {
@@ -70,8 +72,9 @@ public class ViewMockData {
         rows().forEach(i -> {
             long id = ID + i;
             tables.insert("V_TTF_ETL_SRC", row("CLIENTS_ID", id, "PTY_SRC_KEY", key(id), "FIRSTNAME",
-                    i == 2 ? "DECLINED" : faker.name().firstName(), "LASTNAME", faker.name().lastName(), "MIDDLENAME",
-                    null, "DOB", past(30), "SEXID", i % 2 == 0 ? 33 : 34, "RACEETHNICITYID", i % 3 == 0 ? "55" : "W",
+                    i == 2 ? "DECLINED" : text(faker.name().firstName()), "LASTNAME", text(faker.name().lastName()),
+                    "MIDDLENAME", null, "DOB", past(30), "SEXID", i % 2 == 0 ? 33 : 34,
+                    "RACEETHNICITYID", i % 3 == 0 ? "55" : "W",
                     "PHONE", i % 4 == 0 ? "123" : "214555%04d".formatted(i), "SUBMITDATE", past(1), "CREATEDDATE",
                     past(2), "LOAD_DATE", LocalDateTime.now(), "CLIENT_EXISTS_FLAG", "Y"));
         });
@@ -83,13 +86,13 @@ public class ViewMockData {
             long id = ID + i;
             tables.insert("V_WIC_ETL_SRC", row("SOURCE_TABLE", i % 2 == 0 ? "FAMILY" : "CLIENT", "DATEKEY", past(1),
                     "LOAD_DATE", LocalDateTime.now(), "ID", String.valueOf(id), "PTY_SRC_KEY", key(id), "FID",
-                    String.valueOf(400 + i), "FIRST_NAME", faker.name().firstName(), "LAST_NAME",
-                    i == 3 ? null : faker.name().lastName(), "MIDDLE_NAME", null, "DOB", past(5), "GENDER",
+                    String.valueOf(400 + i), "FIRST_NAME", text(faker.name().firstName()), "LAST_NAME",
+                    i == 3 ? null : text(faker.name().lastName()), "MIDDLE_NAME", null, "DOB", past(5), "GENDER",
                     faker.options().option("M", "F", "U"), "BIRTH_WT_LB", 6, "BIRTH_WT_OZ", 11, "LANGUAGE_CD", "ENG",
                     "ETHNICITY", "H", "RACE_WHITE_IND", 1, "RACE_AA_IND", 0, "RACE_ASIAN_IND", 0, "RACE_PI_IND", 0,
-                    "RACE_AN_IND", 0, "ADDRESS1", faker.address().streetAddress(), "CITY", "Houston", "ZIP_CODE",
-                    "77002", "COUNTY", "Harris", "PHONE", "713555%04d".formatted(i), "EMAIL",
-                    faker.internet().emailAddress(), "DATE_ADDRESS_VALID_FROM", past(2)));
+                    "RACE_AN_IND", 0, "ADDRESS1", text(faker.address().streetAddress()), "CITY", text("Houston"),
+                    "ZIP_CODE", "77002", "COUNTY", text("Harris"), "PHONE", "713555%04d".formatted(i), "EMAIL",
+                    text(faker.internet().emailAddress()), "DATE_ADDRESS_VALID_FROM", past(2)));
         });
     }
 

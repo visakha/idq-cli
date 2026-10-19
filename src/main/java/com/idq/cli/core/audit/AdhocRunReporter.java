@@ -17,9 +17,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -29,7 +31,8 @@ import org.springframework.stereotype.Component;
 /// `adhoc_runs_<SOURCE>/<TABLE>_$<Java|IDQ>$_<dd_MM_yyyy_h_mm_AM>.md`.
 ///
 /// A report shows, for every mapping that loads the table: the run outcome, the source tables, the rows of the
-/// `IdqMapInitQuery`, the target rows and the data-quality exceptions.
+/// `IdqMapInitQuery`, the target rows and the data-quality exceptions. When the run's mappings had mock data generated
+/// (see [MockDataGenerated]), a `.sql` file with the same name holds the statements to replay that mock data.
 @Component
 public class AdhocRunReporter {
 
@@ -40,6 +43,7 @@ public class AdhocRunReporter {
 
     private final ReportSettings settings;
     private final Map<RunId, Map<String, MappingLog>> runs = new ConcurrentHashMap<>();
+    private final Map<String, MockDataGenerated> mockData = new ConcurrentHashMap<>();
 
     public AdhocRunReporter(ReportSettings settings) {
         this.settings = settings;
@@ -58,7 +62,23 @@ public class AdhocRunReporter {
         }
     }
 
-    public record Report(Path file, String markdown) {}
+    /// @param sql the mock-data script, `null` when none of the mappings had mock data generated
+    public record Report(Path file, String markdown, String sql) {
+
+        public Path sqlFile() {
+            return AdhocRunReporter.sqlFile(file);
+        }
+    }
+
+    static Path sqlFile(Path report) {
+        return report.resolveSibling(report.getFileName().toString().replaceFirst("\\.md$", ".sql"));
+    }
+
+    /// Keeps the latest mock data per mapping until a run of that mapping reports it.
+    @EventListener
+    public void on(MockDataGenerated event) {
+        mockData.put(event.group(), event);
+    }
 
     @EventListener
     public void on(EtlEvent event) {
@@ -72,6 +92,10 @@ public class AdhocRunReporter {
                 var mappings = runs.remove(e.run());
                 if (mappings != null) {
                     reports(e.run(), List.copyOf(mappings.values())).forEach(AdhocRunReporter::write);
+                    if (mappings.keySet().stream().anyMatch(mockData::containsKey)) {
+                        mockData.keySet().removeAll(mappings.keySet());
+                        mockData.remove(MockDataGenerated.REFERENCE_DATA);
+                    }
                 }
             }
         }
@@ -87,9 +111,34 @@ public class AdhocRunReporter {
         var byTable = new LinkedHashMap<String, List<MappingLog>>();
         mappings.forEach(m -> m.info.targets().forEach(t -> byTable.computeIfAbsent(t, _ -> new ArrayList<>())
                 .add(m)));
-        return byTable.entrySet().stream()
-                .map(e -> new Report(file(run, e.getKey()), markdown(run, e.getKey(), e.getValue())))
-                .toList();
+        return byTable.entrySet().stream().map(e -> {
+            var file = file(run, e.getKey());
+            var sql = sql(run, e.getKey(), e.getValue());
+            var sqlName = sql == null ? null : sqlFile(file).getFileName().toString();
+            return new Report(file, markdown(run, e.getKey(), e.getValue(), sqlName), sql);
+        }).toList();
+    }
+
+    /// Reference seed first, then each mapping's mock fill in workflow order; `null` without mock data.
+    String sql(RunId run, String table, List<MappingLog> mappings) {
+        var fills = mappings.stream().map(m -> mockData.get(m.info.name())).filter(Objects::nonNull).toList();
+        if (fills.isEmpty()) {
+            return null;
+        }
+        var prefix = fills.getFirst().prefix();
+        var sql = new StringBuilder()
+                .append("-- Mock source data behind the ").append(table).append(" report of the ")
+                .append(run.source()).append(" ").append(engineLabel(run.engine())).append(" run started ")
+                .append(run.started().format(RUN_TIME)).append("\n")
+                .append("-- mock-data-pre-fix: ").append(prefix.isEmpty() ? "(none)" : prefix).append("\n")
+                .append("-- Replays the mock fills: earlier mock rows are deleted, then these rows inserted.\n")
+                .append("-- Run it in the OCI schema, then run-etl with mock_data=false to process exactly these")
+                .append(" rows.\n");
+        Stream.concat(Stream.ofNullable(mockData.get(MockDataGenerated.REFERENCE_DATA)), fills.stream())
+                .forEach(fill -> sql.append("\n-- ").append(MockDataGenerated.REFERENCE_DATA.equals(fill.group())
+                                ? "reference data (ReferenceMockData.seed)" : "fill_sample_mock_data_" + fill.group())
+                        .append("\n").append(String.join("\n", fill.statements())).append("\n"));
+        return sql.append("\nCOMMIT;\n").toString();
     }
 
     Path file(RunId run, String table) {
@@ -107,7 +156,7 @@ public class AdhocRunReporter {
         };
     }
 
-    String markdown(RunId run, String table, List<MappingLog> mappings) {
+    String markdown(RunId run, String table, List<MappingLog> mappings, String sqlFile) {
         var md = new StringBuilder();
         md.append("# ").append(table).append(" - ").append(run.source()).append(" adhoc run (")
                 .append(engineLabel(run.engine())).append(")\n\n")
@@ -116,7 +165,9 @@ public class AdhocRunReporter {
                 .append(") |\n")
                 .append("| etl_process | ").append(run.engine()).append(" |\n")
                 .append("| run started | ").append(run.started().format(RUN_TIME)).append(" |\n")
-                .append("| rows shown per table | up to ").append(settings.maxRows()).append(" |\n\n")
+                .append("| rows shown per table | up to ").append(settings.maxRows()).append(" |\n")
+                .append("| mock data SQL | ").append(sqlFile == null
+                        ? "none (no mock data generated for these mappings)" : "`" + sqlFile + "`").append(" |\n\n")
                 .append("## Mappings that load ").append(table).append("\n\n")
                 .append("| seq | mapping | status | rows read | rows written | exceptions | ms | message |\n")
                 .append("| --- | --- | --- | --- | --- | --- | --- | --- |\n");
@@ -175,6 +226,9 @@ public class AdhocRunReporter {
         try {
             Files.createDirectories(report.file().getParent());
             Files.writeString(report.file(), report.markdown(), StandardCharsets.US_ASCII);
+            if (report.sql() != null) {
+                Files.writeString(report.sqlFile(), report.sql(), StandardCharsets.UTF_8);
+            }
             log.info("Audit report {}", report.file());
         } catch (IOException e) {
             throw new UncheckedIOException("Cannot write audit report " + report.file(), e);

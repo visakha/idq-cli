@@ -189,4 +189,13 @@ all the commands and actions available in the CLI can also be accessed via the R
   Tell me your plan on how to fix this gap, get my confirmation and then proceed, create a local branch first
   
  
+ # Mock data prefix and insert SQLs in the AdHoc run
+ when you create the report for the AdHoc runs,  also
+  enhance it so that there is a corresponding sql file with insert statements for the mock data.  also include a
+  property called mock-data-pre-fix where each 'String' data typed mock data is pre-fixed (except for the
+  lookups and reference data like Country codes, Alt Id types etc) , example for LDG_TRS_DC_CASES.EMAIL =
+  'TEST_001-JaneDoe@gmail.com'
+ 
+create another branch, called user-guide-CLI-01 and in that, create a comprehensive user guide on how to use
+  both the CLI Commands by Task and call the file user-guide-cli.md  , also  
 
