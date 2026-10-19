@@ -2,23 +2,33 @@ package com.idq.cli.mock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.idq.cli.config.EtlProcess;
+import com.idq.cli.config.EtlSettings;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 /// `mock-data-pre-fix` handling and the SQL recorded for the audit reports.
 class MockTablesTest {
 
+    static MockTables tables(String prefix) {
+        return new MockTables(null, null, new EtlSettings(EtlProcess.JAVA, true, true, 20, prefix, true, Set.of(),
+                null));
+    }
+
     @Test
     void freeTextGetsThePrefix() {
-        assertThat(MockTables.prefixed("Test_001", "JaneDoe@gmail.com", 125)).isEqualTo("Test_001-JaneDoe@gmail.com");
-        assertThat(MockTables.prefixed("", "JaneDoe@gmail.com", 125)).isEqualTo("JaneDoe@gmail.com");
+        assertThat(tables("Test_001").text("JaneDoe@gmail.com")).isEqualTo("Test_001-JaneDoe@gmail.com");
+        assertThat(tables("").text("JaneDoe@gmail.com")).isEqualTo("JaneDoe@gmail.com");
+        assertThat(tables("Test_001").text(null)).isNull();
     }
 
     @Test
     void prefixedTextIsCutToTheColumnLengthKeepingThePrefix() {
-        assertThat(MockTables.prefixed("Test_001", "Christopher", 15)).isEqualTo("Test_001-Christ");
+        assertThat(MockTables.fit("Test_001-Christopher", 15)).isEqualTo("Test_001-Christ");
+        assertThat(MockTables.fit("Test_001-Mia", 15)).isEqualTo("Test_001-Mia");
     }
 
     @Test

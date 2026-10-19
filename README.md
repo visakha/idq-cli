@@ -29,7 +29,11 @@ The end-to-end run against OCI Oracle is `OracleWorkflowIT` (mock data, all 33 m
 ```bat
 mvn test -Dtest=OracleWorkflowIT
 mvn test -Dtest=OracleWorkflowIT -Dmappings=m_Tgt_C_S_TTF_Pty,m_Tgt_C_S_TTF_Pty_Rle_Phn
+mvn test -Dtest=SourceEntitiesIT
 ```
+
+`SourceEntitiesIT` inserts, counts and reads back one row of every source, MDM and reference entity record (rolled
+back afterwards).
 
 ## CLI
 
@@ -64,6 +68,21 @@ Every table has a Spring Data JDBC `@Table` record (no JPA):
 | Source tables / views | `<Src>Sources` | `EciSources.DFamily` (`STG_ECI_D_FAMILY`) |
 | Target `C_S_*` tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
 | MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
+| Lookup / reference tables | `ReferenceTables` | `ReferenceTables.CodeValue` (`LOOKUP_CODE_VALUE`) |
+
+The source, MDM and reference tables have no primary key. Spring Data JDBC needs an `@Id` to insert, so each of
+those records carries a provisional `@Id` on its most natural key column, marked `/// Provisional @Id` (find them with
+`grep -rn "Provisional" src/main/java`). Tables with `BAK` or a date stamp in their name are never modelled.
+
+Mock data is written as these entity records through Spring Data JDBC. Wide records are built with the typed
+`EntityBuilder` (columns named by accessor, unset columns `NULL`):
+
+```java
+tables.insert(entity(DChild.class)
+        .with(DChild::idChild, id)
+        .with(DChild::firstName, tables.text(faker.name().firstName()))
+        .with(DChild::dob, past(3)));
+```
 
 `MappingInfo.sourceEntities` lists the source entities of each mapping. During a run `EtlAudit` publishes Spring
 events (`EtlEvent`): source tables before each mapping, the `IdqMapInitQuery` rows, and the target rows read back by
