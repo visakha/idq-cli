@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
 /// The actions behind every CLI command and REST endpoint. Prerequisites (latch order) are enforced here so both
@@ -162,8 +163,14 @@ public class EtlConsole {
         return sampleData.fillReal(requireMapping().info().name());
     }
 
+    /// With `mock_data=true` the source tables are first filled by every mapping's mock-data function, so a run
+    /// needs no manual inserts; with `mock_data=false` the workflow reads whatever the tables hold.
     public WorkflowRunner.WorkflowRun runEtl() {
-        return runner.run(requireSource());
+        var source = requireSource();
+        var mock = sampleData.fillMockAll(catalog.of(source).stream().map(m -> m.info().name()).toList());
+        var run = runner.run(source);
+        return new WorkflowRunner.WorkflowRun(run.source(), run.engine(), run.results(),
+                Stream.concat(Stream.of(mock), run.output().stream()).toList());
     }
 
     public MappingResult runLatchedMapping() {

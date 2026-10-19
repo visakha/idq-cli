@@ -32,7 +32,8 @@ public class FssParty extends SourceMapping<ClientDemographics, InactiveStatus.L
         implements MemberMapping.Demographics<ClientDemographics, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("020", "m_Tgt_C_S_FSS_Pty", SourceSystem.FSS,
-            List.of("C_S_FSS_PTY", "C_S_FSS_PTY_RLE"), List.of("V_FSS_ETL_SRC", "STG_FSS_PTY_INACTIVE_STS"));
+            List.of("C_S_FSS_PTY", "C_S_FSS_PTY_RLE"), List.of(FssSources.EtlSrc.class,
+            FssTargets.InactiveStatus.class));
 
     /// Gender, ethnicity and race exceptions only for `CLIENT` rows; language and suffix for all rows.
     static final PartyPattern.Spec SPEC = new PartyPattern.Spec("FSS", RaceSource.INDICATORS, true, true,

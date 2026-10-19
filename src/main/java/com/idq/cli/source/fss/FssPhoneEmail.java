@@ -34,8 +34,8 @@ public class FssPhoneEmail extends SourceMapping<ClientContact, InactiveStatus.L
         implements MemberMapping.PhoneEmail<ClientContact, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("023", "m_Tgt_C_S_FSS_Pty_Rle_Phn_And_EAddr",
-            SourceSystem.FSS, List.of("C_S_FSS_PTY_RLE_PHN", "C_S_FSS_PTY_RLE_EADDR"),
-            List.of("V_FSS_ETL_SRC", "STG_FSS_PTY_INACTIVE_STS"));
+            SourceSystem.FSS, List.of("C_S_FSS_PTY_RLE_PHN", "C_S_FSS_PTY_RLE_EADDR"), List.of(FssSources.EtlSrc.class,
+            FssTargets.InactiveStatus.class));
 
     public FssPhoneEmail(FssQueries queries) {
         super(INFO, queries::fetchClientContacts,

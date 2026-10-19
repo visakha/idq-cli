@@ -85,3 +85,6 @@ Note the SSN key ends with the child id, not the SSN. Unit test: `EciPkeyTest#m_
 
 * `EciAlternateId.transform` switches on the type (`IdentifierRules.ssn` / `medicaidId`); `partyKey`; entity
   `EciTargets.AlternateId`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.DChild`
+  (`STG_ECI_D_CHILD`), `EciSources.DFamily` (`STG_ECI_D_FAMILY`), `EciSources.DMedicaid` (`STG_ECI_D_MEDICAID`),
+  `EciSources.SnCase` (`STG_ECI_SN_CASE`), `EciTargets.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`).

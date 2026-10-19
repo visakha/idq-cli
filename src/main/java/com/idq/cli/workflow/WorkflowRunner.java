@@ -2,9 +2,11 @@ package com.idq.cli.workflow;
 
 import com.idq.cli.config.EtlProcess;
 import com.idq.cli.config.EtlSettings;
+import com.idq.cli.config.ReportSettings;
 import com.idq.cli.core.EtlContext;
 import com.idq.cli.core.MappingFlow;
 import com.idq.cli.core.MappingResult;
+import com.idq.cli.core.audit.EtlAudit;
 import com.idq.cli.core.reference.ReferenceLoader;
 import com.idq.cli.core.target.TargetWriter;
 import com.idq.cli.domain.MemberMapping;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -23,6 +26,9 @@ import org.springframework.stereotype.Component;
 ///
 /// In Java mode every mapping runs in workflow order. A failing mapping is reported and the workflow continues
 /// (the CLI only cares about the latched mapping; the others typically have empty sources).
+///
+/// Every run is recorded through [EtlAudit]: source tables, `IdqMapInitQuery` rows and target rows are published as
+/// events and written to the `adhoc_runs_<SOURCE>` Markdown reports.
 @Component
 public class WorkflowRunner {
 
@@ -33,48 +39,90 @@ public class WorkflowRunner {
     private final TargetWriter writer;
     private final IdqCommandRunner idq;
     private final EtlSettings settings;
+    private final EtlAudit audit;
+    private final ReportSettings reports;
 
     public WorkflowRunner(MappingCatalog catalog, ReferenceLoader referenceLoader, TargetWriter writer,
-            IdqCommandRunner idq, EtlSettings settings) {
+            IdqCommandRunner idq, EtlSettings settings, EtlAudit audit, ReportSettings reports) {
         this.catalog = catalog;
         this.referenceLoader = referenceLoader;
         this.writer = writer;
         this.idq = idq;
         this.settings = settings;
+        this.audit = audit;
+        this.reports = reports;
     }
 
     public record WorkflowRun(SourceSystem source, EtlProcess engine, List<MappingResult> results,
             List<String> output) {}
 
     public WorkflowRun run(SourceSystem source) {
-        if (settings.etlProcess() == EtlProcess.IDQ) {
-            var outcome = idq.startWorkflow(source);
-            return new WorkflowRun(source, EtlProcess.IDQ, List.of(), outcome.output());
-        }
-        var reference = referenceLoader.load();
-        var runStart = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        var results = catalog.of(source).stream()
-                .map(mapping -> runOne(mapping, new EtlContext(mapping.info(), runStart, reference)))
-                .toList();
-        return new WorkflowRun(source, EtlProcess.JAVA, results, results.stream().map(MappingResult::summary).toList());
+        var mappings = catalog.of(source);
+        return settings.etlProcess() == EtlProcess.IDQ ? runIdq(source, mappings) : runJava(source, mappings);
     }
 
     /// Runs a single mapping (Java engine only).
     public MappingResult runMapping(MemberMapping<?, ?> mapping) {
-        return runOne(mapping, new EtlContext(mapping.info(), LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-                referenceLoader.load()));
+        return runJava(mapping.info().source(), List.of(mapping)).results().getFirst();
     }
 
-    private MappingResult runOne(MemberMapping<?, ?> mapping, EtlContext ctx) {
+    private WorkflowRun runJava(SourceSystem source, List<MemberMapping<?, ?>> mappings) {
+        var reference = referenceLoader.load();
+        var runStart = now();
+        var trail = audit.start(source, EtlProcess.JAVA, runStart);
+        var results = mappings.stream()
+                .map(mapping -> runOne(mapping, new EtlContext(mapping.info(), runStart, reference), trail))
+                .toList();
+        var output = withReportLine(source, results.stream().map(MappingResult::summary));
+        trail.completed(output);
+        return new WorkflowRun(source, EtlProcess.JAVA, results, output);
+    }
+
+    /// Informatica does the work; the audit trail records the sources and `IdqMapInitQuery` rows before the
+    /// workflow and the target tables after it.
+    private WorkflowRun runIdq(SourceSystem source, List<MemberMapping<?, ?>> mappings) {
+        var trail = audit.start(source, EtlProcess.IDQ, now());
+        mappings.forEach(mapping -> {
+            trail.sources(mapping.info());
+            try {
+                trail.initQuery(mapping, mapping.fetchIdqMapInitQueryResults());
+            } catch (RuntimeException e) {
+                log.warn("{} IdqMapInitQuery failed: {}", mapping.info().name(), e.getMessage());
+            }
+        });
+        var outcome = idq.startWorkflow(source);
+        mappings.forEach(mapping -> trail.tablesAfterIdq(mapping.info()));
+        var output = withReportLine(source, outcome.output().stream());
+        trail.completed(output);
+        return new WorkflowRun(source, EtlProcess.IDQ, List.of(), output);
+    }
+
+    private MappingResult runOne(MemberMapping<?, ?> mapping, EtlContext ctx, EtlAudit.Run trail) {
         var started = Instant.now();
+        MappingResult result;
         try {
-            var result = MappingFlow.of(mapping).read().transform(ctx).writeWith(writer);
+            trail.sources(mapping.info());
+            var transformed = MappingFlow.of(mapping).read().peek(rows -> trail.initQuery(mapping, rows))
+                    .transform(ctx);
+            result = transformed.writeWith(writer);
+            trail.written(mapping.info(), transformed.output());
             log.info(result.summary());
-            return result;
         } catch (RuntimeException e) {
             log.warn("{} failed: {}", mapping.info().name(), e.getMessage());
-            return MappingResult.failed(mapping.info().name(), Duration.between(started, Instant.now()), e);
+            result = MappingResult.failed(mapping.info().name(), Duration.between(started, Instant.now()), e);
         }
+        trail.finished(mapping.info(), result);
+        return result;
+    }
+
+    private List<String> withReportLine(SourceSystem source, Stream<String> output) {
+        return Stream.concat(output, reports.enabled()
+                ? Stream.of("Audit reports: " + reports.dirFor(source).toAbsolutePath().normalize())
+                : Stream.empty()).toList();
+    }
+
+    private static LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
     public Map<String, Object> describe() {

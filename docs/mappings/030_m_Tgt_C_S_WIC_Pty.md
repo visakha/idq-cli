@@ -56,3 +56,5 @@ Unit test: `WicPkeyTest#m_Tgt_C_S_WIC_Pty_pkey_test`.
 ## Java implementation
 
 * `WicParty.birthWeightGrams`, `transform`; entities `WicTargets.Party`, `WicTargets.PartyRole`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
+  (`V_WIC_ETL_SRC`), `WicTargets.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).

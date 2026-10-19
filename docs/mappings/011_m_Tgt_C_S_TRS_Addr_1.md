@@ -66,3 +66,5 @@ FROM stg_trs_d_indv_addr a
 
 * `TrsUniqueAddress.direction`, `line1`, `line2`, `transform`; `AddressValidator` (default
   `PassThroughAddressValidator`); entity `TrsTargets.UniqueAddress`; load `replaceAll`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DIndvAddr`
+  (`STG_TRS_D_INDV_ADDR`), `TrsSources.CdRef` (`STG_TRS_CD_REF`).

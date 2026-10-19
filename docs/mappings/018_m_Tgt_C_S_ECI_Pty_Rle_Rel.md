@@ -69,3 +69,6 @@ Unit test: `EciPkeyTest#m_Tgt_C_S_ECI_Pty_Rle_Rel_pkey_test`.
 
 * `EciRelationship.childKey`, `familyKey`, `fromRole`, `toRole`, `relationCode`, `relationType`, `pkey`; entity
   `EciTargets.Relationship`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.DFamily`
+  (`STG_ECI_D_FAMILY`), `EciSources.SnChild` (`STG_ECI_SN_CHILD`), `EciTargets.InactiveStatus`
+  (`STG_ECI_PTY_INACTIVE_STS`).

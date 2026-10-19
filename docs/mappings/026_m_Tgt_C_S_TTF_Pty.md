@@ -60,3 +60,5 @@ Unit test: `TtfPkeyTest#m_Tgt_C_S_TTF_Pty_pkey_test`.
 ## Java implementation
 
 * `TtfParty.gender`, `ethnicity`, `transform`; entities `TtfTargets.Party`, `TtfTargets.PartyRole`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TtfSources.EtlSrc`
+  (`V_TTF_ETL_SRC`), `TtfTargets.InactiveStatus` (`STG_TTF_PTY_INACTIVE_STS`).

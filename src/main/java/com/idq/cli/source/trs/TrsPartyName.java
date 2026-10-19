@@ -25,8 +25,8 @@ public class TrsPartyName extends SourceMapping<MemberAlias, NoLookups>
         implements MemberMapping.AlternateName<MemberAlias, NoLookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("003", "m_Tgt_C_S_TRS_Pty_Nm", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_NM"), List.of("STG_TRS_D_CV_DC_MCI_ALIAS", "STG_TRS_D_DC_ALIAS",
-                    "STG_TRS_VALID_MEMBERS"));
+            List.of("C_S_TRS_PTY_NM"), List.of(TrsSources.DCvDcMciAlias.class, TrsSources.DDcAlias.class,
+            TrsTargets.ValidMember.class));
 
     /// IDQ parameter `$MemberNameTypeCode` (label `Alias`).
     public static final String ALIAS_NAME_TYPE = "002";

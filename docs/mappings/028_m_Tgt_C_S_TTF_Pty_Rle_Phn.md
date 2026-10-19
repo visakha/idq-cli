@@ -49,3 +49,5 @@ The key keeps the reported text; `PHN_NUM` holds the standardized digits. Unit t
 ## Java implementation
 
 * `TtfPhone.pkey`, `transform`; `EtlPatterns.write2TargetPhone`; entity `TtfTargets.Phone`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TtfSources.EtlSrc`
+  (`V_TTF_ETL_SRC`), `TtfTargets.InactiveStatus` (`STG_TTF_PTY_INACTIVE_STS`).

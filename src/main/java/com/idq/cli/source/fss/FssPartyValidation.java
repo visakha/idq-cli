@@ -9,6 +9,7 @@ import com.idq.cli.core.Infa;
 import com.idq.cli.core.MappingOutput;
 import com.idq.cli.core.exception.BadRecord;
 import com.idq.cli.core.reference.LookupRows;
+import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.rules.NameStandardization;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
@@ -28,8 +29,8 @@ public class FssPartyValidation extends SourceMapping<ClientName, FssPartyValida
         implements MemberMapping.Demographics<ClientName, FssPartyValidation.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("019", "m_Tgt_C_S_FSS_Pty_Validation", SourceSystem.FSS,
-            List.of("STG_FSS_PTY_INACTIVE_STS", "STG_FSS_PTY_INACTIVE_LOG"),
-            List.of("V_FSS_ETL_SRC", "C_B_PTY_XREF", "STG_FSS_PTY_INACTIVE_STS"));
+            List.of("STG_FSS_PTY_INACTIVE_STS", "STG_FSS_PTY_INACTIVE_LOG"), List.of(FssSources.EtlSrc.class,
+            MdmBaseTables.PartyXref.class, FssTargets.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, Integer> hubStates) {}
 

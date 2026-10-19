@@ -33,8 +33,8 @@ public class TrsAddress extends SourceMapping<AddressAssignment, NoLookups>
         implements MemberMapping.Address<AddressAssignment, NoLookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("012", "m_Tgt_C_S_TRS_Addr_2", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_RLE_ADDR", "DQM_ADDRESS"),
-            List.of("STG_TRS_D_INDV_ADDR", "STG_TRS_D_UNQ_ADDR", "STG_TRS_VALID_MEMBERS"));
+            List.of("C_S_TRS_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(TrsSources.DIndvAddr.class,
+            TrsTargets.UniqueAddress.class, TrsTargets.ValidMember.class));
 
     public TrsAddress(TrsQueries queries) {
         super(INFO, queries::fetchAddressAssignments, NoLookups::none);

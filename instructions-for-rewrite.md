@@ -172,6 +172,21 @@ NOTE: **change the shell prompt** to show the currently latched source system an
 all the commands and actions available in the CLI can also be accessed via the REST API (use RestClient from SpringBoot) , providing programmatic control over the ETL processes, unit tests. The REST API will expose endpoints corresponding to each CLI command, allowing for integration with other systems and automation of workflows.
 
 
-
+# Reporting
+  I am reviewing the code and I do not see the Entity models (i know we are not using JPA, but there should be java models that mirror the IdqMapInitQuery for each mapping and the Source tables and the target tables, am I missing something?)
+  now tell where are the ENTITY Models, I would like to this kind of behaviour  (A) I will manually insert test
+  data into the Oracle tables  (B) run the ETL work flow for that source. The CLI command should then  (1) Read
+  the data into the source specific Entity by issuing IdqMapInitQuery for each of the mappings, then run the ETL
+  logic and the data should be in the Target C_S_* tables.  if I choose to have mock data, then I do not even
+  have to manually fill in the source tables in the Oracle OCI. it should then dump the diagnostic and audit
+  level (use spring eventing and listeners functionality) to write this info into a dir called adhoc_runs and
+  Source Name in its name, example adhoc_runs_ECI and write those reports in the Markdown format. the file
+  should have date and time til minutes and the source table name example and the ETL_PROCESS (i.e Java or IDQ)
+  C_S_ECI_PTY_RLE_$Java$_19_10_2026_9_54_AM.md the purpose of this report is for me to see what data was
+  captured for the process from the source tables via IdqMapInitQuery AND the Source tables themselves and what
+  data is output in the target tables.
+  
+  Tell me your plan on how to fix this gap, get my confirmation and then proceed, create a local branch first
+  
  
 

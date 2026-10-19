@@ -65,3 +65,5 @@ FROM v_eci_etl_src_family_address
 
 * `EciAddress.pkey` + `AddressPatterns.route` (validate, DQM, score, hold lines, exception) shared with FSS / WIC;
   entity `EciTargets.Address`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.EtlSrcFamilyAddress`
+  (`V_ECI_ETL_SRC_FAMILY_ADDRESS`), `EciTargets.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`).

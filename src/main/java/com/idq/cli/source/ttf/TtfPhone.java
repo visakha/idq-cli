@@ -29,7 +29,7 @@ public class TtfPhone extends SourceMapping<ClientPhone, InactiveStatus.Lookup>
         implements MemberMapping.PhoneEmail<ClientPhone, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("028", "m_Tgt_C_S_TTF_Pty_Rle_Phn", SourceSystem.TTF,
-            List.of("C_S_TTF_PTY_RLE_PHN"), List.of("V_TTF_ETL_SRC", "STG_TTF_PTY_INACTIVE_STS"));
+            List.of("C_S_TTF_PTY_RLE_PHN"), List.of(TtfSources.EtlSrc.class, TtfTargets.InactiveStatus.class));
 
     public TtfPhone(TtfQueries queries) {
         super(INFO, queries::fetchClientPhones,

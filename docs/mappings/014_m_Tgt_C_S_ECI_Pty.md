@@ -82,3 +82,6 @@ Unit test: `EciPkeyTest#m_Tgt_C_S_ECI_Pty_pkey_test`.
 
 * `EciParty.transform` -> `PartyPattern.apply(SPEC, ...)` -> `EciTargets.Party` (`Columns.Party` + birth weight and
   language columns) and `EciTargets.PartyRole`; `birthWeightGrams`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.DChild`
+  (`STG_ECI_D_CHILD`), `EciSources.DFamily` (`STG_ECI_D_FAMILY`), `EciTargets.InactiveStatus`
+  (`STG_ECI_PTY_INACTIVE_STS`).

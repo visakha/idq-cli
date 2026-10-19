@@ -12,6 +12,7 @@ import com.idq.cli.core.Infa;
 import com.idq.cli.core.MappingOutput;
 import com.idq.cli.core.exception.BadRecord;
 import com.idq.cli.core.reference.LookupRows;
+import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.rules.NameStandardization;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping;
@@ -30,8 +31,8 @@ public class TtfPartyValidation extends SourceMapping<ClientName, TtfPartyValida
         implements MemberMapping.Demographics<ClientName, TtfPartyValidation.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("025", "m_Tgt_C_S_TTF_Pty_Validation", SourceSystem.TTF,
-            List.of("STG_TTF_PTY_INACTIVE_STS", "STG_TTF_PTY_INACTIVE_LOG"),
-            List.of("V_TTF_ETL_SRC", "C_B_PTY_XREF", "STG_TTF_PTY_INACTIVE_STS"));
+            List.of("STG_TTF_PTY_INACTIVE_STS", "STG_TTF_PTY_INACTIVE_LOG"), List.of(TtfSources.EtlSrc.class,
+            MdmBaseTables.PartyXref.class, TtfTargets.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, Integer> hubStates) {}
 

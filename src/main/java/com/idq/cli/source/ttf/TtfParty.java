@@ -31,7 +31,8 @@ public class TtfParty extends SourceMapping<ClientDemographics, InactiveStatus.L
         implements MemberMapping.Demographics<ClientDemographics, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("026", "m_Tgt_C_S_TTF_Pty", SourceSystem.TTF,
-            List.of("C_S_TTF_PTY", "C_S_TTF_PTY_RLE"), List.of("V_TTF_ETL_SRC", "STG_TTF_PTY_INACTIVE_STS"));
+            List.of("C_S_TTF_PTY", "C_S_TTF_PTY_RLE"), List.of(TtfSources.EtlSrc.class,
+            TtfTargets.InactiveStatus.class));
 
     /// Race by code (`RACE` lookup); no language or suffix rule; every exception applies to every row.
     static final PartyPattern.Spec SPEC = new PartyPattern.Spec("TTF", RaceSource.CODE, false, false, Set.of());

@@ -28,7 +28,7 @@ public class FssRelationship extends SourceMapping<ClientRelation, InactiveStatu
         implements MemberMapping.Role<ClientRelation, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("024", "m_Tgt_C_S_FSS_Pty_Rle_Rel", SourceSystem.FSS,
-            List.of("C_S_FSS_PTY_RLE_REL"), List.of("V_FSS_ETL_SRC_RELATIONS", "STG_FSS_PTY_INACTIVE_STS"));
+            List.of("C_S_FSS_PTY_RLE_REL"), List.of(FssSources.EtlSrcRelations.class, FssTargets.InactiveStatus.class));
 
     public FssRelationship(FssQueries queries) {
         super(INFO, queries::fetchClientRelations,

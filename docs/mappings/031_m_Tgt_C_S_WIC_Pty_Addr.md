@@ -53,3 +53,5 @@ The state segment is empty in the IDQ expression (`city || '|' || '|' || zip`) a
 ## Java implementation
 
 * `WicAddress.pkey` + `AddressPatterns.route`; entity `WicTargets.Address`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
+  (`V_WIC_ETL_SRC`), `WicTargets.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).

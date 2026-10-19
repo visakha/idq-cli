@@ -50,3 +50,5 @@ Unit test: `FssPkeyTest#m_Tgt_C_S_FSS_Pty_Rle_Alt_Id_pkey_test`.
 ## Java implementation
 
 * `FssAlternateId.altIdType`, `pkey`, `transform`; entity `FssTargets.AlternateId`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `FssSources.EtlSrc`
+  (`V_FSS_ETL_SRC`), `FssTargets.InactiveStatus` (`STG_FSS_PTY_INACTIVE_STS`).

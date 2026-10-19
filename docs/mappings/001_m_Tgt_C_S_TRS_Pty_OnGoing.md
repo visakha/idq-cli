@@ -140,3 +140,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_OnGoing_pkey_test`.
 * Load: `TargetBatch.replaceAll` for `C_S_TRS_PTY` / `C_S_TRS_PTY_RLE` (IDQ truncate target), `append` for the
   registry and exceptions.
 * Entities `TrsTargets.Party` (`Columns.Party` + `DEATH_DT`), `TrsTargets.PartyRole`, `TrsTargets.ValidMember`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DDcIndv`
+  (`STG_TRS_D_DC_INDV`), `TrsSources.DCvDcMciIndv` (`STG_TRS_D_CV_DC_MCI_INDV`), `TrsSources.DCvMciEdgIndvToa`
+  (`STG_TRS_D_CV_MCI_EDG_INDV_TOA`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`), `TrsSources.DeactivedMembers`
+  (`STG_TRS_DEACTIVED_MEMBERS`).

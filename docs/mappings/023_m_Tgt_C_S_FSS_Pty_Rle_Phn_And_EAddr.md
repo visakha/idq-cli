@@ -59,3 +59,5 @@ Unit test: `FssPkeyTest#m_Tgt_C_S_FSS_Pty_Rle_Phn_And_EAddr_pkey_test`.
 
 * `FssPhoneEmail.phoneKey`, `emailKey`, `transform`; `ContactRules.phone`, `phoneExtension`, `email`; entities
   `FssTargets.Phone` (`PHN_NUM_EXT`), `FssTargets.Email`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `FssSources.EtlSrc`
+  (`V_FSS_ETL_SRC`), `FssTargets.InactiveStatus` (`STG_FSS_PTY_INACTIVE_STS`).

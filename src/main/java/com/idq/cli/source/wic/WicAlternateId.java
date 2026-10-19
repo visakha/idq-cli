@@ -27,7 +27,7 @@ public class WicAlternateId extends SourceMapping<ClientIdentifier, InactiveStat
         implements MemberMapping.AlternateId<ClientIdentifier, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("032", "m_Tgt_C_S_WIC_Pty_Rle_Alt_Id", SourceSystem.WIC,
-            List.of("C_S_WIC_PTY_RLE_ALT_ID"), List.of("V_WIC_ETL_SRC", "STG_WIC_PTY_INACTIVE_STS"));
+            List.of("C_S_WIC_PTY_RLE_ALT_ID"), List.of(WicSources.EtlSrc.class, WicTargets.InactiveStatus.class));
 
     public WicAlternateId(WicQueries queries) {
         super(INFO, queries::fetchClientIdentifiers,

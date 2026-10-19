@@ -32,7 +32,8 @@ public class WicAddress extends SourceMapping<FamilyAddress, InactiveStatus.Look
         implements MemberMapping.Address<FamilyAddress, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("031", "m_Tgt_C_S_WIC_Pty_Addr", SourceSystem.WIC,
-            List.of("C_S_WIC_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of("V_WIC_ETL_SRC", "STG_WIC_PTY_INACTIVE_STS"));
+            List.of("C_S_WIC_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(WicSources.EtlSrc.class,
+            WicTargets.InactiveStatus.class));
 
     public static final String ADDRESS_TYPE = "002";
 

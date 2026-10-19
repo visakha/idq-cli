@@ -9,6 +9,7 @@ import com.idq.cli.core.Infa;
 import com.idq.cli.core.MappingOutput;
 import com.idq.cli.core.Rows;
 import com.idq.cli.core.exception.BadRecord;
+import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.target.Columns;
 import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
@@ -31,8 +32,8 @@ public class TrsPrimaryCareProvider extends SourceMapping<PrimaryCareProvider, T
         implements MemberMapping.Role<PrimaryCareProvider, TrsPrimaryCareProvider.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("010", "m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP",
-            SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL_PROV"), List.of("STG_TRS_D_IN_MANAGED_CARE",
-                    "STG_TRS_VALID_MEMBERS", "C_B_PTY_RLE_ALT_ID", "C_B_PTY_RLE_ALT_ID_XREF"));
+            SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL_PROV"), List.of(TrsSources.DInManagedCare.class,
+            TrsTargets.ValidMember.class, MdmBaseTables.PartyRoleAltId.class, MdmBaseTables.PartyRoleAltIdXref.class));
 
     /// IDQ parameter `$PCP_REL_TP`.
     public static final String PCP_REL_TP = "100";

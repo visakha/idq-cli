@@ -32,8 +32,8 @@ public class EciRelationship extends SourceMapping<FamilyRelation, EciRelationsh
         implements MemberMapping.Role<FamilyRelation, EciRelationship.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("018", "m_Tgt_C_S_ECI_Pty_Rle_Rel", SourceSystem.ECI,
-            List.of("C_S_ECI_PTY_RLE_REL"),
-            List.of("STG_ECI_D_FAMILY", "STG_ECI_SN_CHILD", "STG_ECI_PTY_INACTIVE_STS"));
+            List.of("C_S_ECI_PTY_RLE_REL"), List.of(EciSources.DFamily.class, EciSources.SnChild.class,
+            EciTargets.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, String> childGender) {}
 

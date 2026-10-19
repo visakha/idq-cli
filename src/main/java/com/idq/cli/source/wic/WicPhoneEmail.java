@@ -33,8 +33,8 @@ public class WicPhoneEmail extends SourceMapping<FamilyContact, InactiveStatus.L
         implements MemberMapping.PhoneEmail<FamilyContact, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("033", "m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr",
-            SourceSystem.WIC, List.of("C_S_WIC_PTY_RLE_PHN", "C_S_WIC_PTY_RLE_EADDR"),
-            List.of("V_WIC_ETL_SRC", "STG_WIC_PTY_INACTIVE_STS"));
+            SourceSystem.WIC, List.of("C_S_WIC_PTY_RLE_PHN", "C_S_WIC_PTY_RLE_EADDR"), List.of(WicSources.EtlSrc.class,
+            WicTargets.InactiveStatus.class));
 
     public WicPhoneEmail(WicQueries queries) {
         super(INFO, queries::fetchFamilyContacts,
