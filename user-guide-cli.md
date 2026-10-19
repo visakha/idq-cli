@@ -45,6 +45,7 @@ The entity models behind the reports (all Spring Data JDBC records, no JPA):
 | Source tables and views | `<Src>Sources` | `EciSources.DFamily` (`STG_ECI_D_FAMILY`) |
 | Target tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
 | MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
+| Lookup / reference tables | `ReferenceTables` | `ReferenceTables.CodeValue` (`LOOKUP_CODE_VALUE`) |
 
 Safety rules that always apply:
 
@@ -421,11 +422,13 @@ mvnw test                                                    all unit tests, no 
 mvnw test -Dtest=EciPkeyTest                                 the PKEY tests of one source
 mvnw test -Dtest=OracleWorkflowIT                            all 33 mappings against OCI on mock data
 mvnw test -Dtest=OracleWorkflowIT#runWritesAuditReports -Dsource=TRS
+mvnw test -Dtest=SourceEntitiesIT                            every source / MDM / reference entity against OCI
 ```
 
-`OracleWorkflowIT` is not part of `mvnw test` (its name does not match the test pattern) and needs the wallet and
-network access; `runWritesAuditReports` runs one whole workflow with
-`mock-data-pre-fix=Test_001` and checks its reports and SQL files in `target/adhoc-it`.
+`SourceEntitiesIT` inserts one row per entity record, counts it and reads it back, then rolls back, so the
+schema is left untouched. `OracleWorkflowIT` and `SourceEntitiesIT` are not part of `mvnw test` (their names do
+not match the test pattern) and need the wallet and network access; `runWritesAuditReports` runs one whole workflow
+with `mock-data-pre-fix=Test_001` and checks its reports and SQL files in `target/adhoc-it`.
 
 ---
 
