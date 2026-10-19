@@ -87,7 +87,7 @@ class TrsPkeyTest {
                 new ManagedCarePlan(456L, DAY, "ZZ", 1L, null, DAY)), NoLookups.NONE, ctx(TrsPlan.INFO));
 
         assertThat(keys(out.rows(TrsTargets.Plan.class))).containsExactly("123|Member|PLN1");
-        assertThat(out.badRecords()).extracting(b -> b.exceptionCode()).containsExactly("Invalid_Plan");
+        assertThat(out.badRecords()).extracting(b -> b.key().exceptionCode()).containsExactly("Invalid_Plan");
     }
 
     @Test

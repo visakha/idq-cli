@@ -5,16 +5,21 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 /// Spring Data JDBC entities of the shared lookup tables, column for column. The mappings read them through
-/// [ReferenceQueries]; the mock-data seed writes them. The tables have no primary key; the `@Id`s are provisional.
+/// [ReferenceQueries]; the mock-data seed writes them. `LOOKUP_CODE_VALUE` has a composite primary key; the other
+/// tables have none, so their `@Id`s are provisional.
 public final class ReferenceTables {
 
     private ReferenceTables() {}
 
-    /// Provisional `@Id` `SRC_CODE_VALUE`: the table has no primary key, Spring Data JDBC needs one.
+    /// Composite primary key [Key] `(CODE_TYPE, SRC_CODE_VALUE, SRC_SYS)`.
     @Table("LOOKUP_CODE_VALUE")
-    public record CodeValue(String createdBy, LocalDateTime createDate, String updatedBy, LocalDateTime lastUpdateDate,
-            String codeType, String mstrRefCode, String mstrRefLabel, String mstrRefDesc, @Id String srcCodeValue,
-            String srcSys, String srcCodeDesc) {}
+    public record CodeValue(@Id Key key, String createdBy, LocalDateTime createDate, String updatedBy,
+            LocalDateTime lastUpdateDate, String mstrRefCode, String mstrRefLabel, String mstrRefDesc,
+            String srcCodeDesc) {
+
+        /// Primary key `(CODE_TYPE, SRC_CODE_VALUE, SRC_SYS)`.
+        public record Key(String codeType, String srcCodeValue, String srcSys) {}
+    }
 
     /// Provisional `@Id` `SRC_CODE_VALUE`: the table has no primary key, Spring Data JDBC needs one.
     @Table("V_LOOKUP_CODE_VALUE")

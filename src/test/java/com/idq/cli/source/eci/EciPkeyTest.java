@@ -78,7 +78,7 @@ class EciPkeyTest {
         var out = new EciAlternateId(q).transform(List.of(childId, badSsn), noInactive(), ctx(EciAlternateId.INFO));
 
         assertThat(keys(out.rows(EciTargets.AlternateId.class))).containsExactly("0000000042|Member|018|0000000042");
-        assertThat(out.badRecords()).extracting(b -> b.exceptionCode()).containsExactly("Invalid_SSN");
+        assertThat(out.badRecords()).extracting(b -> b.key().exceptionCode()).containsExactly("Invalid_SSN");
     }
 
     @Test
