@@ -199,3 +199,8 @@ all the commands and actions available in the CLI can also be accessed via the R
 create another branch, called user-guide-CLI-01 and in that, create a comprehensive user guide on how to use
   both the CLI Commands by Task and call the file user-guide-cli.md  , also  
 
+# Primary Keys for few tables that is not evident by looking
+there are the below table where the PK (Primary Keys are not evident), here is the fix
+- EXC_STG_BAD_REC_MEMB -> SRC_SYS, SRC_SYS_ID_1, EXCEPTION_TYPE, EXCEPTION_CODE, RUN_DATE
+- DQM_ADDRESS -> PTY_SRC_KEY, ADDR_SRC_KEY, SRC_SYSTEM, MDM_ADDR_TP
+- LOOKUP_CODE_VALUE -> CODE_TYPE, SRC_CODE_VALUE,SRC_SYS

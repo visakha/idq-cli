@@ -30,7 +30,7 @@ public final class AddressPatterns {
 
     public static DqmAddress dqm(String ptySrcKey, String addrSrcKey, String srcSystem, String mdmAddrTp,
             LocalDateTime loadDt, Columns.SourceAddress src, String srcPostal, AddressValidator.Result av) {
-        return new DqmAddress(ptySrcKey, addrSrcKey, srcSystem, mdmAddrTp, loadDt, src.srcAddrLn1(),
+        return new DqmAddress(new DqmAddress.Key(ptySrcKey, addrSrcKey, srcSystem, mdmAddrTp), loadDt, src.srcAddrLn1(),
                 src.srcAddrLn2(), src.srcCity(), src.srcState(), srcPostal, src.srcCntry(), src.srcCounty(),
                 av.deliveryAddressLine1(), av.deliveryAddressLine2(), av.city(), av.stateFips(), av.postcodeComplete(),
                 av.countryIso2(), av.countyFips(), av.countyFips(), av.stateFips(), av.latitude(), av.longitude(),

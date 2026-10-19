@@ -135,9 +135,7 @@ public class ReferenceMockData {
         tables.insert(entity(CodeValue.class)
                 .with(CodeValue::createdBy, MARKER)
                 .with(CodeValue::createDate, LocalDateTime.now())
-                .with(CodeValue::codeType, type)
-                .with(CodeValue::srcSys, source)
-                .with(CodeValue::srcCodeValue, sourceValue)
+                .with(CodeValue::key, new CodeValue.Key(type, sourceValue, source))
                 .with(CodeValue::mstrRefCode, master)
                 .with(CodeValue::mstrRefLabel, label));
     }

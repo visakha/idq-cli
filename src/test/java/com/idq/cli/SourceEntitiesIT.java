@@ -61,16 +61,20 @@ class SourceEntitiesIT {
         assertThat(aggregates.findAll(Query.empty().limit(5), type)).isNotEmpty();
     }
 
-    /// Every column set to a one-character / one-digit value, which fits any column of the schema.
+    /// Every column set to a one-character / one-digit value, which fits any column of the schema; composite keys
+    /// (nested records) are filled the same way.
+    @SuppressWarnings("unchecked")
     static <R extends Record> R sample(Class<R> type) {
         var now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        return EntityBuilder.entity(type).map((component, _) -> switch (component.getType().getSimpleName()) {
-            case "String" -> "1";
-            case "Long" -> 1L;
-            case "Integer" -> 1;
-            case "BigDecimal" -> BigDecimal.ONE;
-            case "LocalDateTime" -> now;
-            default -> null;
-        }).build();
+        return EntityBuilder.entity(type).map((component, _) -> component.getType().isRecord()
+                ? sample((Class<? extends Record>) component.getType())
+                : switch (component.getType().getSimpleName()) {
+                    case "String" -> "1";
+                    case "Long" -> 1L;
+                    case "Integer" -> 1;
+                    case "BigDecimal" -> BigDecimal.ONE;
+                    case "LocalDateTime" -> now;
+                    default -> null;
+                }).build();
     }
 }

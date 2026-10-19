@@ -34,7 +34,7 @@ class TtfPkeyTest {
 
         assertThat(out.rows(TtfTargets.InactiveStatus.class)).extracting(TtfTargets.InactiveStatus::srcKey)
                 .containsExactly("0000000031");
-        assertThat(out.badRecords()).extracting(b -> b.exceptionCode()).containsExactly("Invalid_First_Name");
+        assertThat(out.badRecords()).extracting(b -> b.key().exceptionCode()).containsExactly("Invalid_First_Name");
     }
 
     @Test

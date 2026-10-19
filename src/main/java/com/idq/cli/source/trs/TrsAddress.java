@@ -96,11 +96,11 @@ public class TrsAddress extends SourceMapping<AddressAssignment, NoLookups>
     private static DqmAddress dqmRow(AddressAssignment a, Columns.SourceAddress src, EtlContext ctx) {
         var resultPostal = concat(a.pstlCd(), a.pstlCdExt() == null ? "" : "-" + a.pstlCdExt());
         var srcPostal = concat(a.srcPstlCd(), a.srcPstlCdExt() == null ? "" : "-" + a.srcPstlCdExt());
-        return new DqmAddress(a.ptyPk(), dqmKey(a), "TRS", a.addrTypeCd(), ctx.runStart(), src.srcAddrLn1(),
-                src.srcAddrLn2(), src.srcCity(), src.srcState(), srcPostal, src.srcCntry(), src.srcCounty(),
-                a.addrLn1(), a.addrLn2(), a.city(), a.state(), resultPostal, a.cntryCd(), a.county(), a.county(),
-                a.state(), a.lattd(), a.lngtd(), a.geocdStsCd(), a.rsdntlDlvryInd(), a.orgDesc(), a.orgDept(),
-                a.orgNm(), a.bldgNmbr(), a.subBldgNm(), a.mlbltyScr(), a.vldtnMsg(), a.addrdrRsltPct(),
+        return new DqmAddress(new DqmAddress.Key(a.ptyPk(), dqmKey(a), "TRS", a.addrTypeCd()), ctx.runStart(),
+                src.srcAddrLn1(), src.srcAddrLn2(), src.srcCity(), src.srcState(), srcPostal, src.srcCntry(),
+                src.srcCounty(), a.addrLn1(), a.addrLn2(), a.city(), a.state(), resultPostal, a.cntryCd(), a.county(),
+                a.county(), a.state(), a.lattd(), a.lngtd(), a.geocdStsCd(), a.rsdntlDlvryInd(), a.orgDesc(),
+                a.orgDept(), a.orgNm(), a.bldgNmbr(), a.subBldgNm(), a.mlbltyScr(), a.vldtnMsg(), a.addrdrRsltPct(),
                 a.addrTpCd(), a.erlyWrngCd(), a.cassErrCd(), a.dlvryPntVldn());
     }
 }

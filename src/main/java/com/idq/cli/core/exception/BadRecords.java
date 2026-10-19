@@ -119,9 +119,9 @@ public final class BadRecords {
     }
 
     public BadRecord build() {
-        return new BadRecord(srcSys, id1, id2, id3, type, code, desc, runDate, prefix, first, middle, last, suffix,
-                aliasSuffix, birthDate, gender, addressType, line1, line2, city, county, state, zip, zipExt, country,
-                drCode, drDesc, drScore, primaryPhone, workPhone, secondaryPhone, email, attributeName,
-                attributeValue, mappingName, periodStart, periodEnd, deathDt);
+        return new BadRecord(new BadRecord.Key(srcSys, id1, id2, id3, type, code, runDate), desc, prefix, first,
+                middle, last, suffix, aliasSuffix, birthDate, gender, addressType, line1, line2, city, county, state,
+                zip, zipExt, country, drCode, drDesc, drScore, primaryPhone, workPhone, secondaryPhone, email,
+                attributeName, attributeValue, mappingName, periodStart, periodEnd, deathDt);
     }
 }

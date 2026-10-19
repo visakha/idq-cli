@@ -74,6 +74,15 @@ The source, MDM and reference tables have no primary key. Spring Data JDBC needs
 those records carries a provisional `@Id` on its most natural key column, marked `/// Provisional @Id` (find them with
 `grep -rn "Provisional" src/main/java`). Tables with `BAK` or a date stamp in their name are never modelled.
 
+Three tables have a composite key, modelled as a nested `Key` record annotated `@Id` (see
+`instructions-for-rewrite.md`, "Primary Keys for few tables"):
+
+| Table | Entity | Key | Constraint |
+|---|---|---|---|
+| `LOOKUP_CODE_VALUE` | `ReferenceTables.CodeValue` | CODE_TYPE, SRC_CODE_VALUE, SRC_SYS | primary key |
+| `EXC_STG_BAD_REC_MEMB` | `BadRecord` | SRC_SYS, SRC_SYS_ID_1..3, EXCEPTION_TYPE, EXCEPTION_CODE, RUN_DATE | unique (ids 2/3 may be NULL) |
+| `DQM_ADDRESS` | `DqmAddress` | PTY_SRC_KEY, ADDR_SRC_KEY, SRC_SYSTEM, MDM_ADDR_TP | unique (address type may be NULL) |
+
 Mock data is written as these entity records through Spring Data JDBC. Wide records are built with the typed
 `EntityBuilder` (columns named by accessor, unset columns `NULL`):
 

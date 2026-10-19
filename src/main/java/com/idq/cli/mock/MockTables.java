@@ -128,10 +128,12 @@ public class MockTables {
         var lengths = columnsOf(row.getClass().getAnnotation(Table.class).value());
         var persistent = aggregates.getConverter().getMappingContext().getRequiredPersistentEntity(row.getClass());
         return EntityBuilder.from(row).map((component, value) -> {
+            if (!(value instanceof String text) || !text.startsWith(prefix + "-")) {
+                return value;
+            }
             var column = persistent.getRequiredPersistentProperty(component.getName()).getColumnName()
                     .getReference().toUpperCase();
-            return value instanceof String text && text.startsWith(prefix + "-") && lengths.containsKey(column)
-                    ? fit(text, lengths.get(column)) : value;
+            return lengths.containsKey(column) ? fit(text, lengths.get(column)) : value;
         }).build();
     }
 

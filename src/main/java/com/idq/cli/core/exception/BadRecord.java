@@ -9,18 +9,13 @@ import org.springframework.data.relational.core.mapping.Table;
 /// One row of `EXC_STG_BAD_REC_MEMB`, the data-quality exception queue shared by every member mapping.
 /// Build it with [BadRecords].
 ///
-/// The table has no key; `MAPPING_NAME` (never null) is marked as identifier only because Spring Data JDBC requires
-/// one. Rows are only ever inserted.
+/// Identified by [Key], the table's composite unique key. It is a UNIQUE constraint rather than a primary key because
+/// mappings leave the second and third source ids (and an uncatalogued exception's type) `NULL`, as IDQ does.
+/// Rows are only ever inserted.
 @Table("EXC_STG_BAD_REC_MEMB")
 public record BadRecord(
-        String srcSys,
-        @Column("SRC_SYS_ID_1") String srcSysId1,
-        @Column("SRC_SYS_ID_2") String srcSysId2,
-        @Column("SRC_SYS_ID_3") String srcSysId3,
-        String exceptionType,
-        String exceptionCode,
+        @Id Key key,
         String exceptionDesc,
-        LocalDateTime runDate,
         String prefix,
         String firstName,
         String middleName,
@@ -47,7 +42,18 @@ public record BadRecord(
         String email,
         String attributeName,
         String attributeValue,
-        @Id String mappingName,
+        String mappingName,
         LocalDateTime periodStartDate,
         LocalDateTime periodEndDate,
-        LocalDateTime deathDt) {}
+        LocalDateTime deathDt) {
+
+    /// Unique key `(SRC_SYS, SRC_SYS_ID_1, SRC_SYS_ID_2, SRC_SYS_ID_3, EXCEPTION_TYPE, EXCEPTION_CODE, RUN_DATE)`.
+    public record Key(
+            String srcSys,
+            @Column("SRC_SYS_ID_1") String srcSysId1,
+            @Column("SRC_SYS_ID_2") String srcSysId2,
+            @Column("SRC_SYS_ID_3") String srcSysId3,
+            String exceptionType,
+            String exceptionCode,
+            LocalDateTime runDate) {}
+}
