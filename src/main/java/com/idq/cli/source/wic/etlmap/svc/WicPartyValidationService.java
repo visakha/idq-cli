@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WicPartyValidationService {
 
     public static final MappingInfo INFO = MappingInfo.of("029", "m_Tgt_C_S_WIC_Pty_Validation", SourceSystem.WIC,
-            List.of("STG_WIC_PTY_INACTIVE_STS", "STG_WIC_PTY_INACTIVE_LOG"), List.of(WicSources.EtlSrc.class,
+            List.of(WicSources.InactiveStatus.class, WicSources.InactiveLog.class), List.of(WicSources.EtlSrc.class,
             MdmBaseTables.PartyXref.class, WicSources.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, Integer> hubStates) {}

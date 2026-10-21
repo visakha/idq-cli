@@ -38,8 +38,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsPrimaryCareProviderService {
 
     public static final MappingInfo INFO = MappingInfo.of("010", "m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP",
-            SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL_PROV"), List.of(TrsSources.InManagedCareDelta.class,
-            TrsSources.ValidMember.class, MdmBaseTables.PartyRoleAltId.class, MdmBaseTables.PartyRoleAltIdXref.class));
+            SourceSystem.TRS, List.of(TrsTargets.ProviderRelationship.class),
+            List.of(TrsSources.InManagedCareDelta.class, TrsSources.ValidMember.class,
+            MdmBaseTables.PartyRoleAltId.class, MdmBaseTables.PartyRoleAltIdXref.class));
 
     /// IDQ parameter `$PCP_REL_TP`.
     public static final String PCP_REL_TP = "100";

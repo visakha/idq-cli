@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FssPartyValidationService {
 
     public static final MappingInfo INFO = MappingInfo.of("019", "m_Tgt_C_S_FSS_Pty_Validation", SourceSystem.FSS,
-            List.of("STG_FSS_PTY_INACTIVE_STS", "STG_FSS_PTY_INACTIVE_LOG"), List.of(FssSources.EtlSrc.class,
+            List.of(FssSources.InactiveStatus.class, FssSources.InactiveLog.class), List.of(FssSources.EtlSrc.class,
             MdmBaseTables.PartyXref.class, FssSources.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, Integer> hubStates) {}

@@ -209,7 +209,7 @@ public class EtlConsole {
 
     static MappingView view(MemberMapping<?, ?> m) {
         var info = m.info();
-        return new MappingView(info.seq(), info.name(), m.subDomain(), info.targets(), info.sourceTables(),
+        return new MappingView(info.seq(), info.name(), m.subDomain(), info.targetTables(), info.sourceTables(),
                 info.doc());
     }
 

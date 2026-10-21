@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TtfPartyService {
 
     public static final MappingInfo INFO = MappingInfo.of("026", "m_Tgt_C_S_TTF_Pty", SourceSystem.TTF,
-            List.of("C_S_TTF_PTY", "C_S_TTF_PTY_RLE"), List.of(TtfSources.EtlSrc.class,
+            List.of(TtfTargets.Party.class, TtfTargets.PartyRole.class), List.of(TtfSources.EtlSrc.class,
             TtfSources.InactiveStatus.class));
 
     /// Race by code (`RACE` lookup); no language or suffix rule; every exception applies to every row.

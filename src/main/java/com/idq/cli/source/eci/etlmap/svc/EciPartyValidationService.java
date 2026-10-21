@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EciPartyValidationService {
 
     public static final MappingInfo INFO = MappingInfo.of("013", "m_Tgt_C_S_ECI_Pty_Validation", SourceSystem.ECI,
-            List.of("STG_ECI_PTY_INACTIVE_STS", "STG_ECI_PTY_INACTIVE_LOG"), List.of(EciSources.ChildDelta.class,
+            List.of(EciSources.InactiveStatus.class, EciSources.InactiveLog.class), List.of(EciSources.ChildDelta.class,
             EciSources.FamilyDelta.class, MdmBaseTables.PartyXref.class, EciSources.InactiveStatus.class,
             EciSources.EtlLuDupCases.class, EciSources.EtlLuFamilyValidation.class));
 

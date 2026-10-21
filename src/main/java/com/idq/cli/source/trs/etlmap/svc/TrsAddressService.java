@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsAddressService {
 
     public static final MappingInfo INFO = MappingInfo.of("012", "m_Tgt_C_S_TRS_Addr_2", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(TrsSources.IndvAddrDelta.class,
+            List.of(TrsTargets.Address.class, DqmAddress.class), List.of(TrsSources.IndvAddrDelta.class,
             TrsSources.UniqueAddressDelta.class, TrsSources.ValidMember.class));
 
     private final TrsIndvAddrDeltaRepository indvAddrDelta;

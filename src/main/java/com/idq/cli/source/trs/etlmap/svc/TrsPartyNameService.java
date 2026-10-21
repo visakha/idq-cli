@@ -31,8 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsPartyNameService {
 
     public static final MappingInfo INFO = MappingInfo.of("003", "m_Tgt_C_S_TRS_Pty_Nm", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_NM"), List.of(TrsSources.CvDcMciAliasDelta.class, TrsSources.DcAliasDelta.class,
-            TrsSources.ValidMember.class));
+            List.of(TrsTargets.PartyName.class), List.of(TrsSources.CvDcMciAliasDelta.class,
+            TrsSources.DcAliasDelta.class, TrsSources.ValidMember.class));
 
     /// IDQ parameter `$MemberNameTypeCode` (label `Alias`).
     public static final String ALIAS_NAME_TYPE = "002";

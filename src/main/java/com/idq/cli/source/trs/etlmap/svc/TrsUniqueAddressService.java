@@ -34,7 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsUniqueAddressService {
 
     public static final MappingInfo INFO = MappingInfo.of("011", "m_Tgt_C_S_TRS_Addr_1", SourceSystem.TRS,
-            List.of("STG_TRS_D_UNQ_ADDR"), List.of(TrsSources.IndvAddrDelta.class, TrsSources.CdRef.class));
+            List.of(TrsSources.UniqueAddressDelta.class), List.of(TrsSources.IndvAddrDelta.class,
+            TrsSources.CdRef.class));
 
     private final AddressValidator validator;
 

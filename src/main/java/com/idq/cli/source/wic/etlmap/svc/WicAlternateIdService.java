@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WicAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("032", "m_Tgt_C_S_WIC_Pty_Rle_Alt_Id", SourceSystem.WIC,
-            List.of("C_S_WIC_PTY_RLE_ALT_ID"), List.of(WicSources.EtlSrc.class, WicSources.InactiveStatus.class));
+            List.of(WicTargets.AlternateId.class), List.of(WicSources.EtlSrc.class, WicSources.InactiveStatus.class));
 
     private final WicEtlSrcViewRepository etlSrc;
     private final WicInactiveStatusRepository inactiveStatuses;

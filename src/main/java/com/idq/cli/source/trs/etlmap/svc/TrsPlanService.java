@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsPlanService {
 
     public static final MappingInfo INFO = MappingInfo.of("005", "m_Tgt_C_S_TRS_Pty_Rle_Pln", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_RLE_PLN"), List.of(TrsSources.InManagedCareDelta.class, TrsSources.ValidMember.class));
+            List.of(TrsTargets.Plan.class), List.of(TrsSources.InManagedCareDelta.class, TrsSources.ValidMember.class));
 
     private final TrsInManagedCareDeltaRepository inManagedCareDelta;
     private final TrsPlanRepository plans;

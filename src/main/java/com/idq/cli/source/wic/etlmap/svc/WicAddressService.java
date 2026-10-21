@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WicAddressService {
 
     public static final MappingInfo INFO = MappingInfo.of("031", "m_Tgt_C_S_WIC_Pty_Addr", SourceSystem.WIC,
-            List.of("C_S_WIC_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(WicSources.EtlSrc.class,
+            List.of(WicTargets.Address.class, DqmAddress.class), List.of(WicSources.EtlSrc.class,
             WicSources.InactiveStatus.class));
 
     public static final String ADDRESS_TYPE = "002";

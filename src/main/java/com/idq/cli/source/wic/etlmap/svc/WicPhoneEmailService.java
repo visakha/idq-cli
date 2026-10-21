@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WicPhoneEmailService {
 
     public static final MappingInfo INFO = MappingInfo.of("033", "m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr",
-            SourceSystem.WIC, List.of("C_S_WIC_PTY_RLE_PHN", "C_S_WIC_PTY_RLE_EADDR"), List.of(WicSources.EtlSrc.class,
+            SourceSystem.WIC, List.of(WicTargets.Phone.class, WicTargets.Email.class), List.of(WicSources.EtlSrc.class,
             WicSources.InactiveStatus.class));
 
     private final WicEtlSrcViewRepository etlSrc;

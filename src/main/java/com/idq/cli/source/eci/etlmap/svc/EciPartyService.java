@@ -39,8 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class EciPartyService {
 
     public static final MappingInfo INFO = MappingInfo.of("014", "m_Tgt_C_S_ECI_Pty", SourceSystem.ECI,
-            List.of("C_S_ECI_PTY", "C_S_ECI_PTY_RLE"), List.of(EciSources.ChildDelta.class, EciSources.FamilyDelta.class,
-            EciSources.InactiveStatus.class));
+            List.of(EciTargets.Party.class, EciTargets.PartyRole.class), List.of(EciSources.ChildDelta.class,
+            EciSources.FamilyDelta.class, EciSources.InactiveStatus.class));
 
     /// Ethnicity, race and language exceptions are only raised for children.
     static final PartyPattern.Spec SPEC = new PartyPattern.Spec("ECI", RaceSource.INDICATORS, true, false,

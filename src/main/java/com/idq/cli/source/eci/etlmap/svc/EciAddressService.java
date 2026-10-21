@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EciAddressService {
 
     public static final MappingInfo INFO = MappingInfo.of("015", "m_Tgt_C_S_ECI_Pty_Addr", SourceSystem.ECI,
-            List.of("C_S_ECI_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(EciSources.EtlSrcFamilyAddress.class,
+            List.of(EciTargets.Address.class, DqmAddress.class), List.of(EciSources.EtlSrcFamilyAddress.class,
             EciSources.InactiveStatus.class));
 
     private final EciFamilyAddressViewRepository familyAddresses;

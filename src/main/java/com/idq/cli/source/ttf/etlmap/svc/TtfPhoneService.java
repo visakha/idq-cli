@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TtfPhoneService {
 
     public static final MappingInfo INFO = MappingInfo.of("028", "m_Tgt_C_S_TTF_Pty_Rle_Phn", SourceSystem.TTF,
-            List.of("C_S_TTF_PTY_RLE_PHN"), List.of(TtfSources.EtlSrc.class, TtfSources.InactiveStatus.class));
+            List.of(TtfTargets.Phone.class), List.of(TtfSources.EtlSrc.class, TtfSources.InactiveStatus.class));
 
     private final TtfEtlSrcViewRepository etlSrc;
     private final TtfInactiveStatusRepository inactiveStatuses;

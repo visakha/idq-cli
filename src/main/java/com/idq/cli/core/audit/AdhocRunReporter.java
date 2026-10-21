@@ -112,7 +112,7 @@ public class AdhocRunReporter {
     /// One report per target table, in workflow order.
     List<Report> reports(RunId run, List<MappingLog> mappings) {
         var byTable = new LinkedHashMap<String, List<MappingLog>>();
-        mappings.forEach(m -> m.info.targets().forEach(t -> byTable.computeIfAbsent(t, _ -> new ArrayList<>())
+        mappings.forEach(m -> m.info.targetTables().forEach(t -> byTable.computeIfAbsent(t, _ -> new ArrayList<>())
                 .add(m)));
         return byTable.entrySet().stream().map(e -> {
             var file = file(run, e.getKey());
