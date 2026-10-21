@@ -79,6 +79,52 @@ flowchart LR
   n16 --> n17
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_V_WIC_ETL_SRC | SourceTx | rows the view `V_WIC_ETL_SRC` returns (view logic is outside the export) | `EXC_STG_BAD_REC_MEMB`, `C_S_WIC_PTY_RLE_PHN`, `C_S_WIC_PTY_RLE_EADDR` | never read |
+| fil_deactivated_status | FilterTx | keep `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_WIC_PTY_INACTIVE_STS` | `EXC_STG_BAD_REC_MEMB`, `C_S_WIC_PTY_RLE_PHN`, `C_S_WIC_PTY_RLE_EADDR` | **discarded** |
+| RTR_Valid_PhoneNumbers | RouterTx | group `Good_Records`: `ISNULL(Phone_Exception_Code) or Phone_Exception_Code='Missing_AreaCode'` | `C_S_WIC_PTY_RLE_PHN` |  |
+| RTR_Valid_PhoneNumbers | RouterTx | group `Bad_Phone_Records`: `NOT ISNULL(Phone_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` |  |
+| RTR_Valid_PhoneNumbers | RouterTx | default group `Default`: rows that match no other group | no row gets here: every row matches `Good_Records` or `Bad_Phone_Records` |  |
+| Filt_null_email | FilterTx | keep `NOT ISNULL(EMAIL)` | `EXC_STG_BAD_REC_MEMB`, `C_S_WIC_PTY_RLE_EADDR` | **discarded** |
+| rtr_Valid_EAddr_Records | RouterTx | group `Valid_Records`: `ISNULL(DQ_Exception_Code)` | `C_S_WIC_PTY_RLE_EADDR` |  |
+| rtr_Valid_EAddr_Records | RouterTx | group `Bad_Records`: `NOT ISNULL(DQ_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Valid_EAddr_Records | RouterTx | default group `Default`: rows that match no other group | no row gets here: every row matches `Valid_Records` or `Bad_Records` |  |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| fil_deactivated_status | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lookup_STG_WIC_PTY_INACTIVE_STS` on `STG_WIC_PTY_INACTIVE_STS` where `SRC_KEY = PTY_SRC_KEY AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches; `STG_WIC_PTY_INACTIVE_STS` is loaded by `m_Tgt_C_S_WIC_Pty_Validation` in this workflow |
+| RTR_Valid_PhoneNumbers | `Phone_Exception_Code` | mapplet `rule_Phone_Std`: `in_Exception_Code` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = in_Exception_Code`; NULL when no row matches |
+| Filt_null_email | `EMAIL` | source column `EMAIL` read by `Read_V_WIC_ETL_SRC` |
+| rtr_Valid_EAddr_Records | `DQ_Exception_Code` | mapplet `rule_email_validation_v01`: `EXCEPTION_CODE` returned by lookup `lkp_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = in_ExceptionCode`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_WIC_PTY_RLE_PHN`** (`Write_C_S_WIC_PTY_RLE_PHN`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_V_WIC_ETL_SRC` | rows the view `V_WIC_ETL_SRC` returns (view logic is outside the export) | never read |
+| `fil_deactivated_status` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_WIC_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+| `RTR_Valid_PhoneNumbers` | group `Good_Records`: `ISNULL(Phone_Exception_Code) or Phone_Exception_Code='Missing_AreaCode'`<br>(a row that also matches `Bad_Phone_Records` is written there as well) | if `NOT ISNULL(Phone_Exception_Code)`: group `Bad_Phone_Records` &rarr; `EXC_STG_BAD_REC_MEMB` |
+
+**`C_S_WIC_PTY_RLE_EADDR`** (`Write_C_S_WIC_PTY_RLE_EADDR`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_V_WIC_ETL_SRC` | rows the view `V_WIC_ETL_SRC` returns (view logic is outside the export) | never read |
+| `fil_deactivated_status` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_WIC_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+| `Filt_null_email` | `NOT ISNULL(EMAIL)` | **discarded** (not written anywhere) |
+| `rtr_Valid_EAddr_Records` | group `Valid_Records`: `ISNULL(DQ_Exception_Code)` | if `NOT ISNULL(DQ_Exception_Code)`: group `Bad_Records` &rarr; `EXC_STG_BAD_REC_MEMB` |
+
 ## Transformations
 
 In data-flow order.

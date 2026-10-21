@@ -44,6 +44,32 @@ flowchart LR
   n4 --> n5
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_V_WIC_ETL_SRC | SourceTx | rows the view `V_WIC_ETL_SRC` returns (view logic is outside the export) | `C_S_WIC_PTY_RLE_ALT_ID` | never read |
+| Filter | FilterTx | keep `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_WIC_PTY_INACTIVE_STS` | `C_S_WIC_PTY_RLE_ALT_ID` | **discarded** |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Filter | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lookup_STG_WIC_PTY_INACTIVE_STS` on `STG_WIC_PTY_INACTIVE_STS` where `SRC_KEY = PTY_SRC_KEY AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches; `STG_WIC_PTY_INACTIVE_STS` is loaded by `m_Tgt_C_S_WIC_Pty_Validation` in this workflow |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_WIC_PTY_RLE_ALT_ID`** (`Write_C_S_WIC_PTY_RLE_ALT_ID`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_V_WIC_ETL_SRC` | rows the view `V_WIC_ETL_SRC` returns (view logic is outside the export) | never read |
+| `Filter` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_WIC_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+
 ## Transformations
 
 In data-flow order.

@@ -70,6 +70,37 @@ flowchart LR
   n12 --> n13
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_Stg_TRS_D_IN_Managed_Care | SourceTx | custom SQL query (see the step): only the rows it returns<br>Note: filter `MC_PLAN IS NOT NULL` is also stored and is part of the query | `C_S_TRS_PTY_RLE_PLN`, `EXC_STG_BAD_REC_MEMB` | never read |
+| rtr_Invalid_Plan_Cd | RouterTx | group `VALID`: `NOT ISNULL(PLN_MSTR_CD)`<br>= a matching row exists in `V_LOOKUP_CODE_VALUE` | `C_S_TRS_PTY_RLE_PLN` |  |
+| rtr_Invalid_Plan_Cd | RouterTx | default group `Default`: rows that match no other group | `EXC_STG_BAD_REC_MEMB` |  |
+| fltr_Rank | FilterTx | keep `RANK=1` | `EXC_STG_BAD_REC_MEMB` | **discarded** |
+| agg_Dedup_Rec | AggregatorTx | one row per `PKEY_PRTY_RL_PLAN` | `C_S_TRS_PTY_RLE_PLN` | collapsed into the row kept for the same key |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| rtr_Invalid_Plan_Cd | `PLN_MSTR_CD` | `MSTR_CODE_VALUE` returned by lookup `lkp_Plan_Cd` on `V_LOOKUP_CODE_VALUE` where `SRC_CODE_VALUE = in_MC_PLAN`; NULL when no row matches |
+| fltr_Rank | `RANK` | `exp_Rank.v_RANK` = `IIF(in_INDV_ID<>LAST_INDV_ID,1,v_RANK+1)` |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_RLE_PLN`** (`Write_C_S_TRS_PTY_RLE_PLN`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_Stg_TRS_D_IN_Managed_Care` | custom SQL query (see the step): only the rows it returns<br>Note: filter `MC_PLAN IS NOT NULL` is also stored and is part of the query | never read |
+| `rtr_Invalid_Plan_Cd` | group `VALID`: `NOT ISNULL(PLN_MSTR_CD)`<br>= a matching row exists in `V_LOOKUP_CODE_VALUE` | if no group matches: default group `Default` &rarr; `EXC_STG_BAD_REC_MEMB` |
+| `agg_Dedup_Rec` | one row per `PKEY_PRTY_RL_PLAN` | merged into the one row written for its key |
+
 ## Transformations
 
 In data-flow order.

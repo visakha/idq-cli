@@ -99,6 +99,42 @@ flowchart LR
   class n9 retired
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_TRS_D_IN_MANAGED_CARE | SourceTx | custom SQL query (see the step): only the rows it returns<br>Note: filter `PROVIDER_NUM is not null` is also stored and is part of the query | `C_S_TRS_PTY_RLE_REL_PROV`, `EXC_STG_BAD_REC_MEMB` | never read |
+| Filt_Numeric_Prov | FilterTx | keep `IS_NUMBER(PROVIDER_NUM)` | `C_S_TRS_PTY_RLE_REL_PROV`, `EXC_STG_BAD_REC_MEMB` | **discarded** |
+| Rout_Valid_vs_Exceptions | RouterTx | group `Period_Start_Date_GT_Period_End_Date`: `PERIOD_START_DATE > PERIOD_END_DATE` | `EXC_STG_BAD_REC_MEMB` |  |
+| Rout_Valid_vs_Exceptions | RouterTx | group `Valid_Records`: `NOT ISNULL(PTY_RLE_FK_1) AND NOT ISNULL(PTY_RLE_FK_2) AND (PERIOD_START_DATE <= PERIOD_END_DATE OR ISNULL(PERIOD_END_DATE) )` | `C_S_TRS_PTY_RLE_REL_PROV` |  |
+| Rout_Valid_vs_Exceptions | RouterTx | default group `Default`: rows that match no other group | `EXC_STG_BAD_REC_MEMB` |  |
+| MPLT_Member_PTY_RLE_REL_Consolidation | MappletTx | `Filter`: keep `NOT ISNULL(REL_TP)`<br>`Sorter`: distinct: exact duplicate rows are collapsed into one<br>`Aggregator`: one row per `PKEY_SRC_OBJECT`, `PERIOD_END_DATE`, `PERIOD_START_DATE` | `C_S_TRS_PTY_RLE_REL_PROV` | **discarded** inside the mapplet |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Filt_Numeric_Prov | `PROVIDER_NUM` | source column `PROVIDER_NUM` read by `Read_STG_TRS_D_IN_MANAGED_CARE` |
+| Rout_Valid_vs_Exceptions | `PERIOD_START_DATE` | source column `BEGIN_DT` read by `Read_STG_TRS_D_IN_MANAGED_CARE` |
+| Rout_Valid_vs_Exceptions | `PERIOD_END_DATE` | source column `END_DT` read by `Read_STG_TRS_D_IN_MANAGED_CARE` |
+| Rout_Valid_vs_Exceptions | `PTY_RLE_FK_1` | `Exp_Build_FK.v_PTY_RLE_FK_1` = `IIF( ISNULL(in_PTY_RLE_FK_MEMBER) ,NULL ,LTRIM(RTRIM(in_PTY_RLE_FK_MEMBER)) \|\| '\|Member' )` |
+| Rout_Valid_vs_Exceptions | `PTY_RLE_FK_2` | `Exp_Build_FK.v_PTY_RLE_FK_2_Parse` = `SUBSTR(v_PTY_RLE_FK_2_Trim, 1, INSTR(v_PTY_RLE_FK_2_Trim,'\|',1,2) -1)` |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_RLE_REL_PROV`** (`Write_C_S_TRS_PTY_RLE_REL_PROV`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_TRS_D_IN_MANAGED_CARE` | custom SQL query (see the step): only the rows it returns<br>Note: filter `PROVIDER_NUM is not null` is also stored and is part of the query | never read |
+| `Filt_Numeric_Prov` | `IS_NUMBER(PROVIDER_NUM)` | **discarded** (not written anywhere) |
+| `Rout_Valid_vs_Exceptions` | group `Valid_Records`: `NOT ISNULL(PTY_RLE_FK_1) AND NOT ISNULL(PTY_RLE_FK_2) AND (PERIOD_START_DATE <= PERIOD_END_DATE OR ISNULL(PERIOD_END_DATE) )`<br>(a row that also matches `Period_Start_Date_GT_Period_End_Date` is written there as well) | if `PERIOD_START_DATE > PERIOD_END_DATE`: group `Period_Start_Date_GT_Period_End_Date` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if no group matches: default group `Default` &rarr; `EXC_STG_BAD_REC_MEMB` |
+| `MPLT_Member_PTY_RLE_REL_Consolidation` | `Filter`: keep `NOT ISNULL(REL_TP)`<br>`Sorter`: distinct: exact duplicate rows are collapsed into one<br>`Aggregator`: one row per `PKEY_SRC_OBJECT`, `PERIOD_END_DATE`, `PERIOD_START_DATE` | **discarded** inside the mapplet |
+
 ## Transformations
 
 In data-flow order.

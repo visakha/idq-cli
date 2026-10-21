@@ -88,8 +88,9 @@ output folder can be committed and diffs show real changes only.
 
 The entry point. It lists the IDMC assets to create and their names, maps each IDQ connection to an IDMC connector,
 gives the build order (connections, CDQ assets, mapplets innermost first, mappings, mapping tasks, taskflow),
-counts every transformation type, lists the translation rules applied, and ends with the items to confirm in the
-target org.
+counts every transformation type, summarizes the filtered data (per mapping and `C_S_*` table: the steps that can
+keep a row out and where the failed rows go), lists the translation rules applied, and ends with the items to
+confirm in the target org.
 
 ### taskflow.md
 
@@ -123,7 +124,8 @@ Each file has:
 2. **Parameters**: name, type, default, and whether the mapping actually uses it (`no (declared only)` otherwise).
 3. **Target load order**, when the IDQ mapping sets one.
 4. **Flow**: a Mermaid diagram of the transformations in data-flow order.
-5. **Transformations**, in data-flow order, each with its CDI equivalent and:
+5. **Filtered data** (see below).
+6. **Transformations**, in data-flow order, each with its CDI equivalent and:
    * Source / Lookup / Target: connection, object, SQL override, filter, lookup condition, multiple-match policy,
      cache, target operation, truncate option.
    * Expression: every field with its kind (in, out, in/out, variable), type and expression already translated
@@ -133,6 +135,32 @@ Each file has:
      are actually linked.
    * **Links**: every input field and the upstream `transformation.field` it comes from. Router and mapplet fields
      are shown as `transformation.group.field`.
+
+#### Filtered data
+
+Where rows leave the flow, worked out from the links (not hand-written), in three parts:
+
+* **Steps that filter rows**: every step that can stop, divert or collapse rows, with its rule, the targets the
+  passing rows can reach and what happens to the others.
+  * Source: custom SQL query, source filter, select distinct, or a view (its logic is outside the export). A
+    filter stored next to a custom query, or SQL text stored on a read that is not in custom-query mode, is
+    flagged; hard-coded key lists, `rownum` caps and `ORA_HASH` sampling are flagged as likely test filters.
+  * Filter: the condition with comments (`--`, `//`) removed. FALSE **or NULL** drops the row silently.
+  * Router: one line per group. A row goes to every group whose condition is TRUE; a row matching no group goes
+    to the default group, and is discarded when that group is not linked. A default group that no row can reach
+    (two groups test `ISNULL(F)` / `NOT ISNULL(F)`) is said so.
+  * Sorter with *distinct*, Aggregator (one row per group-by key), Update Strategy (rows delete/update instead of
+    insert), mapplets that drop rows inside (their filters are listed), and timeline steps that are not ported.
+* **Where the condition fields come from**: each field a Filter or Router tests is traced back through
+  pass-through ports to a source column, a lookup return (table and condition; NULL when no row matches), an
+  expression, or a mapplet output. When the lookup table is loaded by another mapping of the same workflow (for
+  example `STG_ECI_PTY_INACTIVE_STS`, loaded by `m_Tgt_C_S_ECI_Pty_Validation`), that mapping is named. A null
+  check on a lookup return also gets a plain reading, such as `IsNull(DEACTIVATION_STS)` = *no matching row in
+  `STG_ECI_PTY_INACTIVE_STS`*.
+* **Rows that do not reach `C_S_*` tables** (mappings only): for each `C_S_*` target, every path from the source
+  with the steps a row must pass, and for each step what happens to a row that fails it: never read, discarded,
+  sent to another router group (and the table it lands in, usually `EXC_STG_BAD_REC_MEMB`), collapsed into another
+  row, or dropped inside a mapplet.
 
 ## Translation rules
 
@@ -165,6 +193,7 @@ All settings are constants near the top of the script or in `main()`:
 | Taskflow name | `main()`: `tf = ...` | `wf_X` &rarr; `tf_X` |
 | Mapping task names | `mct()` | `m_X` &rarr; `mct_X` |
 | Fields flagged as not to be mapped | `STALE_COLUMNS` | MDM timeline fields and ranks |
+| Source filters flagged as test filters | `TEST_FILTER` | key lists, long numeric ids, `rownum`, `ORA_HASH` |
 | Whole steps not ported | `RETIRED_STEPS` (keyed by mapping and step name) | the timeline steps the Java port retired |
 | Mapplets not ported (callers are marked too) | `RETIRED_MAPPLETS` | the two timeline mapplets |
 | Live fields with timeline logic to replace | `FIELD_NOTES` | `SRC_ROWID`, `PERIOD_START_DATE_OUT`, `out_Period_End_Date` |
@@ -186,6 +215,9 @@ After changing the script, regenerate the output folders; do not hand-edit the g
   CDI **(manual)** and its links, and must be designed by hand.
 * Expressions are translated textually; review any expression that uses IDQ system parameters other than the two
   listed above.
+* *Filtered data* reads the conditions as written; it does not evaluate them. Conditions on expressions (for
+  example a score computed by `DECODE`) are shown with the expression, so whether a router's default group is ever
+  reached can still need judgement. The logic of source views and custom SQL queries is not analyzed.
 
 ## Troubleshooting
 

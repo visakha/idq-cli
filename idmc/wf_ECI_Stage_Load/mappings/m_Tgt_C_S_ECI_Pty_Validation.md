@@ -111,6 +111,37 @@ flowchart LR
   n19 --> n20
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_ECI_D_CHILD_and_FAMILY | SourceTx | custom SQL query (see the step): only the rows it returns | `EXC_STG_BAD_REC_MEMB`, `STG_ECI_PTY_INACTIVE_STS`, `STG_ECI_PTY_INACTIVE_LOG` | never read |
+| Rtr_Valid_Party | RouterTx | group `Invalid_Party_Name`: `(Length(Rtrim(FIRST_NAME))=0 OR Length(Rtrim(LAST_NAME))=0 OR IsNULL(FIRST_NAME) OR IsNULL(LAST_NAME) ) AND FAM_INACTIVE_YN = 'N'` (comments removed) | `EXC_STG_BAD_REC_MEMB` |  |
+| Rtr_Valid_Party | RouterTx | group `Deactivation`: `Length(Rtrim(FIRST_NAME))=0 OR Length(Rtrim(LAST_NAME))=0 OR IsNULL(FIRST_NAME) OR IsNULL(LAST_NAME) OR NOT IsNull(OMIT_ID) OR FAM_INACTIVE_YN = 'Y'` (comments removed) | `STG_ECI_PTY_INACTIVE_STS`, `STG_ECI_PTY_INACTIVE_LOG` |  |
+| Rtr_Valid_Party | RouterTx | group `Reactivation`: `NOT IsNull(DEACTIVATION_STS) and Length(Rtrim(FIRST_NAME))>0 and Length(Rtrim(LAST_NAME))>0 and IsNull(OMIT_ID) and FAM_INACTIVE_YN='N'` (comments removed) | `STG_ECI_PTY_INACTIVE_STS`, `STG_ECI_PTY_INACTIVE_LOG` |  |
+| Rtr_Valid_Party | RouterTx | default group `Default`: rows that match no other group | nothing: group not linked, **discarded** |  |
+| Filt_new_deactivations | FilterTx | keep `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | `STG_ECI_PTY_INACTIVE_STS` | **discarded** |
+| Upd_Delete_Inactive | UpdateStrategyTx | `DD_DELETE` | `STG_ECI_PTY_INACTIVE_STS` | not dropped: each row deletes the target row |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Rtr_Valid_Party | `FIRST_NAME` | mapplet `mplt_Name_Standardization_Indv_Member`: mapplet `mplt_Name_Standardization_Trailing_Num_Removal`: `exp_Name_Cor_numbr.var_FName` = `RTRIM(LTRIM( Decode (True, SUBSTR(LTRIM(RTRIM(FName_lbl)),LENGTH(LTRIM(RTRIM(FName_lbl)))-2,2)!= '99' AND SUBSTR(LTRIM(RTRIM(in_FName)),LENGTH(LTRIM(RTRIM(in_FName))),1) = '0',in_FName, INSTR(FName_lbl,'9') >0, SUBSTR(in_FName,1, INSTR( FName_lbl, '9', 1, 1 )-1), in_FName) ))` |
+| Rtr_Valid_Party | `LAST_NAME` | mapplet `mplt_Name_Standardization_Indv_Member`: mapplet `mplt_Name_Standardization_Trailing_Num_Removal`: `exp_Name_Cor_numbr.var_LName` = `RTRIM(LTRIM( Decode (True, SUBSTR(LTRIM(RTRIM(LName_lbl)),LENGTH(LTRIM(RTRIM(LName_lbl)))-2,2)!= '99' AND SUBSTR(LTRIM(RTRIM(in_LName)),LENGTH(LTRIM(RTRIM(in_LName))),1) = '0',in_LName, INSTR(LName_lbl,'9') >0, SUBSTR(in_LName,1, INSTR( LName_lbl, '9', 1, 1 )-1),in_LName) ))` |
+| Rtr_Valid_Party | `FAM_INACTIVE_YN` | `Exp_Consolidate_Exceptions.FAM_INACTIVE_YN` = `IIF(ISNULL(FAM_NAME_STATUS) and ISNULL(FAM_PHONE_AND_ADDRESS_STS) and ISNULL(FAM_INACTIVE_STATUS), 'N','Y')` |
+| Rtr_Valid_Party | `OMIT_ID` | `ID` returned by lookup `Lookup_V_ECI_ETL_LU_DUP_CASES` on `V_ECI_ETL_LU_DUP_CASES` where `SOURCE_TABLE = SOURCE_TABLE1 AND ID = ID1`; NULL when no row matches |
+| Rtr_Valid_Party | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lookup_STG_ECI_PTY_INACTIVE_STS` on `STG_ECI_PTY_INACTIVE_STS` where `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches |
+| Filt_new_deactivations | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lookup_STG_ECI_PTY_INACTIVE_STS` on `STG_ECI_PTY_INACTIVE_STS` where `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+This mapping writes no `C_S_*` table (it loads `EXC_STG_BAD_REC_MEMB`, `STG_ECI_PTY_INACTIVE_STS`, `STG_ECI_PTY_INACTIVE_LOG`); the steps above decide which rows it writes.
+
 ## Transformations
 
 In data-flow order.

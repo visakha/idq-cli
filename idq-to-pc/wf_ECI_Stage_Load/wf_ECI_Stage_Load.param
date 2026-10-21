@@ -1,0 +1,36 @@
+# PowerCenter parameter file for wf_ECI_Stage_Load (defaults taken from the IDQ mapping parameters).
+
+[ECI.WF:wf_ECI_Stage_Load]
+
+[ECI.WF:wf_ECI_Stage_Load.ST:s_m_Tgt_C_S_ECI_Pty]
+$$PTY_BO_CLASS_CD_Member=Indv
+$$ECI_PTY_TBL_SRC=ECI_CHILD
+$$RLE_BO_CLASS_CD_Member=Member
+
+[ECI.WF:wf_ECI_Stage_Load.ST:s_m_Tgt_C_S_ECI_Pty_Rle_Alt_Id]
+
+[ECI.WF:wf_ECI_Stage_Load.ST:s_m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr]
+
+[ECI.WF:wf_ECI_Stage_Load.ST:s_m_Tgt_C_S_ECI_Pty_Validation]
+$$PTY_BO_CLASS_CD_Member=Indiv
+$$ECI_PTY_TBL_SRC=ECI_CHILD
+$$RLE_BO_CLASS_CD_Member=Member
+
+[ECI.WF:wf_ECI_Stage_Load.ST:s_m_Tgt_C_S_ECI_Pty_Addr]
+$$Member_Role_Type=Member
+$$Member_Hierarchy_Code=Member
+$$Member_HM_REL_TP_CD=Member Addr
+$$Min_Valid_Mailability_Score=3
+$$Default_TX_State_CD=48
+$$County_CD_NonTX=996
+$$CountyCD_DefaultAll=998
+$$Default_NonUS_State_CD=99
+$$Default_NonUS_Country_CD=ZZ
+
+[ECI.WF:wf_ECI_Stage_Load.ST:s_m_Tgt_C_S_ECI_Pty_Rle_Rel]
+
+[ECI.WF:wf_ECI_Stage_Load.ST:s_m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Addr]
+
+[ECI.WF:wf_ECI_Stage_Load.ST:s_m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Phn]
+
+[ECI.WF:wf_ECI_Stage_Load.ST:s_m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid]

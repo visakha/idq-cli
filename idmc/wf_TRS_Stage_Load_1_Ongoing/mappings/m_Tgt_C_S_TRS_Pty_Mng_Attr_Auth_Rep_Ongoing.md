@@ -66,6 +66,27 @@ flowchart LR
   class n3,n4 retired
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_TRS_D_DC_Primary_Payee | SourceTx | custom SQL query (see the step): only the rows it returns | `C_S_TRS_PTY_MNG_ATTR` | never read |
+| agg_Dedup_TRS_Pty_Mng_Attr | AggregatorTx | one row per `PKEY_SRC_OBJECT` | `C_S_TRS_PTY_MNG_ATTR` | collapsed into the row kept for the same key |
+| srtr_Rank | SorterTx | **not ported** (stale MDM timeline): Distinct re-sort around `exp_Rank`. Link the fields that feed it straight to the fields it fed. |  |  |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_MNG_ATTR`** (`Write_C_S_TRS_Pty_Mng_Attr`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_TRS_D_DC_Primary_Payee` | custom SQL query (see the step): only the rows it returns | never read |
+| `agg_Dedup_TRS_Pty_Mng_Attr` | one row per `PKEY_SRC_OBJECT` | merged into the one row written for its key |
+
 ## Transformations
 
 In data-flow order.

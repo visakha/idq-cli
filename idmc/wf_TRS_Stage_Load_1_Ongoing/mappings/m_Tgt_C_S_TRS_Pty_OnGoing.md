@@ -168,6 +168,63 @@ flowchart LR
   class n19 retired
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_TRS_D_DC_INDV | SourceTx | custom SQL query (see the step): only the rows it returns<br>Note: filter `INDV_ID=504937068` is also stored; it is not part of the custom query text and looks like a test filter: confirm it is not applied | `EXC_STG_BAD_REC_MEMB`, `STG_TRS_VALID_MEMBERS`, `C_S_TRS_PTY_RLE`, `C_S_TRS_PTY` | never read |
+| rtr_Invalid_Party | RouterTx | group `Invalid_Party_Name`: `Length(Rtrim(Frst_Nm))=0 OR Length(Rtrim(Lst_Nm))=0 OR IsNULL(Frst_Nm) OR IsNULL(Lst_Nm)` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Invalid_Party | RouterTx | group `Invalid_Gender_Code`: `NOT ISNULL(Gender_Exception_Description)` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Invalid_Party | RouterTx | group `Invalid_Death_Date`: `NOT ISNULL(Exception_Desc_Death_Date)`<br>= a matching row exists in `EXC_LOOKUP_CODE_VALUE` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Invalid_Party | RouterTx | group `Invalid_BirthDate`: `NOT ISNULL(BirthDate_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Invalid_Party | RouterTx | group `Valid_Party`: `LENGTH(RTRIM(FRST_NM)) !=0 OR LENGTH(RTRIM(LST_NM))!=0 OR NOT ISNULL(FRST_NM) OR NOT ISNULL(LST_NM)` (comments removed) | `STG_TRS_VALID_MEMBERS`, `C_S_TRS_PTY_RLE`, `C_S_TRS_PTY`, `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Invalid_Party | RouterTx | default group `Default`: rows that match no other group | no row gets here: every row matches `Invalid_Party_Name` or `Valid_Party` |  |
+| srtr_Dedup_Rec | SorterTx | distinct: exact duplicate rows are collapsed into one | `STG_TRS_VALID_MEMBERS`, `C_S_TRS_PTY_RLE`, `C_S_TRS_PTY`, `EXC_STG_BAD_REC_MEMB` | collapsed into the row kept for the same key |
+| fltr_New_Valid_Members | FilterTx | keep `ISNULL(PTY_PK_EXISTS)`<br>= no matching row in `STG_TRS_VALID_MEMBERS` | `STG_TRS_VALID_MEMBERS` | **discarded** |
+| agg_Valid_Members | AggregatorTx | one row per `PTY_PK` | `STG_TRS_VALID_MEMBERS` | collapsed into the row kept for the same key |
+| Aggregator | AggregatorTx | one row per `PKEY_SRC_OBJECT_PTY_RLE` | `C_S_TRS_PTY_RLE` | collapsed into the row kept for the same key |
+| Aggregator1 | AggregatorTx | one row per `PKEY_SRC_OBJECT` | `C_S_TRS_PTY` | collapsed into the row kept for the same key |
+| Fil_Race_Exceptions | FilterTx | keep `NOT ISNULL(Race_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` | **discarded** |
+| Fil_Ethnicity_Exceptions | FilterTx | keep `NOT ISNULL(Ethnicity_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` | **discarded** |
+| fltr_Dups | FilterTx | **not ported** (stale MDM timeline): Filter `VERSION_SEQ_NUM = 1`; the version is hard-coded to 1, so it passes every row. Link the fields that feed it straight to the fields it fed. |  |  |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| rtr_Invalid_Party | `Frst_Nm` | mapplet `mplt_Name_Standardization_Indv_Member`: mapplet `mplt_Name_Standardization_Trailing_Num_Removal`: `exp_Name_Cor_numbr.var_FName` = `RTRIM(LTRIM( Decode (True, SUBSTR(LTRIM(RTRIM(FName_lbl)),LENGTH(LTRIM(RTRIM(FName_lbl)))-2,2)!= '99' AND SUBSTR(LTRIM(RTRIM(in_FName)),LENGTH(LTRIM(RTRIM(in_FName))),1) = '0',in_FName, INSTR(FName_lbl,'9') >0, SUBSTR(in_FName,1, INSTR( FName_lbl, '9', 1, 1 )-1), in_FName) ))` |
+| rtr_Invalid_Party | `Lst_Nm` | mapplet `mplt_Name_Standardization_Indv_Member`: mapplet `mplt_Name_Standardization_Trailing_Num_Removal`: `exp_Name_Cor_numbr.var_LName` = `RTRIM(LTRIM( Decode (True, SUBSTR(LTRIM(RTRIM(LName_lbl)),LENGTH(LTRIM(RTRIM(LName_lbl)))-2,2)!= '99' AND SUBSTR(LTRIM(RTRIM(in_LName)),LENGTH(LTRIM(RTRIM(in_LName))),1) = '0',in_LName, INSTR(LName_lbl,'9') >0, SUBSTR(in_LName,1, INSTR( LName_lbl, '9', 1, 1 )-1),in_LName) ))` |
+| rtr_Invalid_Party | `Gender_Exception_Description` | mapplet `mplt_Gender_Validation`: `EXCEPTION_DESC` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = In_Exception_Code`; NULL when no row matches |
+| rtr_Invalid_Party | `Exception_Desc_Death_Date` | `EXCEPTION_DESC` returned by lookup `lkp_Exc_Death_Dt` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = Exception_Code_Death_Dt`; NULL when no row matches |
+| rtr_Invalid_Party | `BirthDate_Exception_Code` | mapplet `mplt_BirthDate_Validation`: `exp_BirthDate_Validation.Exception_Code` = `Decode(TRUE, IN(Src_Sys,'P23','C21','P88','MAX','P84','PMR','TRS','CRE','ECI','WIC','FSS', 'TTF') AND IN(Party_Type,'HCP','Indv','INDV','I') AND BirthDate > sysdate, 'Invalid_Birth_Date', NULL)` |
+| fltr_New_Valid_Members | `PTY_PK_EXISTS` | `PTY_PK` returned by lookup `lkp_Stg_TRS_Valid_Members` on `STG_TRS_VALID_MEMBERS` where `PTY_PK = PTY_PK_IN`; NULL when no row matches; `STG_TRS_VALID_MEMBERS` is loaded by `m_Tgt_C_S_TRS_Pty_Deactivation_1` in this workflow |
+| Fil_Race_Exceptions | `Race_Exception_Code` | mapplet `mplt_Race_Validation`: `EXCEPTION_CODE` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = in_Exception_Code`; NULL when no row matches |
+| Fil_Ethnicity_Exceptions | `Ethnicity_Exception_Code` | mapplet `mplt_Ethnicity_Validation`: `EXCEPTION_CODE` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = EXCEPTION_CODE1`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_RLE`** (`Write_C_S_TRS_PTY_RLE`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_TRS_D_DC_INDV` | custom SQL query (see the step): only the rows it returns<br>Note: filter `INDV_ID=504937068` is also stored; it is not part of the custom query text and looks like a test filter: confirm it is not applied | never read |
+| `rtr_Invalid_Party` | group `Valid_Party`: `LENGTH(RTRIM(FRST_NM)) !=0 OR LENGTH(RTRIM(LST_NM))!=0 OR NOT ISNULL(FRST_NM) OR NOT ISNULL(LST_NM)`<br>(a row that also matches `Invalid_Party_Name`, `Invalid_Gender_Code`, `Invalid_Death_Date`, `Invalid_BirthDate` is written there as well) | if `Length(Rtrim(Frst_Nm))=0 OR Length(Rtrim(Lst_Nm))=0 OR IsNULL(Frst_Nm) OR IsNULL(Lst_Nm)`: group `Invalid_Party_Name` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `NOT ISNULL(Gender_Exception_Description)`: group `Invalid_Gender_Code` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `NOT ISNULL(Exception_Desc_Death_Date)`: group `Invalid_Death_Date` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `NOT ISNULL(BirthDate_Exception_Code)`: group `Invalid_BirthDate` &rarr; `EXC_STG_BAD_REC_MEMB` |
+| `srtr_Dedup_Rec` | not an exact duplicate of an earlier row | collapsed into the identical row |
+| `Aggregator` | one row per `PKEY_SRC_OBJECT_PTY_RLE` | merged into the one row written for its key |
+
+**`C_S_TRS_PTY`** (`Write_C_S_TRS_PTY`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_TRS_D_DC_INDV` | custom SQL query (see the step): only the rows it returns<br>Note: filter `INDV_ID=504937068` is also stored; it is not part of the custom query text and looks like a test filter: confirm it is not applied | never read |
+| `rtr_Invalid_Party` | group `Valid_Party`: `LENGTH(RTRIM(FRST_NM)) !=0 OR LENGTH(RTRIM(LST_NM))!=0 OR NOT ISNULL(FRST_NM) OR NOT ISNULL(LST_NM)`<br>(a row that also matches `Invalid_Party_Name`, `Invalid_Gender_Code`, `Invalid_Death_Date`, `Invalid_BirthDate` is written there as well) | if `Length(Rtrim(Frst_Nm))=0 OR Length(Rtrim(Lst_Nm))=0 OR IsNULL(Frst_Nm) OR IsNULL(Lst_Nm)`: group `Invalid_Party_Name` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `NOT ISNULL(Gender_Exception_Description)`: group `Invalid_Gender_Code` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `NOT ISNULL(Exception_Desc_Death_Date)`: group `Invalid_Death_Date` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `NOT ISNULL(BirthDate_Exception_Code)`: group `Invalid_BirthDate` &rarr; `EXC_STG_BAD_REC_MEMB` |
+| `srtr_Dedup_Rec` | not an exact duplicate of an earlier row | collapsed into the identical row |
+| `Aggregator1` | one row per `PKEY_SRC_OBJECT` | merged into the one row written for its key |
+
 ## Transformations
 
 In data-flow order.

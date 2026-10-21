@@ -117,6 +117,29 @@ The legacy MDM timeline of the C_S_* tables is stale, so its logic is not built 
 | [`m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing`](mappings/m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing.md) | `exp_Rank` | ExpressionTx | `VERSION_SEQ_NUM` rank, hard-coded to 1. Link the fields that feed it straight to the fields it fed. |
 | [`m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing`](mappings/m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing.md) | `srtr_Rank` | SorterTx | Distinct re-sort around `exp_Rank`. Link the fields that feed it straight to the fields it fed. |
 
+## Filtered data
+
+Which steps can keep a source row out of each `C_S_*` table, and where the diverted rows go instead. Each mapping spec has a *Filtered data* section with the conditions, the origin of every field they test and what happens to the rows that fail.
+
+| Mapping | `C_S_*` table | Steps that can keep a row out | Failed rows diverted to |
+|---|---|---|---|
+| [`m_Tgt_C_S_TRS_Pty_OnGoing`](mappings/m_Tgt_C_S_TRS_Pty_OnGoing.md#filtered-data) | `C_S_TRS_PTY_RLE` | `Read_STG_TRS_D_DC_INDV`, `rtr_Invalid_Party`, `srtr_Dedup_Rec`, `Aggregator` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_TRS_Pty_OnGoing`](mappings/m_Tgt_C_S_TRS_Pty_OnGoing.md#filtered-data) | `C_S_TRS_PTY` | `Read_STG_TRS_D_DC_INDV`, `rtr_Invalid_Party`, `srtr_Dedup_Rec`, `Aggregator1` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_TRS_Pty_Deactivation_1`](mappings/m_Tgt_C_S_TRS_Pty_Deactivation_1.md#filtered-data) | (no `C_S_*` target) |  |  |
+| [`m_Tgt_C_S_TRS_Pty_Rle_TOA`](mappings/m_Tgt_C_S_TRS_Pty_Rle_TOA.md#filtered-data) | `C_S_TRS_PTY_RLE_TOA` | `read_Staging_Delta_Tables`, `rtr_Valid_Records` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem.md#filtered-data) | `C_S_TRS_PTY_RLE_REL` | `Read_STG_TRS_D_DC_RELATIONSHIPS`, `rtr_AltId_Exp`, `MPLT_Member_PTY_RLE_REL_Consolidation` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Rel_DeActivation_1`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Rel_DeActivation_1.md#filtered-data) | (no `C_S_*` target) |  |  |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP.md#filtered-data) | `C_S_TRS_PTY_RLE_REL_PROV` | `Read_STG_TRS_D_IN_MANAGED_CARE`, `Filt_Numeric_Prov`, `Rout_Valid_vs_Exceptions`, `MPLT_Member_PTY_RLE_REL_Consolidation` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr.md#filtered-data) | `C_S_TRS_PTY_RLE_PHN` | `read_Staging_Delta_Tables`, `fltr_Hold`, `mplt_Phone_Normalization`, `rtr_Valid_Phone_Records`, `mplt_Phone_Consolidation`, `agg_Pty_Rle_Phone` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr.md#filtered-data) | `C_S_TRS_PTY_RLE_EADDR` | `read_Staging_Delta_Tables`, `fltr_Hold`, `fltr_Null_Emails`, `rtr_Valid_EAddr_Records`, `mplt_EAddr_Consolidation`, `agg_Pty_Rle_Eaddr` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw`](mappings/m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw.md#filtered-data) | `C_S_TRS_PTY_MNG_ATTR` | `Read_Stg_TRS_D_DC_Indv`, `fltr_Null_Values`, `srtr_Pkey` |  |
+| [`m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing`](mappings/m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing.md#filtered-data) | `C_S_TRS_PTY_MNG_ATTR` | `Read_STG_TRS_D_DC_Primary_Payee`, `agg_Dedup_TRS_Pty_Mng_Attr` |  |
+| [`m_Tgt_C_S_TRS_Pty_Nm`](mappings/m_Tgt_C_S_TRS_Pty_Nm.md#filtered-data) | `C_S_TRS_PTY_NM` | `Read_STG_TRS_D_CV_DC_MCI_Alias`, `fltr_Null_Fn_Ln`, `srtr_Pkey`, `srtr_TRS_Pty_Nm` |  |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Alt_Id`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Alt_Id.md#filtered-data) | `C_S_TRS_PTY_RLE_ALT_ID` | `Read_STG_TRS_D_DC_INDV`, `mplt_TRS_Pty_Rle_Alt_Id_Normalization` |  |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Pln`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Pln.md#filtered-data) | `C_S_TRS_PTY_RLE_PLN` | `Read_Stg_TRS_D_IN_Managed_Care`, `rtr_Invalid_Plan_Cd`, `agg_Dedup_Rec` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_TRS_Addr_1`](mappings/m_Tgt_C_S_TRS_Addr_1.md#filtered-data) | (no `C_S_*` target) |  |  |
+| [`m_Tgt_C_S_TRS_Addr_2`](mappings/m_Tgt_C_S_TRS_Addr_2.md#filtered-data) | `C_S_TRS_PTY_RLE_ADDR` | `read_Staging_Delta_Tables`, `rtr_Good_vs_Exception_Pty_Records` | `EXC_STG_BAD_REC_MEMB` |
+
 ## Translation rules applied
 
 | IDQ | CDI | Where |

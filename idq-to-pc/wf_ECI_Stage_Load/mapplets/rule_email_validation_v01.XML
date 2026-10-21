@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE POWERMART SYSTEM "powrmart.dtd">
+<POWERMART CREATION_DATE="10/21/2026 00:00:00" REPOSITORY_VERSION="186.95">
+  <REPOSITORY CODEPAGE="UTF-8" DATABASETYPE="Oracle" NAME="IDQ_CONVERTED" VERSION="186">
+    <FOLDER DESCRIPTION="Converted from the IDQ export " GROUP="" NAME="ECI" OWNER="Administrator" PERMISSIONS="rwx---r--" SHARED="NOTSHARED" UUID="">
+      <MAPPLET DESCRIPTION="[ML 12/31/2024] changed the email to improve consistency for matching" ISVALID="YES" NAME="rule_email_validation_v01" OBJECTVERSION="1" VERSIONNUMBER="1">
+        <TRANSFORMATION DESCRIPTION="" NAME="input" OBJECTVERSION="1" REUSABLE="NO" TYPE="Input Transformation" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="255" SCALE="0" MAPPLETGROUP="input" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="Inlined mapplet input" NAME="rule_email_Domain_Subdomain_validation__V1_input" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Email" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Trim_Lower" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="I_Email" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="255" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="LOWER(LTRIM(RTRIM(I_Email)))" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SubDomain" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Email" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="V_RootDomain" PICTURETEXT="" PORTTYPE="LOCAL VARIABLE" PRECISION="255" SCALE="0" EXPRESSION="LTRIM(RTRIM(LOWER(SUBSTR(Email, INSTR( Email, '@', 1, 1)+1,255))))" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="ERROR('transformation error')" DESCRIPTION="" NAME="O_RootDomain" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="V_RootDomain" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="V_TLD" PICTURETEXT="" PORTTYPE="LOCAL VARIABLE" PRECISION="255" SCALE="0" EXPRESSION="IIF( INSTR(V_RootDomain,'.',1,1)&lt;1,'',SUBSTR(V_RootDomain,INSTR( V_RootDomain, '.', -1, 1)+1,99))&#10;--" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="V_Domain_SubDomain" PICTURETEXT="" PORTTYPE="LOCAL VARIABLE" PRECISION="255" SCALE="0" EXPRESSION="SUBSTR(V_RootDomain, 1,INSTR( V_RootDomain, '.', -1, 1)-1)&#10;----IIF( INSTR(V_RootDomain,'.',1,2)&lt;1,'',) -- DOMAIN " EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="V_TLD" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_SubDomain" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="V_Domain_SubDomain" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Email" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="TLD" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_SubDomain" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Domain_SubDomain" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="integer" DEFAULTVALUE="" DESCRIPTION="" NAME="length_TLD" PICTURETEXT="" PORTTYPE="LOCAL VARIABLE" PRECISION="10" SCALE="0" EXPRESSION="length(TLD)" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_First_Last_Validation" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="IIF ((INSTR(Domain_SubDomain,'_', 1, 1)&gt;1 OR IN(SUBSTR(Domain_SubDomain,1,1),'.','-' ) OR  IN(SUBSTR(Domain_SubDomain,-1,1),'-')),'Invalid','Valid' )&#10;&#10;" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_Validation" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="IIF (reg_match(Domain_SubDomain,'[a-z0-9.-]+'),'Valid','Invalid' )&#10;&#10;" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_Consecutivedot_Validation" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="IIF (INSTR(Domain_SubDomain,'..', 1, 1)&gt;1,'Invalid','Valid' )&#10;&#10;" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD_Validation" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="IIF(reg_match(TLD,'[a-z0-9]+'),'Valid','Invalid' )&#10;&#10;" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD_Length_Validataion" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="IIF (length_TLD&gt;=2 and length_TLD &lt;=11,'Valid', 'Invalid' )&#10;" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="O_RootDomain" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="255" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="ERROR('transformation error')" DESCRIPTION="" NAME="RootDomain_Validation" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="IIF (INSTR(O_RootDomain,'..', 1, 1)&gt;1,'Invalid','Valid' )&#10;" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Email" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="TLD" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_SubDomain" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Domain_SubDomain" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_First_Last_Validation" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_Validation" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_Consecutivedot_Validation" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD_Validation" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD_Length_Validataion" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="RootDomain_Validation" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="RootDomain_Validation" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_Subdomain_Result" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="IIF( (Domain_First_Last_Validation='Invalid' OR Domain_Validation='Invalid'  OR  Domain_Consecutivedot_Validation='Invalid' OR&#10;RootDomain_Validation='Invalid') , 'Invalid','Valid')" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD_Result" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="IIF( (TLD_Validation='Invalid' OR TLD_Length_Validataion='Invalid'), 'Invalid','Valid')" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="Inlined mapplet output" NAME="rule_email_Domain_Subdomain_validation__V1_output" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Email" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_Subdomain_Result" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="Domain_Subdomain_Result" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD_Result" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="TLD_Result" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="Inlined mapplet input" NAME="rule_email_LocalPart_validation_V1_input" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Email" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="rule_email_LocalPart_validation_V1_Exp_Trim_Lower" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="I_Email" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="255" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="LOWER(LTRIM(RTRIM(I_Email)))" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="rule_email_LocalPart_validation_V1_Exp_LocalPart_Validation" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Email" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email_LocalPart_Validation" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="Email" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="Inlined mapplet output" NAME="rule_email_LocalPart_validation_V1_output" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="255" SCALE="0" EXPRESSION="Email" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email_LocalPart_Validation" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="Email_LocalPart_Validation" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="Expression" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EMAIL_ADDRESS" PICTURETEXT="" PORTTYPE="INPUT/OUTPUT" PRECISION="80" SCALE="0" EXPRESSION="EMAIL_ADDRESS" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="ERROR('transformation error')" DESCRIPTION="" NAME="O_EMAIL_ADDRESS" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="80" SCALE="0" EXPRESSION="LOWER(LTRIM(RTRIM(EMAIL_ADDRESS)))" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email_LocalPart_Validation" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Domain_Subdomain_Result" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="TLD_Result" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="V_EMAIL_ADDRESS" PICTURETEXT="" PORTTYPE="LOCAL VARIABLE" PRECISION="80" SCALE="0" EXPRESSION="IIF(REG_MATCH(LTRIM(RTRIM(EMAIL_ADDRESS)), '.*[\s]+.*'),'Invalid','Valid')" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EmailFormat" PICTURETEXT="" PORTTYPE="LOCAL VARIABLE" PRECISION="50" SCALE="0" EXPRESSION="IIF( &#10;  (INSTR(EMAIL_ADDRESS, '.', INSTR(EMAIL_ADDRESS, '@')) = 0 OR INSTR(EMAIL_ADDRESS, '@') = 0), &#10;  'Invalid', &#10;  'Valid'&#10;)" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email_Validation_Result" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="50" SCALE="0" EXPRESSION="IIF ( (V_EMAIL_ADDRESS='Invalid' OR Email_LocalPart_Validation='Invalid' OR  Domain_Subdomain_Result='Invalid'  OR TLD_Result='Invalid'    OR EmailFormat='Invalid'),'Invalid_Email',null)" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="lkp_EXC_LOOKUP_CODE_VALUE" OBJECTVERSION="1" REUSABLE="NO" TYPE="Lookup Procedure" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="in_ExceptionCode" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="255" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="decimal" DEFAULTVALUE="" DESCRIPTION="" NAME="EXC_LOOKUP_CODE_VALUE_ID" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="10" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="CREATED_BY" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="50" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="date/time" DEFAULTVALUE="" DESCRIPTION="" NAME="CREATE_DATE" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="29" SCALE="9" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="UPDATED_BY" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="50" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="date/time" DEFAULTVALUE="" DESCRIPTION="" NAME="LAST_UPDATE_DATE" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="29" SCALE="9" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EXCEPTION_CODE" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="300" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EXCEPTION_DESC" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="300" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EXCEPTION_TYPE" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="300" SCALE="0" />
+          <TABLEATTRIBUTE NAME="Lookup Sql Override" VALUE="" />
+          <TABLEATTRIBUTE NAME="Lookup table name" VALUE="EXC_LOOKUP_CODE_VALUE" />
+          <TABLEATTRIBUTE NAME="Lookup Source Filter" VALUE="" />
+          <TABLEATTRIBUTE NAME="Lookup caching enabled" VALUE="YES" />
+          <TABLEATTRIBUTE NAME="Lookup policy on multiple match" VALUE="Use Any Value" />
+          <TABLEATTRIBUTE NAME="Lookup condition" VALUE="EXCEPTION_CODE = in_ExceptionCode" />
+          <TABLEATTRIBUTE NAME="Connection Information" VALUE="STAGING" />
+          <TABLEATTRIBUTE NAME="Source Type" VALUE="Database" />
+          <TABLEATTRIBUTE NAME="Recache if Stale" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+          <TABLEATTRIBUTE NAME="Lookup cache directory name" VALUE="$PMCacheDir/" />
+          <TABLEATTRIBUTE NAME="Lookup cache initialize" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Lookup cache persistent" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Lookup Data Cache Size" VALUE="Auto" />
+          <TABLEATTRIBUTE NAME="Lookup Index Cache Size" VALUE="Auto" />
+          <TABLEATTRIBUTE NAME="Dynamic Lookup Cache" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Synchronize Dynamic Cache" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Output Old Value On Update" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Update Dynamic Cache Condition" VALUE="TRUE" />
+          <TABLEATTRIBUTE NAME="Cache File Name Prefix" VALUE="" />
+          <TABLEATTRIBUTE NAME="Re-cache from lookup source" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Insert Else Update" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Update Else Insert" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Datetime Format" VALUE="" />
+          <TABLEATTRIBUTE NAME="Thousand Separator" VALUE="None" />
+          <TABLEATTRIBUTE NAME="Decimal Separator" VALUE="." />
+          <TABLEATTRIBUTE NAME="Case Sensitive String Comparison" VALUE="YES" />
+          <TABLEATTRIBUTE NAME="Null ordering" VALUE="Null Is Highest Value" />
+          <TABLEATTRIBUTE NAME="Sorted Input" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Lookup source is static" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Pre-build lookup cache" VALUE="Auto" />
+          <TABLEATTRIBUTE NAME="Subsecond Precision" VALUE="6" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="output" OBJECTVERSION="1" REUSABLE="NO" TYPE="Output Transformation" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EMAIL_ADDRESS" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="80" SCALE="0" MAPPLETGROUP="output" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Email_Validation_Result" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" MAPPLETGROUP="output" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EXCEPTION_CODE" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="300" SCALE="0" MAPPLETGROUP="output" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EXCEPTION_DESC" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="300" SCALE="0" MAPPLETGROUP="output" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EXCEPTION_TYPE" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="300" SCALE="0" MAPPLETGROUP="output" />
+        </TRANSFORMATION>
+        <INSTANCE DESCRIPTION="" NAME="input" TRANSFORMATION_TYPE="Input Transformation" TRANSFORMATION_NAME="input" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_input" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_Domain_Subdomain_validation__V1_input" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Trim_Lower" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Trim_Lower" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SubDomain" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SubDomain" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_Domain_Subdomain_validation__V1_output" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_Domain_Subdomain_validation__V1_output" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_LocalPart_validation_V1_input" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_LocalPart_validation_V1_input" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_LocalPart_validation_V1_Exp_Trim_Lower" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_LocalPart_validation_V1_Exp_Trim_Lower" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_LocalPart_validation_V1_Exp_LocalPart_Validation" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_LocalPart_validation_V1_Exp_LocalPart_Validation" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="rule_email_LocalPart_validation_V1_output" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="rule_email_LocalPart_validation_V1_output" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="Expression" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="Expression" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="lkp_EXC_LOOKUP_CODE_VALUE" TRANSFORMATION_TYPE="Lookup Procedure" TRANSFORMATION_NAME="lkp_EXC_LOOKUP_CODE_VALUE" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="output" TRANSFORMATION_TYPE="Output Transformation" TRANSFORMATION_NAME="output" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_input" FROMINSTANCETYPE="Expression" TOFIELD="I_Email" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Trim_Lower" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Trim_Lower" FROMINSTANCETYPE="Expression" TOFIELD="Email" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SubDomain" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SubDomain" FROMINSTANCETYPE="Expression" TOFIELD="Email" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="TLD" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SubDomain" FROMINSTANCETYPE="Expression" TOFIELD="TLD" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Domain_SubDomain" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SubDomain" FROMINSTANCETYPE="Expression" TOFIELD="Domain_SubDomain" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="O_RootDomain" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SubDomain" FROMINSTANCETYPE="Expression" TOFIELD="O_RootDomain" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" FROMINSTANCETYPE="Expression" TOFIELD="Email" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="TLD" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" FROMINSTANCETYPE="Expression" TOFIELD="TLD" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Domain_SubDomain" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" FROMINSTANCETYPE="Expression" TOFIELD="Domain_SubDomain" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Domain_First_Last_Validation" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" FROMINSTANCETYPE="Expression" TOFIELD="Domain_First_Last_Validation" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Domain_Validation" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" FROMINSTANCETYPE="Expression" TOFIELD="Domain_Validation" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="TLD_Validation" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" FROMINSTANCETYPE="Expression" TOFIELD="TLD_Validation" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Domain_Consecutivedot_Validation" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" FROMINSTANCETYPE="Expression" TOFIELD="Domain_Consecutivedot_Validation" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="TLD_Length_Validataion" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" FROMINSTANCETYPE="Expression" TOFIELD="TLD_Length_Validataion" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="RootDomain_Validation" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_Validation" FROMINSTANCETYPE="Expression" TOFIELD="RootDomain_Validation" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" FROMINSTANCETYPE="Expression" TOFIELD="Email" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_output" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Domain_Subdomain_Result" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" FROMINSTANCETYPE="Expression" TOFIELD="Domain_Subdomain_Result" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_output" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="TLD_Result" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_Exp_Domain_SD_Result" FROMINSTANCETYPE="Expression" TOFIELD="TLD_Result" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_output" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="rule_email_LocalPart_validation_V1_input" FROMINSTANCETYPE="Expression" TOFIELD="I_Email" TOINSTANCE="rule_email_LocalPart_validation_V1_Exp_Trim_Lower" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="rule_email_LocalPart_validation_V1_Exp_Trim_Lower" FROMINSTANCETYPE="Expression" TOFIELD="Email" TOINSTANCE="rule_email_LocalPart_validation_V1_Exp_LocalPart_Validation" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="rule_email_LocalPart_validation_V1_Exp_LocalPart_Validation" FROMINSTANCETYPE="Expression" TOFIELD="Email" TOINSTANCE="rule_email_LocalPart_validation_V1_output" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email_LocalPart_Validation" FROMINSTANCE="rule_email_LocalPart_validation_V1_Exp_LocalPart_Validation" FROMINSTANCETYPE="Expression" TOFIELD="Email_LocalPart_Validation" TOINSTANCE="rule_email_LocalPart_validation_V1_output" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="input" FROMINSTANCETYPE="Input Transformation" TOFIELD="Email" TOINSTANCE="rule_email_Domain_Subdomain_validation__V1_input" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="input" FROMINSTANCETYPE="Input Transformation" TOFIELD="Email" TOINSTANCE="rule_email_LocalPart_validation_V1_input" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email" FROMINSTANCE="input" FROMINSTANCETYPE="Input Transformation" TOFIELD="EMAIL_ADDRESS" TOINSTANCE="Expression" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email_LocalPart_Validation" FROMINSTANCE="rule_email_LocalPart_validation_V1_output" FROMINSTANCETYPE="Expression" TOFIELD="Email_LocalPart_Validation" TOINSTANCE="Expression" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Domain_Subdomain_Result" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_output" FROMINSTANCETYPE="Expression" TOFIELD="Domain_Subdomain_Result" TOINSTANCE="Expression" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="TLD_Result" FROMINSTANCE="rule_email_Domain_Subdomain_validation__V1_output" FROMINSTANCETYPE="Expression" TOFIELD="TLD_Result" TOINSTANCE="Expression" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Email_Validation_Result" FROMINSTANCE="Expression" FROMINSTANCETYPE="Expression" TOFIELD="in_ExceptionCode" TOINSTANCE="lkp_EXC_LOOKUP_CODE_VALUE" TOINSTANCETYPE="Lookup Procedure" />
+        <CONNECTOR FROMFIELD="EXCEPTION_CODE" FROMINSTANCE="lkp_EXC_LOOKUP_CODE_VALUE" FROMINSTANCETYPE="Lookup Procedure" TOFIELD="EXCEPTION_CODE" TOINSTANCE="output" TOINSTANCETYPE="Output Transformation" />
+        <CONNECTOR FROMFIELD="EXCEPTION_DESC" FROMINSTANCE="lkp_EXC_LOOKUP_CODE_VALUE" FROMINSTANCETYPE="Lookup Procedure" TOFIELD="EXCEPTION_DESC" TOINSTANCE="output" TOINSTANCETYPE="Output Transformation" />
+        <CONNECTOR FROMFIELD="EXCEPTION_TYPE" FROMINSTANCE="lkp_EXC_LOOKUP_CODE_VALUE" FROMINSTANCETYPE="Lookup Procedure" TOFIELD="EXCEPTION_TYPE" TOINSTANCE="output" TOINSTANCETYPE="Output Transformation" />
+        <CONNECTOR FROMFIELD="O_EMAIL_ADDRESS" FROMINSTANCE="Expression" FROMINSTANCETYPE="Expression" TOFIELD="EMAIL_ADDRESS" TOINSTANCE="output" TOINSTANCETYPE="Output Transformation" />
+      </MAPPLET>
+    </FOLDER>
+  </REPOSITORY>
+</POWERMART>

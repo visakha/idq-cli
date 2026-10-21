@@ -68,6 +68,38 @@ flowchart LR
   n12 --> n13
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_ECI_D_FAMILY | SourceTx | custom SQL query (see the step): only the rows it returns | `C_S_ECI_PTY_RLE_REL`, `EXC_STG_BAD_REC_MEMB` | never read |
+| Filter_Fam_Child_Valid | FilterTx | keep `isnull(CHILD_DEACTIVATION_STS) and isnull(FAM_DEACTIVATION_STS1)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` (lookup `Lkp_CHILD_STG_ECI_PTY_INACTIVE_STS`) and no matching row in `STG_ECI_PTY_INACTIVE_STS` (lookup `Lkp_FAM_STG_ECI_PTY_INACTIVE_STS`) | `C_S_ECI_PTY_RLE_REL`, `EXC_STG_BAD_REC_MEMB` | **discarded** |
+| Route_Good_vs_Exceptions | RouterTx | group `Valid_Relations`: `NOT IsNull(MSTR_REF_CODE)` (comments removed)<br>= a matching row exists in `LOOKUP_CODE_VALUE` | `C_S_ECI_PTY_RLE_REL` |  |
+| Route_Good_vs_Exceptions | RouterTx | group `Relation_Exceptions`: `IsNull(MSTR_REF_CODE)`<br>= no matching row in `LOOKUP_CODE_VALUE` | `EXC_STG_BAD_REC_MEMB` |  |
+| Route_Good_vs_Exceptions | RouterTx | default group `Default`: rows that match no other group | no row gets here: every row matches `Valid_Relations` or `Relation_Exceptions` |  |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Filter_Fam_Child_Valid | `CHILD_DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lkp_CHILD_STG_ECI_PTY_INACTIVE_STS` on `STG_ECI_PTY_INACTIVE_STS` where `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches; `STG_ECI_PTY_INACTIVE_STS` is loaded by `m_Tgt_C_S_ECI_Pty_Validation` in this workflow |
+| Filter_Fam_Child_Valid | `FAM_DEACTIVATION_STS1` | `DEACTIVATION_STS` returned by lookup `Lkp_FAM_STG_ECI_PTY_INACTIVE_STS` on `STG_ECI_PTY_INACTIVE_STS` where `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches; `STG_ECI_PTY_INACTIVE_STS` is loaded by `m_Tgt_C_S_ECI_Pty_Validation` in this workflow |
+| Route_Good_vs_Exceptions | `MSTR_REF_CODE` | `MSTR_REF_CODE` returned by lookup `Lkp_Rel_Tp_Code_Value` on `LOOKUP_CODE_VALUE` where `SRC_SYS = Source_System AND SRC_CODE_VALUE = FAMILY_CD`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_ECI_PTY_RLE_REL`** (`Write_C_S_ECI_PTY_RLE_REL`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_ECI_D_FAMILY` | custom SQL query (see the step): only the rows it returns | never read |
+| `Filter_Fam_Child_Valid` | `isnull(CHILD_DEACTIVATION_STS) and isnull(FAM_DEACTIVATION_STS1)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` (lookup `Lkp_CHILD_STG_ECI_PTY_INACTIVE_STS`) and no matching row in `STG_ECI_PTY_INACTIVE_STS` (lookup `Lkp_FAM_STG_ECI_PTY_INACTIVE_STS`) | **discarded** (not written anywhere) |
+| `Route_Good_vs_Exceptions` | group `Valid_Relations`: `NOT IsNull(MSTR_REF_CODE)`<br>= a matching row exists in `LOOKUP_CODE_VALUE` | if `IsNull(MSTR_REF_CODE)`: group `Relation_Exceptions` &rarr; `EXC_STG_BAD_REC_MEMB` |
+
 ## Transformations
 
 In data-flow order.

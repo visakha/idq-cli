@@ -70,6 +70,42 @@ flowchart LR
   n13 --> n14
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_V_TTF_ETL_SRC | SourceTx | rows the view `V_TTF_ETL_SRC` returns (view logic is outside the export)<br>Note: stored SQL text `"V_TTF_ETL_SRC"."PHONE"in ()` is a WHERE fragment, not a query, and the read has no custom-query mode: it looks unused, confirm | `EXC_STG_BAD_REC_MEMB`, `C_S_TTF_PTY_RLE_PHN` | never read |
+| fil_deactivated_status | FilterTx | keep `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_TTF_PTY_INACTIVE_STS` | `EXC_STG_BAD_REC_MEMB`, `C_S_TTF_PTY_RLE_PHN` | **discarded** |
+| Filt_null_phone | FilterTx | keep `not isnull(SRC_PHONE)` | `EXC_STG_BAD_REC_MEMB`, `C_S_TTF_PTY_RLE_PHN` | **discarded** |
+| RTR_Valid_PhoneNumbers | RouterTx | group `Good_Records`: `ISNULL(Phone_Exception_Code)` (comments removed) | `C_S_TTF_PTY_RLE_PHN` |  |
+| RTR_Valid_PhoneNumbers | RouterTx | group `Bad_Phone_Records`: `NOT ISNULL(Phone_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` |  |
+| RTR_Valid_PhoneNumbers | RouterTx | group `Bad_Phone_Ext__Records`: `NOT ISNULL(Phone_Nbr_Ext_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` |  |
+| RTR_Valid_PhoneNumbers | RouterTx | default group `Default`: rows that match no other group | no row gets here: every row matches `Good_Records` or `Bad_Phone_Records` |  |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| fil_deactivated_status | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lookup_STG_TTF_PTY_INACTIVE_STS` on `STG_TTF_PTY_INACTIVE_STS` where `SRC_KEY = PTY_SRC_KEY AND ROWID_SYSTEM = SRC_SYS`; NULL when no row matches; `STG_TTF_PTY_INACTIVE_STS` is loaded by `m_Tgt_C_S_TTF_Pty_Validation` in this workflow |
+| Filt_null_phone | `SRC_PHONE` | source column `PHONE` read by `Read_V_TTF_ETL_SRC` |
+| RTR_Valid_PhoneNumbers | `Phone_Exception_Code` | mapplet `rule_Phone_Std`: `in_Exception_Code` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = in_Exception_Code`; NULL when no row matches |
+| RTR_Valid_PhoneNumbers | `Phone_Nbr_Ext_Exception_Code` | mapplet `rule_Phone_Extension_Std`: `EXCEPTION_CODE1` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = EXCEPTION_CODE1`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TTF_PTY_RLE_PHN`** (`Write_C_S_TTF_PTY_RLE_PHN`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_V_TTF_ETL_SRC` | rows the view `V_TTF_ETL_SRC` returns (view logic is outside the export)<br>Note: stored SQL text `"V_TTF_ETL_SRC"."PHONE"in ()` is a WHERE fragment, not a query, and the read has no custom-query mode: it looks unused, confirm | never read |
+| `fil_deactivated_status` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_TTF_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+| `Filt_null_phone` | `not isnull(SRC_PHONE)` | **discarded** (not written anywhere) |
+| `RTR_Valid_PhoneNumbers` | group `Good_Records`: `ISNULL(Phone_Exception_Code)`<br>(a row that also matches `Bad_Phone_Ext__Records` is written there as well) | if `NOT ISNULL(Phone_Exception_Code)`: group `Bad_Phone_Records` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `NOT ISNULL(Phone_Nbr_Ext_Exception_Code)`: group `Bad_Phone_Ext__Records` &rarr; `EXC_STG_BAD_REC_MEMB` |
+
 ## Transformations
 
 In data-flow order.

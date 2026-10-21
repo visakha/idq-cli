@@ -66,6 +66,36 @@ flowchart LR
   n11 --> n12
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| read_Staging_Delta_Tables | SourceTx | custom SQL query (see the step): only the rows it returns | `EXC_STG_BAD_REC_MEMB`, `C_S_TRS_PTY_RLE_TOA` | never read |
+| rtr_Valid_Records | RouterTx | group `Bad_Value`: `isnull(TOA_CD)`<br>= no matching row in `LOOKUP_CODE_VALUE` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Valid_Records | RouterTx | group `Period_Begin_Date_GT_Period_End_Date`: `BEGIN_DT > END_DT` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Valid_Records | RouterTx | default group `Default`: rows that match no other group | `C_S_TRS_PTY_RLE_TOA` |  |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| rtr_Valid_Records | `TOA_CD` | `MSTR_REF_CODE` returned by lookup `lkp_LOOKUP_CODE_VALUE` on `LOOKUP_CODE_VALUE` where `SRC_SYS = in_SRC_SYS AND SRC_CODE_VALUE = in_TYPE_OF_ASSISTANCE_CD`; NULL when no row matches |
+| rtr_Valid_Records | `BEGIN_DT` | source column `BEGIN_DT` read by `read_Staging_Delta_Tables` |
+| rtr_Valid_Records | `END_DT` | source column `END_DT` read by `read_Staging_Delta_Tables` |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_RLE_TOA`** (`Write_C_S_TRS_PTY_RLE_TOA`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `read_Staging_Delta_Tables` | custom SQL query (see the step): only the rows it returns | never read |
+| `rtr_Valid_Records` | matches none of the other groups (default `Default`) | if `isnull(TOA_CD)`: group `Bad_Value` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `BEGIN_DT > END_DT`: group `Period_Begin_Date_GT_Period_End_Date` &rarr; `EXC_STG_BAD_REC_MEMB` |
+
 ## Transformations
 
 In data-flow order.

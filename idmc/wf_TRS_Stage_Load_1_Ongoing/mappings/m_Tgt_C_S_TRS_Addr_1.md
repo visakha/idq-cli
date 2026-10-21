@@ -64,6 +64,20 @@ flowchart LR
   n4 --> n5
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| read_Staging_Delta_Tables | SourceTx | custom SQL query (see the step): only the rows it returns | `STG_TRS_D_UNQ_ADDR` | never read |
+
+### Rows that do not reach `C_S_*` tables
+
+This mapping writes no `C_S_*` table (it loads `STG_TRS_D_UNQ_ADDR`); the steps above decide which rows it writes.
+
 ## Transformations
 
 In data-flow order.
