@@ -17,13 +17,13 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsProviderRelationshipRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.PrimaryCareProvider;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.ProviderKey;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
 import com.idq.cli.source.trs.etldb.repo.TrsInManagedCareDeltaRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsPartyRoleAltIdRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsProviderRelationshipRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,7 +39,7 @@ public class TrsPrimaryCareProviderService {
 
     public static final MappingInfo INFO = MappingInfo.of("010", "m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP",
             SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL_PROV"), List.of(TrsSources.InManagedCareDelta.class,
-            TrsTargets.ValidMember.class, MdmBaseTables.PartyRoleAltId.class, MdmBaseTables.PartyRoleAltIdXref.class));
+            TrsSources.ValidMember.class, MdmBaseTables.PartyRoleAltId.class, MdmBaseTables.PartyRoleAltIdXref.class));
 
     /// IDQ parameter `$PCP_REL_TP`.
     public static final String PCP_REL_TP = "100";

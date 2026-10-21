@@ -11,8 +11,8 @@ that mirrors it.
 
 * User guide (CLI and REST, by task): [user-guide-cli.md](user-guide-cli.md).
 * Mapping documentation: [docs/mappings/README.md](docs/mappings/README.md), one `NNN_<mapping>.md` per mapping.
-* Code layout: `source/<sys>` (`etldb` tables and repositories, `etlmap` one service per mapping), `domain`
-  (mapping identity), `core` (mapplets, rules, target structure, Informatica functions), `workflow`, `cli`, `api`,
+* Code layout: `source/<sys>` (`etldb` source tables and repositories, `etlmap` one service per mapping),
+  `mdmdc` (the MDM `C_S_*` staging tables and their repositories), `domain` (mapping identity), `core` (mapplets, rules, target structure, Informatica functions), `workflow`, `cli`, `api`,
   `mock`.
 
 ## Build and test
@@ -66,7 +66,7 @@ Every table has a Spring Data JDBC `@Table` record (no JPA):
 |---|---|---|
 | `IdqMapInitQuery` rows | `<Src>QueryRows`, returned by a `@Query` of the repository of the table they read | `EciQueryRows.FamilyRelation` |
 | Source tables / views | `<Src>Sources` | `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`) |
-| Target `C_S_*` tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
+| Target `C_S_*` tables | `mdmdc.etldb.models.<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
 | MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
 | Lookup / reference tables | `ReferenceTables` | `ReferenceTables.CodeValue` (`LOOKUP_CODE_VALUE`) |
 
@@ -81,12 +81,14 @@ the same name keeps the bare record name (`STG_TRS_DC_CASES` is `TrsSources.DcCa
 
 ### Data layer (`source.<src>.etldb`) and mappings (`source.<src>.etlmap`)
 
-Every source (TRS, ECI, FSS, TTF, WIC) has the same layout, shown here for ECI:
+Every source (TRS, ECI, FSS, TTF, WIC) has the same layout, shown here for ECI. The `C_S_*` tables the mappings load
+belong to MDM and live apart, in `com.idq.cli.mdmdc.etldb` (`models.<Src>Targets`, one repository per table in
+`repo`, e.g. `EciAddressRepository`).
 
 | Package | Contents |
 |---|---|
-| `etldb.models` | `EciSources` (source tables / views), `EciTargets` (`C_S_ECI_*`, `STG_ECI_PTY_INACTIVE_*`), `EciQueryRows` (`IdqMapInitQuery` and lookup rows) |
-| `etldb.repo` | One repository per table, bound to that table's entity. Source repositories own the `@Query` that reads them (`EciChildDeltaRepository#fetchPartyDemographics`); target repositories expose only `deleteAll` and `insertAll` |
+| `etldb.models` | `EciSources` (source tables / views, plus the workflow tables `STG_ECI_PTY_INACTIVE_*`), `EciQueryRows` (`IdqMapInitQuery` and lookup rows) |
+| `etldb.repo` | One repository per source or workflow table, bound to that table's entity. Source repositories own the `@Query` that reads them (`EciChildDeltaRepository#fetchPartyDemographics`); the `C_S_*` repositories in `mdmdc.etldb.repo` expose only `deleteAll` and `insertAll` |
 | `etldb.svc` | Reserved for pure database services that combine several repositories into one business function (no IDQ logic) |
 | `etlmap.svc` | One plain `@Service` per mapping (`EciPartyService` = `m_Tgt_C_S_ECI_Pty`), registered by `EciMappings`: fetch the init-query rows and lookups, `transform` (the IDQ logic, unchanged), then `load` through named steps such as `replaceParties` / `replacePartyRoles` |
 
@@ -102,14 +104,15 @@ Three tables have a composite key, modelled as a nested `Key` record annotated `
 | `EXC_STG_BAD_REC_MEMB` | `BadRecord` | SRC_SYS, SRC_SYS_ID_1..3, EXCEPTION_TYPE, EXCEPTION_CODE, RUN_DATE | unique (ids 2/3 may be NULL) |
 | `DQM_ADDRESS` | `DqmAddress` | PTY_SRC_KEY, ADDR_SRC_KEY, SRC_SYSTEM, MDM_ADDR_TP | unique (address type may be NULL) |
 
-Mock data is written as these entity records through Spring Data JDBC. Wide records are built with the typed
-`EntityBuilder` (columns named by accessor, unset columns `NULL`):
+Mock data is written as these entity records through Spring Data JDBC. Wide records have a plain `builder()`
+(one setter per column, unset columns `NULL`):
 
 ```java
-tables.insert(entity(ChildDelta.class)
-        .with(ChildDelta::idChild, id)
-        .with(ChildDelta::firstName, tables.text(faker.name().firstName()))
-        .with(ChildDelta::dob, past(3)));
+tables.insert(ChildDelta.builder()
+        .idChild(id)
+        .firstName(tables.text(faker.name().firstName()))
+        .dob(past(3))
+        .build());
 ```
 
 `MappingInfo.sourceEntities` lists the source entities of each mapping. During a run `EtlAudit` publishes Spring

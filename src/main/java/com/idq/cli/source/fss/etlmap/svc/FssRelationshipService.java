@@ -16,12 +16,12 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.FssTargets;
+import com.idq.cli.mdmdc.etldb.repo.FssRelationshipRepository;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientRelation;
 import com.idq.cli.source.fss.etldb.models.FssSources;
-import com.idq.cli.source.fss.etldb.models.FssTargets;
 import com.idq.cli.source.fss.etldb.repo.FssEtlSrcRelationsViewRepository;
 import com.idq.cli.source.fss.etldb.repo.FssInactiveStatusRepository;
-import com.idq.cli.source.fss.etldb.repo.FssRelationshipRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FssRelationshipService {
 
     public static final MappingInfo INFO = MappingInfo.of("024", "m_Tgt_C_S_FSS_Pty_Rle_Rel", SourceSystem.FSS,
-            List.of("C_S_FSS_PTY_RLE_REL"), List.of(FssSources.EtlSrcRelations.class, FssTargets.InactiveStatus.class));
+            List.of("C_S_FSS_PTY_RLE_REL"), List.of(FssSources.EtlSrcRelations.class, FssSources.InactiveStatus.class));
 
     private final FssEtlSrcRelationsViewRepository etlSrcRelations;
     private final FssInactiveStatusRepository inactiveStatuses;

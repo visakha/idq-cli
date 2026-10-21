@@ -1,7 +1,6 @@
 package com.idq.cli.mock;
 
 import com.idq.cli.config.EtlSettings;
-import com.idq.cli.core.EntityBuilder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,8 +15,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
+import org.springframework.data.mapping.model.EntityInstantiators;
+import org.springframework.data.mapping.model.InstantiationAwarePropertyAccessor;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
-import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +33,7 @@ public class MockTables {
 
     private static final DateTimeFormatter TIMESTAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Pattern PARAMETER = Pattern.compile(":(\\w+)");
+    private static final EntityInstantiators INSTANTIATORS = new EntityInstantiators();
 
     private final JdbcAggregateTemplate aggregates;
     private final NamedParameterJdbcTemplate jdbc;
@@ -62,10 +63,6 @@ public class MockTables {
             recorder.remove();
         }
         return List.copyOf(statements);
-    }
-
-    public <R extends Record> R insert(EntityBuilder<R> row) {
-        return insert(row.build());
     }
 
     /// Inserts one entity. Prefixed free text longer than its column is cut at the end, so the prefix survives.
@@ -120,21 +117,31 @@ public class MockTables {
                 })));
     }
 
+    /// A copy of `row` with every prefixed text cut to its column, made through Spring Data's mapping metadata (records
+    /// are immutable, so [InstantiationAwarePropertyAccessor] creates the copy through the canonical constructor).
     private <R extends Record> R fitted(R row) {
         var prefix = settings.mockDataPrefix();
         if (prefix.isBlank()) {
             return row;
         }
-        var lengths = columnsOf(row.getClass().getAnnotation(Table.class).value());
-        var persistent = aggregates.getConverter().getMappingContext().getRequiredPersistentEntity(row.getClass());
-        return EntityBuilder.from(row).map((component, value) -> {
-            if (!(value instanceof String text) || !text.startsWith(prefix + "-")) {
-                return value;
+        var entity = entityOf(row);
+        var lengths = columnsOf(entity.getTableName().getReference());
+        var accessor = new InstantiationAwarePropertyAccessor<>(row, entity::getPropertyAccessor, INSTANTIATORS);
+        for (var property : entity) {
+            if (accessor.getProperty(property) instanceof String text && text.startsWith(prefix + "-")) {
+                var column = property.getColumnName().getReference().toUpperCase();
+                if (lengths.containsKey(column)) {
+                    accessor.setProperty(property, fit(text, lengths.get(column)));
+                }
             }
-            var column = persistent.getRequiredPersistentProperty(component.getName()).getColumnName()
-                    .getReference().toUpperCase();
-            return lengths.containsKey(column) ? fit(text, lengths.get(column)) : value;
-        }).build();
+        }
+        return accessor.getBean();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <R> RelationalPersistentEntity<R> entityOf(R row) {
+        return (RelationalPersistentEntity<R>) aggregates.getConverter().getMappingContext()
+                .getRequiredPersistentEntity(row.getClass());
     }
 
     static String fit(String text, int maxLength) {
@@ -144,9 +151,9 @@ public class MockTables {
     /// `INSERT INTO <table> (<all columns>) VALUES (<literals>);`, embedded column groups flattened.
     String insertSql(Record row) {
         var values = new LinkedHashMap<String, Object>();
-        var context = aggregates.getConverter().getMappingContext();
-        collect(context.getRequiredPersistentEntity(row.getClass()), row, "", values);
-        return "INSERT INTO " + row.getClass().getAnnotation(Table.class).value() + " ("
+        var entity = entityOf(row);
+        collect(entity, row, "", values);
+        return "INSERT INTO " + entity.getTableName().getReference() + " ("
                 + String.join(", ", values.keySet()) + ") VALUES ("
                 + values.values().stream().map(MockTables::literal).collect(Collectors.joining(", ")) + ");";
     }

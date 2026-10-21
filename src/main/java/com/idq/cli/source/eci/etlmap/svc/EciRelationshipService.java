@@ -17,12 +17,12 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.EciTargets;
+import com.idq.cli.mdmdc.etldb.repo.EciRelationshipRepository;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyRelation;
 import com.idq.cli.source.eci.etldb.models.EciSources;
-import com.idq.cli.source.eci.etldb.models.EciTargets;
 import com.idq.cli.source.eci.etldb.repo.EciFamilyDeltaRepository;
 import com.idq.cli.source.eci.etldb.repo.EciInactiveStatusRepository;
-import com.idq.cli.source.eci.etldb.repo.EciRelationshipRepository;
 import com.idq.cli.source.eci.etldb.repo.EciSnChildRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -39,7 +39,7 @@ public class EciRelationshipService {
 
     public static final MappingInfo INFO = MappingInfo.of("018", "m_Tgt_C_S_ECI_Pty_Rle_Rel", SourceSystem.ECI,
             List.of("C_S_ECI_PTY_RLE_REL"), List.of(EciSources.FamilyDelta.class, EciSources.SnChild.class,
-            EciTargets.InactiveStatus.class));
+            EciSources.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, String> childGender) {}
 

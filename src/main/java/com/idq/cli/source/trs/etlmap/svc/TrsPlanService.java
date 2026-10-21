@@ -15,11 +15,11 @@ import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping.NoLookups;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsPlanRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.ManagedCarePlan;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
 import com.idq.cli.source.trs.etldb.repo.TrsInManagedCareDeltaRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsPlanRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsPlanService {
 
     public static final MappingInfo INFO = MappingInfo.of("005", "m_Tgt_C_S_TRS_Pty_Rle_Pln", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_RLE_PLN"), List.of(TrsSources.InManagedCareDelta.class, TrsTargets.ValidMember.class));
+            List.of("C_S_TRS_PTY_RLE_PLN"), List.of(TrsSources.InManagedCareDelta.class, TrsSources.ValidMember.class));
 
     private final TrsInManagedCareDeltaRepository inManagedCareDelta;
     private final TrsPlanRepository plans;

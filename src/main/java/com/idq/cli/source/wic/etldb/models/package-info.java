@@ -4,6 +4,8 @@
 /// to end and the audit reports can print any table.
 ///
 /// * [WicSources] - source tables and views
-/// * [WicTargets] - target tables `C_S_WIC_*` and the other tables the mappings write
+/// * the workflow tables the mappings write are in [WicSources] too (`STG_WIC_PTY_INACTIVE_STS` / `_LOG`)
 /// * [WicQueryRows] - rows returned by the `IdqMapInitQuery`s and lookups; projections, not tables
+///
+/// The `C_S_WIC_*` tables the mappings load are MDM tables: `com.idq.cli.mdmdc.etldb.models.WicTargets`.
 package com.idq.cli.source.wic.etldb.models;

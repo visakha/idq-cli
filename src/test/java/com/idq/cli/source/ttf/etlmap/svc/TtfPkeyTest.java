@@ -10,19 +10,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.idq.cli.core.InactiveStatus;
 import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.target.StagingRow;
+import com.idq.cli.mdmdc.etldb.models.TtfTargets;
+import com.idq.cli.mdmdc.etldb.repo.TtfAlternateIdRepository;
+import com.idq.cli.mdmdc.etldb.repo.TtfPartyRepository;
+import com.idq.cli.mdmdc.etldb.repo.TtfPartyRoleRepository;
+import com.idq.cli.mdmdc.etldb.repo.TtfPhoneRepository;
 import com.idq.cli.source.ttf.etldb.models.TtfQueryRows.ClientDemographics;
 import com.idq.cli.source.ttf.etldb.models.TtfQueryRows.ClientIdentifier;
 import com.idq.cli.source.ttf.etldb.models.TtfQueryRows.ClientName;
 import com.idq.cli.source.ttf.etldb.models.TtfQueryRows.ClientPhone;
-import com.idq.cli.source.ttf.etldb.models.TtfTargets;
-import com.idq.cli.source.ttf.etldb.repo.TtfAlternateIdRepository;
+import com.idq.cli.source.ttf.etldb.models.TtfSources;
 import com.idq.cli.source.ttf.etldb.repo.TtfEtlSrcViewRepository;
 import com.idq.cli.source.ttf.etldb.repo.TtfInactiveLogRepository;
 import com.idq.cli.source.ttf.etldb.repo.TtfInactiveStatusRepository;
-import com.idq.cli.source.ttf.etldb.repo.TtfPartyRepository;
-import com.idq.cli.source.ttf.etldb.repo.TtfPartyRoleRepository;
 import com.idq.cli.source.ttf.etldb.repo.TtfPartyXrefRepository;
-import com.idq.cli.source.ttf.etldb.repo.TtfPhoneRepository;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,7 @@ class TtfPkeyTest {
         var out = partyValidation().transform(List.of(declined),
                 new TtfPartyValidationService.Lookups(InactiveStatus.Lookup.NONE, Map.of()), ctx(TtfPartyValidationService.INFO));
 
-        assertThat(out.rows(TtfTargets.InactiveStatus.class)).extracting(TtfTargets.InactiveStatus::srcKey)
+        assertThat(out.rows(TtfSources.InactiveStatus.class)).extracting(TtfSources.InactiveStatus::srcKey)
                 .containsExactly("0000000031");
         assertThat(out.badRecords()).extracting(b -> b.key().exceptionCode()).containsExactly("Invalid_First_Name");
     }

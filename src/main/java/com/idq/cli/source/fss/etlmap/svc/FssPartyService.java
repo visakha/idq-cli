@@ -20,13 +20,13 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.FssTargets;
+import com.idq.cli.mdmdc.etldb.repo.FssPartyRepository;
+import com.idq.cli.mdmdc.etldb.repo.FssPartyRoleRepository;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientDemographics;
 import com.idq.cli.source.fss.etldb.models.FssSources;
-import com.idq.cli.source.fss.etldb.models.FssTargets;
 import com.idq.cli.source.fss.etldb.repo.FssEtlSrcViewRepository;
 import com.idq.cli.source.fss.etldb.repo.FssInactiveStatusRepository;
-import com.idq.cli.source.fss.etldb.repo.FssPartyRepository;
-import com.idq.cli.source.fss.etldb.repo.FssPartyRoleRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,7 +41,7 @@ public class FssPartyService {
 
     public static final MappingInfo INFO = MappingInfo.of("020", "m_Tgt_C_S_FSS_Pty", SourceSystem.FSS,
             List.of("C_S_FSS_PTY", "C_S_FSS_PTY_RLE"), List.of(FssSources.EtlSrc.class,
-            FssTargets.InactiveStatus.class));
+            FssSources.InactiveStatus.class));
 
     /// Gender, ethnicity and race exceptions only for `CLIENT` rows; language and suffix for all rows.
     static final PartyPattern.Spec SPEC = new PartyPattern.Spec("FSS", RaceSource.INDICATORS, true, true,

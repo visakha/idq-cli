@@ -2,7 +2,6 @@ package com.idq.cli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.idq.cli.core.EntityBuilder;
 import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.reference.ReferenceTables;
 import com.idq.cli.source.eci.etldb.models.EciSources;
@@ -22,6 +21,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
+import org.springframework.data.mapping.Parameter;
+import org.springframework.data.mapping.model.EntityInstantiators;
+import org.springframework.data.mapping.model.ParameterValueProvider;
+import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
+import org.springframework.data.relational.core.mapping.RelationalPersistentProperty;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,19 +66,27 @@ class SourceEntitiesIT {
     }
 
     /// Every column set to a one-character / one-digit value, which fits any column of the schema; composite keys
-    /// (nested records) are filled the same way.
+    /// (nested records) are filled the same way. Built through Spring Data's mapping metadata and entity instantiator.
     @SuppressWarnings("unchecked")
-    static <R extends Record> R sample(Class<R> type) {
+    <R> R sample(Class<R> type) {
         var now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        return EntityBuilder.entity(type).map((component, _) -> component.getType().isRecord()
-                ? sample((Class<? extends Record>) component.getType())
-                : switch (component.getType().getSimpleName()) {
-                    case "String" -> "1";
-                    case "Long" -> 1L;
-                    case "Integer" -> 1;
-                    case "BigDecimal" -> BigDecimal.ONE;
-                    case "LocalDateTime" -> now;
-                    default -> null;
-                }).build();
+        var entity = (RelationalPersistentEntity<R>) aggregates.getConverter().getMappingContext()
+                .getRequiredPersistentEntity(type);
+        return new EntityInstantiators().getInstantiatorFor(entity).createInstance(entity,
+                new ParameterValueProvider<RelationalPersistentProperty>() {
+                    @Override
+                    public <T> T getParameterValue(Parameter<T, RelationalPersistentProperty> parameter) {
+                        var parameterType = parameter.getType().getType();
+                        return (T) (parameterType.isRecord() ? sample(parameterType)
+                                : switch (parameterType.getSimpleName()) {
+                                    case "String" -> "1";
+                                    case "Long" -> 1L;
+                                    case "Integer" -> 1;
+                                    case "BigDecimal" -> BigDecimal.ONE;
+                                    case "LocalDateTime" -> now;
+                                    default -> null;
+                                });
+                    }
+                });
     }
 }

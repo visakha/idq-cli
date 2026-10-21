@@ -2,7 +2,7 @@ package com.idq.cli.source.fss.etldb.repo;
 
 import com.idq.cli.core.reference.LookupRows.KeyValue;
 import com.idq.cli.core.repo.InsertRepository;
-import com.idq.cli.source.fss.etldb.models.FssTargets;
+import com.idq.cli.source.fss.etldb.models.FssSources;
 import java.util.List;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -11,8 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 /// `STG_FSS_PTY_INACTIVE_STS` - the parties currently deactivated. Written by the FSS validation mapping, read by every
 /// later mapping of the workflow to drop deactivated parties.
-public interface FssInactiveStatusRepository extends Repository<FssTargets.InactiveStatus, String>,
-        InsertRepository<FssTargets.InactiveStatus> {
+public interface FssInactiveStatusRepository extends Repository<FssSources.InactiveStatus, String>,
+        InsertRepository<FssSources.InactiveStatus> {
 
     String TABLE = "STG_FSS_PTY_INACTIVE_STS";
 

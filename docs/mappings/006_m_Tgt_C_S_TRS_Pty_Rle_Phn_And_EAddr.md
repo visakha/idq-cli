@@ -80,5 +80,5 @@ JOIN stg_trs_valid_members vm ON TO_CHAR(i.indv_id) = vm.pty_pk
 * `TrsPhoneEmailService.phoneSlots` = the normalizer; `ContactRules.phone` / `ContactRules.email`;
   `EtlPatterns.write2TargetPhone` / `write2TargetEmail` / `badData4Phone` / `badData4Email`; `Rows.latestPerKey`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DcCasesDelta`
-  (`STG_TRS_D_DC_CASES`), `TrsSources.DcCaseIndv` (`STG_TRS_DC_CASE_INDV`), `TrsTargets.ValidMember`
+  (`STG_TRS_D_DC_CASES`), `TrsSources.DcCaseIndv` (`STG_TRS_DC_CASE_INDV`), `TrsSources.ValidMember`
   (`STG_TRS_VALID_MEMBERS`).

@@ -88,4 +88,4 @@ Note the SSN key ends with the child id, not the SSN. Unit test: `EciPkeyTest#m_
   `EciTargets.AlternateId`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.ChildDelta`
   (`STG_ECI_D_CHILD`), `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`), `EciSources.MedicaidDelta` (`STG_ECI_D_MEDICAID`),
-  `EciSources.SnCase` (`STG_ECI_SN_CASE`), `EciTargets.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`).
+  `EciSources.SnCase` (`STG_ECI_SN_CASE`), `EciSources.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`).

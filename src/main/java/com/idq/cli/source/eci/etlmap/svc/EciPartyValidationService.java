@@ -19,7 +19,6 @@ import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyValidation;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.PartyName;
 import com.idq.cli.source.eci.etldb.models.EciSources;
-import com.idq.cli.source.eci.etldb.models.EciTargets;
 import com.idq.cli.source.eci.etldb.repo.EciChildDeltaRepository;
 import com.idq.cli.source.eci.etldb.repo.EciDupCasesViewRepository;
 import com.idq.cli.source.eci.etldb.repo.EciFamilyValidationViewRepository;
@@ -42,7 +41,7 @@ public class EciPartyValidationService {
 
     public static final MappingInfo INFO = MappingInfo.of("013", "m_Tgt_C_S_ECI_Pty_Validation", SourceSystem.ECI,
             List.of("STG_ECI_PTY_INACTIVE_STS", "STG_ECI_PTY_INACTIVE_LOG"), List.of(EciSources.ChildDelta.class,
-            EciSources.FamilyDelta.class, MdmBaseTables.PartyXref.class, EciTargets.InactiveStatus.class,
+            EciSources.FamilyDelta.class, MdmBaseTables.PartyXref.class, EciSources.InactiveStatus.class,
             EciSources.EtlLuDupCases.class, EciSources.EtlLuFamilyValidation.class));
 
     /// @param duplicateCases `<source table>|<id>` of parties whose every case is a duplicate (reason 8)
@@ -119,8 +118,8 @@ public class EciPartyValidationService {
                 changes.reactivate(key);
             }
         }
-        return InactiveStatus.output(changes, bad, EciTargets.InactiveStatus.class, EciTargets.InactiveStatus::new,
-                EciTargets.InactiveLog.class, EciTargets.InactiveLog::new);
+        return InactiveStatus.output(changes, bad, EciSources.InactiveStatus.class, EciSources.InactiveStatus::new,
+                EciSources.InactiveLog.class, EciSources.InactiveLog::new);
     }
 
     static boolean hasLength(String value) {
@@ -132,8 +131,8 @@ public class EciPartyValidationService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(EciInactiveLogRepository.TABLE, logActivationChanges(output.rows(EciTargets.InactiveLog.class)));
-        for (var batch : output.batches(EciTargets.InactiveStatus.class)) {
+        loaded.put(EciInactiveLogRepository.TABLE, logActivationChanges(output.rows(EciSources.InactiveLog.class)));
+        for (var batch : output.batches(EciSources.InactiveStatus.class)) {
             loaded.merge(EciInactiveStatusRepository.TABLE, batch.mode() instanceof LoadMode.DeleteByKey<?>
                     ? removeReactivatedStatuses(batch.rows()) : recordNewDeactivations(batch.rows()), Integer::sum);
         }
@@ -143,16 +142,16 @@ public class EciPartyValidationService {
         return loaded;
     }
 
-    int logActivationChanges(List<EciTargets.InactiveLog> logs) {
+    int logActivationChanges(List<EciSources.InactiveLog> logs) {
         return inactiveLog.insertAll(logs).size();
     }
 
-    int removeReactivatedStatuses(List<EciTargets.InactiveStatus> reactivated) {
+    int removeReactivatedStatuses(List<EciSources.InactiveStatus> reactivated) {
         return reactivated.stream()
                 .mapToInt(s -> inactiveStatuses.deleteBySrcKeyAndRowidSystem(s.srcKey(), s.rowidSystem())).sum();
     }
 
-    int recordNewDeactivations(List<EciTargets.InactiveStatus> deactivated) {
+    int recordNewDeactivations(List<EciSources.InactiveStatus> deactivated) {
         return inactiveStatuses.insertAll(deactivated).size();
     }
 }

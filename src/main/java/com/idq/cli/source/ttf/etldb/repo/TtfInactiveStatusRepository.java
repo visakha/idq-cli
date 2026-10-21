@@ -2,7 +2,7 @@ package com.idq.cli.source.ttf.etldb.repo;
 
 import com.idq.cli.core.reference.LookupRows.KeyValue;
 import com.idq.cli.core.repo.InsertRepository;
-import com.idq.cli.source.ttf.etldb.models.TtfTargets;
+import com.idq.cli.source.ttf.etldb.models.TtfSources;
 import java.util.List;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -11,8 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 /// `STG_TTF_PTY_INACTIVE_STS` - the parties currently deactivated. Written by the TTF validation mapping, read by every
 /// later mapping of the workflow to drop deactivated parties.
-public interface TtfInactiveStatusRepository extends Repository<TtfTargets.InactiveStatus, String>,
-        InsertRepository<TtfTargets.InactiveStatus> {
+public interface TtfInactiveStatusRepository extends Repository<TtfSources.InactiveStatus, String>,
+        InsertRepository<TtfSources.InactiveStatus> {
 
     String TABLE = "STG_TTF_PTY_INACTIVE_STS";
 

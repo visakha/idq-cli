@@ -11,9 +11,9 @@ import com.idq.cli.core.MappingResult;
 import com.idq.cli.core.audit.EtlEvent.RowSample;
 import com.idq.cli.core.audit.EtlEvent.RunId;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.EciTargets;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyRelation;
 import com.idq.cli.source.eci.etldb.models.EciSources;
-import com.idq.cli.source.eci.etldb.models.EciTargets;
 import com.idq.cli.source.eci.etlmap.svc.EciPkeyTest;
 import com.idq.cli.source.eci.etlmap.svc.EciRelationshipService;
 import java.nio.file.Files;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.data.jdbc.core.mapping.JdbcMappingContext;
 
 /// The audit report of a Java run of `m_Tgt_C_S_ECI_Pty_Rle_Rel`, built from the events the workflow publishes.
 class AdhocRunReporterTest {
@@ -35,7 +36,7 @@ class AdhocRunReporterTest {
 
     @Test
     void writesOneMarkdownReportPerTargetTable() throws Exception {
-        var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200));
+        var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200), new JdbcMappingContext());
         var info = EciRelationshipService.INFO;
         var relation = new FamilyRelation("To Child", 7L, "F", 42L, "1", DAY, DAY);
         var output = EciPkeyTest.relationships().transform(List.of(relation),
@@ -74,7 +75,7 @@ class AdhocRunReporterTest {
 
     @Test
     void mockDataOfTheRunIsWrittenAsSqlNextToTheReport() throws Exception {
-        var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200));
+        var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200), new JdbcMappingContext());
         var info = EciRelationshipService.INFO;
         reporter.on(new MockDataGenerated(MockDataGenerated.REFERENCE_DATA, "Test_001",
                 List.of("INSERT INTO LOOKUP_CODE_VALUE (CODE_TYPE) VALUES ('REL_TP');")));
@@ -108,7 +109,7 @@ class AdhocRunReporterTest {
 
     @Test
     void sameMinuteRunsDoNotOverwriteEachOther() throws Exception {
-        var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200));
+        var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200), new JdbcMappingContext());
         var first = reporter.file(run, "C_S_ECI_PTY");
         Files.createDirectories(first.getParent());
         Files.writeString(first, "earlier run");

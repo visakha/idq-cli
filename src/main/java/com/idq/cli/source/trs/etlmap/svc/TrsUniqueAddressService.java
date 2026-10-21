@@ -20,7 +20,6 @@ import com.idq.cli.domain.MemberMapping.NoLookups;
 import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.DistinctAddress;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
 import com.idq.cli.source.trs.etldb.repo.TrsIndvAddrDeltaRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsUniqueAddressDeltaRepository;
 import java.util.LinkedHashMap;
@@ -82,7 +81,7 @@ public class TrsUniqueAddressService {
             var l2 = line2(a);
             var av = validator.validate(new AddressValidator.Input(l1, l2, a.addrCity(), a.addrStateCd(),
                     concat(a.addrZip5(), "-", a.addrZip4()), "US", "TRS"), ctx.reference());
-            return new TrsTargets.UniqueAddressDelta(a.addrId(), av.deliveryAddressLine1(), av.deliveryAddressLine2(),
+            return new TrsSources.UniqueAddressDelta(a.addrId(), av.deliveryAddressLine1(), av.deliveryAddressLine2(),
                     av.buildingName(), av.subBuildingNumber(), av.city(), av.countyFips(), av.stateFips(),
                     av.countryIso2(), av.zip5(), av.zip4(), av.latitude(), av.longitude(), av.matchCode(),
                     av.matchCodeDescription(), av.mailabilityScore(), av.addressType(), av.organizationDescriptor(),
@@ -93,21 +92,21 @@ public class TrsUniqueAddressService {
                     av.cassErrorCode(), av.deliveryPointValidation(), l1, l2, a.addrCity(), null, a.addrStateCd(),
                     "US", a.addrZip5(), a.addrZip4());
         }).toList();
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsTargets.UniqueAddressDelta.class, addresses));
+        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsSources.UniqueAddressDelta.class, addresses));
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(TrsUniqueAddressDeltaRepository.TABLE,
-                replaceUniqueAddresses(output.rows(TrsTargets.UniqueAddressDelta.class)));
+                replaceUniqueAddresses(output.rows(TrsSources.UniqueAddressDelta.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceUniqueAddresses(List<TrsTargets.UniqueAddressDelta> rows) {
+    int replaceUniqueAddresses(List<TrsSources.UniqueAddressDelta> rows) {
         settings.requireClearable(TrsUniqueAddressDeltaRepository.TABLE);
         uniqueAddresses.deleteAll();
         return uniqueAddresses.insertAll(rows).size();

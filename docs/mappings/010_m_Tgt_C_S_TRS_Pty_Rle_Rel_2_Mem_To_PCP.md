@@ -93,5 +93,5 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP_pkey_test`.
 * `TrsPrimaryCareProviderService.transform`, `providerRoleKey`, `pkey`; `Lookups(providerKeyByTpi)`;
   `Rows.currentSegmentPerKey`; entity `TrsTargets.ProviderRelationship`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.InManagedCareDelta`
-  (`STG_TRS_D_IN_MANAGED_CARE`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`), `MdmBaseTables.PartyRoleAltId`
+  (`STG_TRS_D_IN_MANAGED_CARE`), `TrsSources.ValidMember` (`STG_TRS_VALID_MEMBERS`), `MdmBaseTables.PartyRoleAltId`
   (`C_B_PTY_RLE_ALT_ID`), `MdmBaseTables.PartyRoleAltIdXref` (`C_B_PTY_RLE_ALT_ID_XREF`).

@@ -18,12 +18,12 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TtfTargets;
+import com.idq.cli.mdmdc.etldb.repo.TtfPhoneRepository;
 import com.idq.cli.source.ttf.etldb.models.TtfQueryRows.ClientPhone;
 import com.idq.cli.source.ttf.etldb.models.TtfSources;
-import com.idq.cli.source.ttf.etldb.models.TtfTargets;
 import com.idq.cli.source.ttf.etldb.repo.TtfEtlSrcViewRepository;
 import com.idq.cli.source.ttf.etldb.repo.TtfInactiveStatusRepository;
-import com.idq.cli.source.ttf.etldb.repo.TtfPhoneRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TtfPhoneService {
 
     public static final MappingInfo INFO = MappingInfo.of("028", "m_Tgt_C_S_TTF_Pty_Rle_Phn", SourceSystem.TTF,
-            List.of("C_S_TTF_PTY_RLE_PHN"), List.of(TtfSources.EtlSrc.class, TtfTargets.InactiveStatus.class));
+            List.of("C_S_TTF_PTY_RLE_PHN"), List.of(TtfSources.EtlSrc.class, TtfSources.InactiveStatus.class));
 
     private final TtfEtlSrcViewRepository etlSrc;
     private final TtfInactiveStatusRepository inactiveStatuses;

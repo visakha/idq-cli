@@ -344,9 +344,9 @@ Static reference lists. `STG_REF_PHN_AREA_CD_TEST` looks like a test copy of `RE
 | `STG_TRS_D_DC_RELATIONSHIPS` | `TrsSources.DcRelationshipsDelta` | INDV_ID |
 | `STG_TRS_D_INDV_ADDR` | `TrsSources.IndvAddrDelta` | INDV_ID |
 | `STG_TRS_D_IN_MANAGED_CARE` | `TrsSources.InManagedCareDelta` | INDV_ID |
-| `STG_TRS_D_UNQ_ADDR` | `TrsTargets.UniqueAddressDelta` | ADDR_ID |
+| `STG_TRS_D_UNQ_ADDR` | `TrsSources.UniqueAddressDelta` | ADDR_ID |
 | `STG_TRS_H_DC_INDV` | `TrsSources.DcIndvHist` | INDV_ID |
-| `STG_TRS_VALID_MEMBERS` | `TrsTargets.ValidMember` | PTY_PK |
+| `STG_TRS_VALID_MEMBERS` | `TrsSources.ValidMember` | PTY_PK |
 
 Unique keys (not primary keys): `EXC_STG_BAD_REC_MEMB` and `DQM_ADDRESS` carry composite UNIQUE constraints
 because some key columns are NULL by design. Most source-table `@Id`s are still provisional (marked

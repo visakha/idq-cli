@@ -21,13 +21,13 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.EciTargets;
+import com.idq.cli.mdmdc.etldb.repo.EciEmailRepository;
+import com.idq.cli.mdmdc.etldb.repo.EciPhoneRepository;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyContact;
 import com.idq.cli.source.eci.etldb.models.EciSources;
-import com.idq.cli.source.eci.etldb.models.EciTargets;
-import com.idq.cli.source.eci.etldb.repo.EciEmailRepository;
 import com.idq.cli.source.eci.etldb.repo.EciFamilyPhoneViewRepository;
 import com.idq.cli.source.eci.etldb.repo.EciInactiveStatusRepository;
-import com.idq.cli.source.eci.etldb.repo.EciPhoneRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,7 +42,7 @@ public class EciPhoneEmailService {
 
     public static final MappingInfo INFO = MappingInfo.of("017", "m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr",
             SourceSystem.ECI, List.of("C_S_ECI_PTY_RLE_PHN", "C_S_ECI_PTY_RLE_EADDR"),
-            List.of(EciSources.EtlSrcFamilyPhone.class, EciTargets.InactiveStatus.class));
+            List.of(EciSources.EtlSrcFamilyPhone.class, EciSources.InactiveStatus.class));
 
     private final EciFamilyPhoneViewRepository familyPhones;
     private final EciInactiveStatusRepository inactiveStatuses;

@@ -4,6 +4,8 @@
 /// to end and the audit reports can print any table.
 ///
 /// * [FssSources] - source tables and views
-/// * [FssTargets] - target tables `C_S_FSS_*` and the other tables the mappings write
+/// * the workflow tables the mappings write are in [FssSources] too (`STG_FSS_PTY_INACTIVE_STS` / `_LOG`)
 /// * [FssQueryRows] - rows returned by the `IdqMapInitQuery`s and lookups; projections, not tables
+///
+/// The `C_S_FSS_*` tables the mappings load are MDM tables: `com.idq.cli.mdmdc.etldb.models.FssTargets`.
 package com.idq.cli.source.fss.etldb.models;

@@ -22,13 +22,13 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.FssTargets;
+import com.idq.cli.mdmdc.etldb.repo.FssEmailRepository;
+import com.idq.cli.mdmdc.etldb.repo.FssPhoneRepository;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientContact;
 import com.idq.cli.source.fss.etldb.models.FssSources;
-import com.idq.cli.source.fss.etldb.models.FssTargets;
-import com.idq.cli.source.fss.etldb.repo.FssEmailRepository;
 import com.idq.cli.source.fss.etldb.repo.FssEtlSrcViewRepository;
 import com.idq.cli.source.fss.etldb.repo.FssInactiveStatusRepository;
-import com.idq.cli.source.fss.etldb.repo.FssPhoneRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,7 +43,7 @@ public class FssPhoneEmailService {
 
     public static final MappingInfo INFO = MappingInfo.of("023", "m_Tgt_C_S_FSS_Pty_Rle_Phn_And_EAddr",
             SourceSystem.FSS, List.of("C_S_FSS_PTY_RLE_PHN", "C_S_FSS_PTY_RLE_EADDR"), List.of(FssSources.EtlSrc.class,
-            FssTargets.InactiveStatus.class));
+            FssSources.InactiveStatus.class));
 
     private final FssEtlSrcViewRepository etlSrc;
     private final FssInactiveStatusRepository inactiveStatuses;

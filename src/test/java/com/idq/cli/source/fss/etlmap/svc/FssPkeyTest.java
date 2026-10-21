@@ -11,25 +11,26 @@ import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.rules.PassThroughAddressValidator;
 import com.idq.cli.core.target.DqmAddressRepository;
 import com.idq.cli.core.target.StagingRow;
+import com.idq.cli.mdmdc.etldb.models.FssTargets;
+import com.idq.cli.mdmdc.etldb.repo.FssAddressRepository;
+import com.idq.cli.mdmdc.etldb.repo.FssAlternateIdRepository;
+import com.idq.cli.mdmdc.etldb.repo.FssEmailRepository;
+import com.idq.cli.mdmdc.etldb.repo.FssPartyRepository;
+import com.idq.cli.mdmdc.etldb.repo.FssPartyRoleRepository;
+import com.idq.cli.mdmdc.etldb.repo.FssPhoneRepository;
+import com.idq.cli.mdmdc.etldb.repo.FssRelationshipRepository;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientAddress;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientContact;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientDemographics;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientIdentifier;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientName;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientRelation;
-import com.idq.cli.source.fss.etldb.models.FssTargets;
-import com.idq.cli.source.fss.etldb.repo.FssAddressRepository;
-import com.idq.cli.source.fss.etldb.repo.FssAlternateIdRepository;
-import com.idq.cli.source.fss.etldb.repo.FssEmailRepository;
+import com.idq.cli.source.fss.etldb.models.FssSources;
 import com.idq.cli.source.fss.etldb.repo.FssEtlSrcRelationsViewRepository;
 import com.idq.cli.source.fss.etldb.repo.FssEtlSrcViewRepository;
 import com.idq.cli.source.fss.etldb.repo.FssInactiveLogRepository;
 import com.idq.cli.source.fss.etldb.repo.FssInactiveStatusRepository;
-import com.idq.cli.source.fss.etldb.repo.FssPartyRepository;
-import com.idq.cli.source.fss.etldb.repo.FssPartyRoleRepository;
 import com.idq.cli.source.fss.etldb.repo.FssPartyXrefRepository;
-import com.idq.cli.source.fss.etldb.repo.FssPhoneRepository;
-import com.idq.cli.source.fss.etldb.repo.FssRelationshipRepository;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -84,8 +85,8 @@ class FssPkeyTest {
                 new FssPartyValidationService.Lookups(new InactiveStatus.Lookup(Map.of("0000000012", "P")), Map.of()),
                 ctx(FssPartyValidationService.INFO));
 
-        assertThat(out.rows(FssTargets.InactiveStatus.class))
-                .extracting(FssTargets.InactiveStatus::srcKey, FssTargets.InactiveStatus::deactivationSts)
+        assertThat(out.rows(FssSources.InactiveStatus.class))
+                .extracting(FssSources.InactiveStatus::srcKey, FssSources.InactiveStatus::deactivationSts)
                 .containsExactly(org.assertj.core.groups.Tuple.tuple("0000000012", null),
                         org.assertj.core.groups.Tuple.tuple("0000000011", "H"),
                         org.assertj.core.groups.Tuple.tuple("0000000012", "Reactivation"));

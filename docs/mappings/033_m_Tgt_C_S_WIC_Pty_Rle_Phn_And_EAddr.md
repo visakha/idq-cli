@@ -54,4 +54,4 @@ Unit test: `WicPkeyTest#m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr_pkey_test`.
 
 * `WicPhoneEmailService.phoneKey`, `emailKey`, `transform`; entities `WicTargets.Phone`, `WicTargets.Email`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
-  (`V_WIC_ETL_SRC`), `WicTargets.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).
+  (`V_WIC_ETL_SRC`), `WicSources.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).

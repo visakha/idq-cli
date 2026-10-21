@@ -83,5 +83,5 @@ The IDQ comment records a correction (10/24/2020) from the individual id to the 
 * `TrsSwitchesService.attributes` = the normalizer (`Attribute` record), `transform` filters, builds
   `TrsTargets.ManagedAttribute`, sorts and keeps one row per key; load `replaceAll`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DcIndvDelta`
-  (`STG_TRS_D_DC_INDV`), `TrsSources.CvDcMciIndvDelta` (`STG_TRS_D_CV_DC_MCI_INDV`), `TrsTargets.ValidMember`
+  (`STG_TRS_D_DC_INDV`), `TrsSources.CvDcMciIndvDelta` (`STG_TRS_D_CV_DC_MCI_INDV`), `TrsSources.ValidMember`
   (`STG_TRS_VALID_MEMBERS`).

@@ -17,7 +17,6 @@ import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.ClientName;
 import com.idq.cli.source.wic.etldb.models.WicSources;
-import com.idq.cli.source.wic.etldb.models.WicTargets;
 import com.idq.cli.source.wic.etldb.repo.WicEtlSrcViewRepository;
 import com.idq.cli.source.wic.etldb.repo.WicInactiveLogRepository;
 import com.idq.cli.source.wic.etldb.repo.WicInactiveStatusRepository;
@@ -36,7 +35,7 @@ public class WicPartyValidationService {
 
     public static final MappingInfo INFO = MappingInfo.of("029", "m_Tgt_C_S_WIC_Pty_Validation", SourceSystem.WIC,
             List.of("STG_WIC_PTY_INACTIVE_STS", "STG_WIC_PTY_INACTIVE_LOG"), List.of(WicSources.EtlSrc.class,
-            MdmBaseTables.PartyXref.class, WicTargets.InactiveStatus.class));
+            MdmBaseTables.PartyXref.class, WicSources.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, Integer> hubStates) {}
 
@@ -84,15 +83,15 @@ public class WicPartyValidationService {
                 changes.reactivate(key);
             }
         }
-        return InactiveStatus.output(changes, bad, WicTargets.InactiveStatus.class, WicTargets.InactiveStatus::new,
-                WicTargets.InactiveLog.class, WicTargets.InactiveLog::new);
+        return InactiveStatus.output(changes, bad, WicSources.InactiveStatus.class, WicSources.InactiveStatus::new,
+                WicSources.InactiveLog.class, WicSources.InactiveLog::new);
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(WicInactiveLogRepository.TABLE, logActivationChanges(output.rows(WicTargets.InactiveLog.class)));
-        for (var batch : output.batches(WicTargets.InactiveStatus.class)) {
+        loaded.put(WicInactiveLogRepository.TABLE, logActivationChanges(output.rows(WicSources.InactiveLog.class)));
+        for (var batch : output.batches(WicSources.InactiveStatus.class)) {
             loaded.merge(WicInactiveStatusRepository.TABLE, batch.mode() instanceof LoadMode.DeleteByKey<?>
                     ? removeReactivatedStatuses(batch.rows()) : recordNewDeactivations(batch.rows()), Integer::sum);
         }
@@ -102,16 +101,16 @@ public class WicPartyValidationService {
         return loaded;
     }
 
-    int logActivationChanges(List<WicTargets.InactiveLog> logs) {
+    int logActivationChanges(List<WicSources.InactiveLog> logs) {
         return inactiveLog.insertAll(logs).size();
     }
 
-    int removeReactivatedStatuses(List<WicTargets.InactiveStatus> reactivated) {
+    int removeReactivatedStatuses(List<WicSources.InactiveStatus> reactivated) {
         return reactivated.stream()
                 .mapToInt(s -> inactiveStatuses.deleteBySrcKeyAndRowidSystem(s.srcKey(), s.rowidSystem())).sum();
     }
 
-    int recordNewDeactivations(List<WicTargets.InactiveStatus> deactivated) {
+    int recordNewDeactivations(List<WicSources.InactiveStatus> deactivated) {
         return inactiveStatuses.insertAll(deactivated).size();
     }
 }

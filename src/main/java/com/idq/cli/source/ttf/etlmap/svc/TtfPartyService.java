@@ -19,13 +19,13 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TtfTargets;
+import com.idq.cli.mdmdc.etldb.repo.TtfPartyRepository;
+import com.idq.cli.mdmdc.etldb.repo.TtfPartyRoleRepository;
 import com.idq.cli.source.ttf.etldb.models.TtfQueryRows.ClientDemographics;
 import com.idq.cli.source.ttf.etldb.models.TtfSources;
-import com.idq.cli.source.ttf.etldb.models.TtfTargets;
 import com.idq.cli.source.ttf.etldb.repo.TtfEtlSrcViewRepository;
 import com.idq.cli.source.ttf.etldb.repo.TtfInactiveStatusRepository;
-import com.idq.cli.source.ttf.etldb.repo.TtfPartyRepository;
-import com.idq.cli.source.ttf.etldb.repo.TtfPartyRoleRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class TtfPartyService {
 
     public static final MappingInfo INFO = MappingInfo.of("026", "m_Tgt_C_S_TTF_Pty", SourceSystem.TTF,
             List.of("C_S_TTF_PTY", "C_S_TTF_PTY_RLE"), List.of(TtfSources.EtlSrc.class,
-            TtfTargets.InactiveStatus.class));
+            TtfSources.InactiveStatus.class));
 
     /// Race by code (`RACE` lookup); no language or suffix rule; every exception applies to every row.
     static final PartyPattern.Spec SPEC = new PartyPattern.Spec("TTF", RaceSource.CODE, false, false, Set.of());

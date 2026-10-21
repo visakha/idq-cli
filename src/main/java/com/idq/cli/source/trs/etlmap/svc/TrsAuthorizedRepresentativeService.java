@@ -13,11 +13,11 @@ import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping.NoLookups;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsManagedAttributeRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AuthorizedRepresentative;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
 import com.idq.cli.source.trs.etldb.repo.TrsDcPrimaryPayeeDeltaRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsManagedAttributeRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class TrsAuthorizedRepresentativeService {
             SourceSystem.TRS, List.of("C_S_TRS_PTY_MNG_ATTR"), List.of(TrsSources.DcPrimaryPayeeDelta.class,
             TrsSources.DcPrimaryPayee.class, TrsSources.CvEdMciEdgIndv.class, TrsSources.CvEdMciEdgIndvDelta.class,
             TrsSources.DcCases.class, TrsSources.DcCasesDelta.class, TrsSources.DcCaseIndv.class,
-            TrsTargets.ValidMember.class));
+            TrsSources.ValidMember.class));
 
     /// IDQ parameter `$ATTR_TP_AUTH_REP`.
     public static final String ATTR_TP_AUTH_REP = "Auth_Rep_Flag";

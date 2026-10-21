@@ -1,9 +1,6 @@
 package com.idq.cli.mock;
 
-import static com.idq.cli.core.EntityBuilder.entity;
-
 import com.idq.cli.config.EtlSettings;
-import com.idq.cli.core.EntityBuilder;
 import com.idq.cli.source.eci.etldb.models.EciSources.ChildDelta;
 import com.idq.cli.source.eci.etldb.models.EciSources.FamilyDelta;
 import com.idq.cli.source.eci.etldb.models.EciSources.MedicaidDelta;
@@ -54,41 +51,44 @@ public class EciMockDataV2 {
         for (var id : ids()) {
             int i = (int) (id - ID);
             var gender = faker.options().option("M", "F");
-            tables.insert(entity(ChildDelta.class)
-                    .with(ChildDelta::idChild, id)
-                    .with(ChildDelta::childSsn, i % 4 == 0 ? "000123456" : "%09d".formatted(123_450_000 + i))
-                    .with(ChildDelta::firstName, i == 2 ? null : tables.text(faker.name().firstName()))
-                    .with(ChildDelta::lastName, tables.text(faker.name().lastName()))
-                    .with(ChildDelta::middleInitial, "A")
-                    .with(ChildDelta::dob, past(3))
-                    .with(ChildDelta::gender, gender)
-                    .with(ChildDelta::birthWtLb, 7)
-                    .with(ChildDelta::birthWtOz, 4)
-                    .with(ChildDelta::languageCd, i % 5 == 0 ? 99 : 1)
-                    .with(ChildDelta::ethnicity, 1)
-                    .with(ChildDelta::raceWhite, 1)
-                    .with(ChildDelta::raceAa, i % 3 == 0 ? 1 : 0)
-                    .with(ChildDelta::raceAsian, 0)
-                    .with(ChildDelta::racePi, 0)
-                    .with(ChildDelta::raceAn, 0)
-                    .with(ChildDelta::dateCreated, past(2))
-                    .with(ChildDelta::dateModified, past(1))
-                    .with(ChildDelta::createdBy, "mock")
-                    .with(ChildDelta::modifiedBy, "mock")
-                    .with(ChildDelta::loadDate, LocalDateTime.now()));
-            tables.insert(entity(SnChild.class)
-                    .with(SnChild::idChild, id)
-                    .with(SnChild::gender, gender));
-            tables.insert(entity(FamilyDelta.class)
-                    .with(FamilyDelta::idFamily, id)
-                    .with(FamilyDelta::idChild, id)
-                    .with(FamilyDelta::familyCd, 1)
-                    .with(FamilyDelta::gender, "F")
-                    .with(FamilyDelta::firstName, tables.text(faker.name().firstName()))
-                    .with(FamilyDelta::lastName, tables.text(faker.name().lastName()))
-                    .with(FamilyDelta::dob, past(40))
-                    .with(FamilyDelta::dateCreated, past(2))
-                    .with(FamilyDelta::loadDate, LocalDateTime.now()));
+            tables.insert(ChildDelta.builder()
+                    .idChild(id)
+                    .childSsn(i % 4 == 0 ? "000123456" : "%09d".formatted(123_450_000 + i))
+                    .firstName(i == 2 ? null : tables.text(faker.name().firstName()))
+                    .lastName(tables.text(faker.name().lastName()))
+                    .middleInitial("A")
+                    .dob(past(3))
+                    .gender(gender)
+                    .birthWtLb(7)
+                    .birthWtOz(4)
+                    .languageCd(i % 5 == 0 ? 99 : 1)
+                    .ethnicity(1)
+                    .raceWhite(1)
+                    .raceAa(i % 3 == 0 ? 1 : 0)
+                    .raceAsian(0)
+                    .racePi(0)
+                    .raceAn(0)
+                    .dateCreated(past(2))
+                    .dateModified(past(1))
+                    .createdBy("mock")
+                    .modifiedBy("mock")
+                    .loadDate(LocalDateTime.now())
+                    .build());
+            tables.insert(SnChild.builder()
+                    .idChild(id)
+                    .gender(gender)
+                    .build());
+            tables.insert(FamilyDelta.builder()
+                    .idFamily(id)
+                    .idChild(id)
+                    .familyCd(1)
+                    .gender("F")
+                    .firstName(tables.text(faker.name().firstName()))
+                    .lastName(tables.text(faker.name().lastName()))
+                    .dob(past(40))
+                    .dateCreated(past(2))
+                    .loadDate(LocalDateTime.now())
+                    .build());
         }
     }
 
@@ -105,19 +105,20 @@ public class EciMockDataV2 {
         tables.deleteRange("V_ECI_ETL_SRC_FAMILY_ADDRESS", "ID", ID, ID + 999_999);
         for (var id : ids()) {
             int i = (int) (id - ID);
-            tables.insert(entity(EtlSrcFamilyAddress.class)
-                    .with(EtlSrcFamilyAddress::sourceTable, i % 2 == 0 ? "ECI_FAMILY" : "ECI_CHILD")
-                    .with(EtlSrcFamilyAddress::id, BigDecimal.valueOf(id))
-                    .with(EtlSrcFamilyAddress::idFamilyAddress, BigDecimal.valueOf(500 + i))
-                    .with(EtlSrcFamilyAddress::address1, tables.text(faker.address().streetAddress()))
-                    .with(EtlSrcFamilyAddress::address2, i % 3 == 0 ? tables.text("Suite 4") : null)
-                    .with(EtlSrcFamilyAddress::addressCd, BigDecimal.valueOf(i % 6 == 0 ? 9 : 1))
-                    .with(EtlSrcFamilyAddress::cityName, tables.text("Austin"))
-                    .with(EtlSrcFamilyAddress::countyName, tables.text("Travis"))
-                    .with(EtlSrcFamilyAddress::stateAbbrev, "TX")
-                    .with(EtlSrcFamilyAddress::zipCode, "78701")
-                    .with(EtlSrcFamilyAddress::zipSfx, "1234")
-                    .with(EtlSrcFamilyAddress::lastUpdateDate, past(1)));
+            tables.insert(EtlSrcFamilyAddress.builder()
+                    .sourceTable(i % 2 == 0 ? "ECI_FAMILY" : "ECI_CHILD")
+                    .id(BigDecimal.valueOf(id))
+                    .idFamilyAddress(BigDecimal.valueOf(500 + i))
+                    .address1(tables.text(faker.address().streetAddress()))
+                    .address2(i % 3 == 0 ? tables.text("Suite 4") : null)
+                    .addressCd(BigDecimal.valueOf(i % 6 == 0 ? 9 : 1))
+                    .cityName(tables.text("Austin"))
+                    .countyName(tables.text("Travis"))
+                    .stateAbbrev("TX")
+                    .zipCode("78701")
+                    .zipSfx("1234")
+                    .lastUpdateDate(past(1))
+                    .build());
         }
     }
 
@@ -128,15 +129,17 @@ public class EciMockDataV2 {
         tables.deleteRange("STG_ECI_SN_CASE", "ID_CASE", ID, ID + 999_999);
         for (var id : ids()) {
             int i = (int) (id - ID);
-            tables.insert(entity(SnCase.class)
-                    .with(SnCase::idCase, id)
-                    .with(SnCase::idChild, id));
-            tables.insert(entity(MedicaidDelta.class)
-                    .with(MedicaidDelta::idMedicaid, 800L + i)
-                    .with(MedicaidDelta::idCase, id)
-                    .with(MedicaidDelta::medicaidNbr, i % 4 == 0 ? "12-34" : "%09d".formatted(512_000_000 + i))
-                    .with(MedicaidDelta::dateCreated, past(2))
-                    .with(MedicaidDelta::dateModified, past(1)));
+            tables.insert(SnCase.builder()
+                    .idCase(id)
+                    .idChild(id)
+                    .build());
+            tables.insert(MedicaidDelta.builder()
+                    .idMedicaid(800L + i)
+                    .idCase(id)
+                    .medicaidNbr(i % 4 == 0 ? "12-34" : "%09d".formatted(512_000_000 + i))
+                    .dateCreated(past(2))
+                    .dateModified(past(1))
+                    .build());
         }
     }
 
@@ -147,26 +150,27 @@ public class EciMockDataV2 {
             int i = (int) (id - ID);
             var periodStart = past(1);
             tables.insert(contact(id, i, periodStart)
-                    .with(EtlSrcFamilyPhone::idFamilyPhone, "P" + i)
-                    .with(EtlSrcFamilyPhone::phoneEmailType, "PHONE")
-                    .with(EtlSrcFamilyPhone::phoneEmail, i % 4 == 0 ? "5551234" : "512555%04d".formatted(i))
-                    .with(EtlSrcFamilyPhone::phoneTp, "Telephone")
-                    .with(EtlSrcFamilyPhone::usgTp, "001")
-                    .with(EtlSrcFamilyPhone::prefLvl, "Primary"));
+                    .idFamilyPhone("P" + i)
+                    .phoneEmailType("PHONE")
+                    .phoneEmail(i % 4 == 0 ? "5551234" : "512555%04d".formatted(i))
+                    .phoneTp("Telephone")
+                    .usgTp("001")
+                    .prefLvl("Primary")
+                    .build());
             tables.insert(contact(id, i, periodStart)
-                    .with(EtlSrcFamilyPhone::idFamilyPhone, "E" + i)
-                    .with(EtlSrcFamilyPhone::phoneEmailType, "EADDRESS")
-                    .with(EtlSrcFamilyPhone::phoneEmail,
-                            tables.text(i % 5 == 0 ? "broken@" : faker.internet().emailAddress())));
+                    .idFamilyPhone("E" + i)
+                    .phoneEmailType("EADDRESS")
+                    .phoneEmail(tables.text(i % 5 == 0 ? "broken@" : faker.internet().emailAddress()))
+                    .build());
         }
     }
 
-    private static EntityBuilder<EtlSrcFamilyPhone> contact(long id, int i, LocalDateTime periodStart) {
-        return entity(EtlSrcFamilyPhone.class)
-                .with(EtlSrcFamilyPhone::sourceTable, i % 2 == 0 ? "ECI_FAMILY" : "ECI_CHILD")
-                .with(EtlSrcFamilyPhone::id, String.valueOf(id))
-                .with(EtlSrcFamilyPhone::idCase, BigDecimal.valueOf(id))
-                .with(EtlSrcFamilyPhone::periodStartDate, periodStart);
+    private static EtlSrcFamilyPhone.Builder contact(long id, int i, LocalDateTime periodStart) {
+        return EtlSrcFamilyPhone.builder()
+                .sourceTable(i % 2 == 0 ? "ECI_FAMILY" : "ECI_CHILD")
+                .id(String.valueOf(id))
+                .idCase(BigDecimal.valueOf(id))
+                .periodStartDate(periodStart);
     }
 
     public void fill_sample_mock_data_m_Tgt_C_S_ECI_Pty_Rle_Rel() {

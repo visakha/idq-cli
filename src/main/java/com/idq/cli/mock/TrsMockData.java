@@ -1,27 +1,25 @@
 package com.idq.cli.mock;
 
-import static com.idq.cli.core.EntityBuilder.entity;
-
 import com.idq.cli.config.EtlSettings;
 import com.idq.cli.core.Rows;
 import com.idq.cli.core.reference.MdmBaseTables.PartyRoleAltId;
 import com.idq.cli.core.reference.MdmBaseTables.PartyRoleAltIdXref;
-import com.idq.cli.source.trs.etldb.models.TrsSources.CvEdMciEdgIndv;
 import com.idq.cli.source.trs.etldb.models.TrsSources.CvDcMciAliasDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.CvDcMciIndvDelta;
+import com.idq.cli.source.trs.etldb.models.TrsSources.CvEdMciEdgIndv;
 import com.idq.cli.source.trs.etldb.models.TrsSources.CvMciEdgIndvToaDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.DcAliasDelta;
+import com.idq.cli.source.trs.etldb.models.TrsSources.DcCaseIndv;
+import com.idq.cli.source.trs.etldb.models.TrsSources.DcCases;
 import com.idq.cli.source.trs.etldb.models.TrsSources.DcCasesDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.DcIndvDelta;
+import com.idq.cli.source.trs.etldb.models.TrsSources.DcIndvHist;
 import com.idq.cli.source.trs.etldb.models.TrsSources.DcPrimaryPayeeDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.DcRelationshipsDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.InManagedCareDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.IndvAddrDelta;
-import com.idq.cli.source.trs.etldb.models.TrsSources.DcCaseIndv;
-import com.idq.cli.source.trs.etldb.models.TrsSources.DcCases;
-import com.idq.cli.source.trs.etldb.models.TrsSources.DcIndvHist;
-import com.idq.cli.source.trs.etldb.models.TrsTargets.UniqueAddressDelta;
-import com.idq.cli.source.trs.etldb.models.TrsTargets.ValidMember;
+import com.idq.cli.source.trs.etldb.models.TrsSources.UniqueAddressDelta;
+import com.idq.cli.source.trs.etldb.models.TrsSources.ValidMember;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -83,11 +81,12 @@ public class TrsMockData {
     }
 
     private void validMember(long id, String ptyPk, String sourceTable) {
-        tables.insert(entity(ValidMember.class)
-                .with(ValidMember::indvId, id)
-                .with(ValidMember::ptyPk, ptyPk)
-                .with(ValidMember::srcTbl, sourceTable)
-                .with(ValidMember::createDate, LocalDateTime.now()));
+        tables.insert(ValidMember.builder()
+                .indvId(id)
+                .ptyPk(ptyPk)
+                .srcTbl(sourceTable)
+                .createDate(LocalDateTime.now())
+                .build());
     }
 
     private LocalDateTime pastDate(int years) {
@@ -107,45 +106,47 @@ public class TrsMockData {
     }
 
     private List<DcIndvDelta> dailyIndividuals() {
-        return people().stream().map(p -> tables.insert(entity(DcIndvDelta.class)
-                .with(DcIndvDelta::indvId, p.indvId())
-                .with(DcIndvDelta::historySeq, BigDecimal.ONE)
-                .with(DcIndvDelta::firstName, p.firstName())
-                .with(DcIndvDelta::midName, p.midName())
-                .with(DcIndvDelta::lastName, p.lastName())
-                .with(DcIndvDelta::sufxName, p.sufxName())
-                .with(DcIndvDelta::prefixName, "MR")
-                .with(DcIndvDelta::genderCd, p.genderCd())
-                .with(DcIndvDelta::raceCd, p.raceCd())
-                .with(DcIndvDelta::ethnicityCd, "H")
-                .with(DcIndvDelta::ssaValidationSw, "Y")
-                .with(DcIndvDelta::fileClearanceSw, "Y")
-                .with(DcIndvDelta::inactiveInd, "N")
-                .with(DcIndvDelta::deleteSw, "N")
-                .with(DcIndvDelta::dobDt, p.dob())
-                .with(DcIndvDelta::createDt, p.created())
-                .with(DcIndvDelta::ssn, p.ssn())
-                .with(DcIndvDelta::loadDate, LocalDateTime.now()))).toList();
+        return people().stream().map(p -> tables.insert(DcIndvDelta.builder()
+                .indvId(p.indvId())
+                .historySeq(BigDecimal.ONE)
+                .firstName(p.firstName())
+                .midName(p.midName())
+                .lastName(p.lastName())
+                .sufxName(p.sufxName())
+                .prefixName("MR")
+                .genderCd(p.genderCd())
+                .raceCd(p.raceCd())
+                .ethnicityCd("H")
+                .ssaValidationSw("Y")
+                .fileClearanceSw("Y")
+                .inactiveInd("N")
+                .deleteSw("N")
+                .dobDt(p.dob())
+                .createDt(p.created())
+                .ssn(p.ssn())
+                .loadDate(LocalDateTime.now())
+                .build())).toList();
     }
 
     private void convertedIndividuals() {
-        people().forEach(p -> tables.insert(entity(CvDcMciIndvDelta.class)
-                .with(CvDcMciIndvDelta::indvId, p.indvId())
-                .with(CvDcMciIndvDelta::historySeq, BigDecimal.ONE)
-                .with(CvDcMciIndvDelta::firstName, p.firstName())
-                .with(CvDcMciIndvDelta::midName, p.midName())
-                .with(CvDcMciIndvDelta::lastName, p.lastName())
-                .with(CvDcMciIndvDelta::sufxName, p.sufxName())
-                .with(CvDcMciIndvDelta::prefixName, "MR")
-                .with(CvDcMciIndvDelta::genderCd, p.genderCd())
-                .with(CvDcMciIndvDelta::raceCd, p.raceCd())
-                .with(CvDcMciIndvDelta::ethnicityCd, "H")
-                .with(CvDcMciIndvDelta::inactiveInd, "N")
-                .with(CvDcMciIndvDelta::dobDt, p.dob())
-                .with(CvDcMciIndvDelta::createDt, p.created())
-                .with(CvDcMciIndvDelta::ssn, p.ssn())
-                .with(CvDcMciIndvDelta::twConvertInd, "Y")
-                .with(CvDcMciIndvDelta::ltcConvertInd, "N")));
+        people().forEach(p -> tables.insert(CvDcMciIndvDelta.builder()
+                .indvId(p.indvId())
+                .historySeq(BigDecimal.ONE)
+                .firstName(p.firstName())
+                .midName(p.midName())
+                .lastName(p.lastName())
+                .sufxName(p.sufxName())
+                .prefixName("MR")
+                .genderCd(p.genderCd())
+                .raceCd(p.raceCd())
+                .ethnicityCd("H")
+                .inactiveInd("N")
+                .dobDt(p.dob())
+                .createDt(p.created())
+                .ssn(p.ssn())
+                .twConvertInd("Y")
+                .ltcConvertInd("N")
+                .build()));
     }
 
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_OnGoing() {
@@ -162,23 +163,26 @@ public class TrsMockData {
         for (var id : individuals()) {
             var caseNum = num(CASE + (id - INDV));
             var edg = num(EDG + (id - INDV));
-            tables.insert(entity(DcPrimaryPayeeDelta.class)
-                    .with(DcPrimaryPayeeDelta::caseNum, caseNum)
-                    .with(DcPrimaryPayeeDelta::edgNum, edg)
-                    .with(DcPrimaryPayeeDelta::addrTypeCd, "MA")
-                    .with(DcPrimaryPayeeDelta::altPayeeExistsSw, "Y")
-                    .with(DcPrimaryPayeeDelta::createDt, pastDate(1)));
-            tables.insert(entity(CvEdMciEdgIndv.class)
-                    .with(CvEdMciEdgIndv::caseNum, caseNum)
-                    .with(CvEdMciEdgIndv::edgNum, edg)
-                    .with(CvEdMciEdgIndv::indvId, num(id))
-                    .with(CvEdMciEdgIndv::eligEffBeginDt, pastDate(3))
-                    .with(CvEdMciEdgIndv::createDt, pastDate(1)));
-            tables.insert(entity(DcCases.class)
-                    .with(DcCases::caseNum, caseNum)
-                    .with(DcCases::authrepVerfCd, "CS")
-                    .with(DcCases::sentAuthrepSw, "Y")
-                    .with(DcCases::createDt, pastDate(1)));
+            tables.insert(DcPrimaryPayeeDelta.builder()
+                    .caseNum(caseNum)
+                    .edgNum(edg)
+                    .addrTypeCd("MA")
+                    .altPayeeExistsSw("Y")
+                    .createDt(pastDate(1))
+                    .build());
+            tables.insert(CvEdMciEdgIndv.builder()
+                    .caseNum(caseNum)
+                    .edgNum(edg)
+                    .indvId(num(id))
+                    .eligEffBeginDt(pastDate(3))
+                    .createDt(pastDate(1))
+                    .build());
+            tables.insert(DcCases.builder()
+                    .caseNum(caseNum)
+                    .authrepVerfCd("CS")
+                    .sentAuthrepSw("Y")
+                    .createDt(pastDate(1))
+                    .build());
         }
     }
 
@@ -192,19 +196,21 @@ public class TrsMockData {
                 var lastName = tables.text(faker.name().lastName());
                 var created = pastDate(2);
                 if (id % 2 == 0) {
-                    tables.insert(entity(DcAliasDelta.class)
-                            .with(DcAliasDelta::indvId, num(id))
-                            .with(DcAliasDelta::seqNum, num(seq))
-                            .with(DcAliasDelta::firstName, firstName)
-                            .with(DcAliasDelta::lastName, lastName)
-                            .with(DcAliasDelta::createDt, created));
+                    tables.insert(DcAliasDelta.builder()
+                            .indvId(num(id))
+                            .seqNum(num(seq))
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .createDt(created)
+                            .build());
                 } else {
-                    tables.insert(entity(CvDcMciAliasDelta.class)
-                            .with(CvDcMciAliasDelta::indvId, num(id))
-                            .with(CvDcMciAliasDelta::sequenceNum, num(seq))
-                            .with(CvDcMciAliasDelta::firstName, firstName)
-                            .with(CvDcMciAliasDelta::lastName, lastName)
-                            .with(CvDcMciAliasDelta::createDt, created));
+                    tables.insert(CvDcMciAliasDelta.builder()
+                            .indvId(num(id))
+                            .sequenceNum(num(seq))
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .createDt(created)
+                            .build());
                 }
             }
         }
@@ -216,10 +222,11 @@ public class TrsMockData {
         validMembers();
         var daily = dailyIndividuals();
         convertedIndividuals();
-        daily.forEach(indv -> tables.insert(entity(DcIndvHist.class)
-                .with(DcIndvHist::indvId, indv.indvId())
-                .with(DcIndvHist::ssn, indv.ssn())
-                .with(DcIndvHist::ssaValidationSw, "Y")));
+        daily.forEach(indv -> tables.insert(DcIndvHist.builder()
+                .indvId(indv.indvId())
+                .ssn(indv.ssn())
+                .ssaValidationSw("Y")
+                .build()));
     }
 
     /// Every fourth individual is enrolled in the unknown plan `ZZ`.
@@ -227,13 +234,14 @@ public class TrsMockData {
         clean("STG_TRS_D_IN_MANAGED_CARE");
         validMembers();
         for (var id : individuals()) {
-            tables.insert(entity(InManagedCareDelta.class)
-                    .with(InManagedCareDelta::indvId, num(id))
-                    .with(InManagedCareDelta::beginDt, pastDate(3))
-                    .with(InManagedCareDelta::mcPlan, id % 4 == 0 ? "ZZ" : "PA")
-                    .with(InManagedCareDelta::historySeq, BigDecimal.ONE)
-                    .with(InManagedCareDelta::createDt, pastDate(1))
-                    .with(InManagedCareDelta::mcProgCode, "S"));
+            tables.insert(InManagedCareDelta.builder()
+                    .indvId(num(id))
+                    .beginDt(pastDate(3))
+                    .mcPlan(id % 4 == 0 ? "ZZ" : "PA")
+                    .historySeq(BigDecimal.ONE)
+                    .createDt(pastDate(1))
+                    .mcProgCode("S")
+                    .build());
         }
     }
 
@@ -245,18 +253,20 @@ public class TrsMockData {
         for (var id : individuals()) {
             var caseNum = num(CASE + (id - INDV));
             int i = (int) (id - INDV);
-            tables.insert(entity(DcCasesDelta.class)
-                    .with(DcCasesDelta::caseNum, caseNum)
-                    .with(DcCasesDelta::createDt, pastDate(1))
-                    .with(DcCasesDelta::phNum, i % 7 == 0 ? "512-555-12" : "512555%04d".formatted(1000 + i))
-                    .with(DcCasesDelta::workPhNum, i % 3 == 0 ? "2145551234" : null)
-                    .with(DcCasesDelta::workPhNumExt, i % 3 == 0 ? num(12) : null)
-                    .with(DcCasesDelta::otherPhNum, i % 4 == 0 ? "8005550000" : null)
-                    .with(DcCasesDelta::email, tables.text(i % 5 == 0 ? "not an email"
-                            : faker.internet().emailAddress())));
-            tables.insert(entity(DcCaseIndv.class)
-                    .with(DcCaseIndv::caseNum, caseNum)
-                    .with(DcCaseIndv::indvId, num(id)));
+            tables.insert(DcCasesDelta.builder()
+                    .caseNum(caseNum)
+                    .createDt(pastDate(1))
+                    .phNum(i % 7 == 0 ? "512-555-12" : "512555%04d".formatted(1000 + i))
+                    .workPhNum(i % 3 == 0 ? "2145551234" : null)
+                    .workPhNumExt(i % 3 == 0 ? num(12) : null)
+                    .otherPhNum(i % 4 == 0 ? "8005550000" : null)
+                    .email(tables.text(i % 5 == 0 ? "not an email"
+                            : faker.internet().emailAddress()))
+                    .build());
+            tables.insert(DcCaseIndv.builder()
+                    .caseNum(caseNum)
+                    .indvId(num(id))
+                    .build());
         }
     }
 
@@ -271,21 +281,22 @@ public class TrsMockData {
         validMembers();
         for (var id : individuals()) {
             var begin = pastDate(3);
-            tables.insert(entity(CvMciEdgIndvToaDelta.class)
-                    .with(CvMciEdgIndvToaDelta::indvId, num(id))
-                    .with(CvMciEdgIndvToaDelta::programCd, "MA")
-                    .with(CvMciEdgIndvToaDelta::edgNum, num(EDG + (id - INDV)))
-                    .with(CvMciEdgIndvToaDelta::mciCreateSeq, BigDecimal.ONE)
-                    .with(CvMciEdgIndvToaDelta::historySeq, BigDecimal.ONE)
-                    .with(CvMciEdgIndvToaDelta::caseNum, num(CASE + (id - INDV)))
-                    .with(CvMciEdgIndvToaDelta::partStatusCd, "EL")
-                    .with(CvMciEdgIndvToaDelta::typeOfAssistanceCd, id % 5 == 0 ? "ZZ" : "A1")
-                    .with(CvMciEdgIndvToaDelta::createDt, pastDate(1))
-                    .with(CvMciEdgIndvToaDelta::systemCd, "TR")
-                    .with(CvMciEdgIndvToaDelta::conversionInd, "C")
-                    .with(CvMciEdgIndvToaDelta::eligEffBeginDt, begin)
-                    .with(CvMciEdgIndvToaDelta::eligEffEndDt, id % 6 == 0 ? begin.minusDays(10) : null)
-                    .with(CvMciEdgIndvToaDelta::convertDt, pastDate(5)));
+            tables.insert(CvMciEdgIndvToaDelta.builder()
+                    .indvId(num(id))
+                    .programCd("MA")
+                    .edgNum(num(EDG + (id - INDV)))
+                    .mciCreateSeq(BigDecimal.ONE)
+                    .historySeq(BigDecimal.ONE)
+                    .caseNum(num(CASE + (id - INDV)))
+                    .partStatusCd("EL")
+                    .typeOfAssistanceCd(id % 5 == 0 ? "ZZ" : "A1")
+                    .createDt(pastDate(1))
+                    .systemCd("TR")
+                    .conversionInd("C")
+                    .eligEffBeginDt(begin)
+                    .eligEffEndDt(id % 6 == 0 ? begin.minusDays(10) : null)
+                    .convertDt(pastDate(5))
+                    .build());
         }
     }
 
@@ -295,14 +306,15 @@ public class TrsMockData {
         validMembers();
         var ids = individuals();
         for (int i = 0; i + 1 < ids.size(); i += 2) {
-            tables.insert(entity(DcRelationshipsDelta.class)
-                    .with(DcRelationshipsDelta::indvId, num(ids.get(i)))
-                    .with(DcRelationshipsDelta::refIndvId, num(ids.get(i + 1)))
-                    .with(DcRelationshipsDelta::effBeginDt, pastDate(4))
-                    .with(DcRelationshipsDelta::histNavInd, "C")
-                    .with(DcRelationshipsDelta::relationshipTypeCd, i % 6 == 0 ? "XX" : "PA")
-                    .with(DcRelationshipsDelta::createDt, pastDate(2))
-                    .with(DcRelationshipsDelta::updateDt, pastDate(1)));
+            tables.insert(DcRelationshipsDelta.builder()
+                    .indvId(num(ids.get(i)))
+                    .refIndvId(num(ids.get(i + 1)))
+                    .effBeginDt(pastDate(4))
+                    .histNavInd("C")
+                    .relationshipTypeCd(i % 6 == 0 ? "XX" : "PA")
+                    .createDt(pastDate(2))
+                    .updateDt(pastDate(1))
+                    .build());
         }
     }
 
@@ -315,27 +327,29 @@ public class TrsMockData {
         for (var id : individuals()) {
             int i = (int) (id - INDV);
             var tpi = "%09d".formatted(700_000_000 + i);
-            tables.insert(entity(InManagedCareDelta.class)
-                    .with(InManagedCareDelta::indvId, num(id))
-                    .with(InManagedCareDelta::beginDt, pastDate(2))
-                    .with(InManagedCareDelta::mcPlan, "PA")
-                    .with(InManagedCareDelta::historySeq, BigDecimal.ONE)
-                    .with(InManagedCareDelta::createDt, pastDate(1))
-                    .with(InManagedCareDelta::providerNum, i % 5 == 0 ? "X12" : tpi)
-                    .with(InManagedCareDelta::mcProgCode, "S"));
+            tables.insert(InManagedCareDelta.builder()
+                    .indvId(num(id))
+                    .beginDt(pastDate(2))
+                    .mcPlan("PA")
+                    .historySeq(BigDecimal.ONE)
+                    .createDt(pastDate(1))
+                    .providerNum(i % 5 == 0 ? "X12" : tpi)
+                    .mcProgCode("S")
+                    .build());
             if (i % 4 != 0) {
                 var rowid = "MOCK" + "%010d".formatted(i);
-                tables.insert(entity(PartyRoleAltId.class)
-                        .with(PartyRoleAltId::rowidObject, rowid)
-                        .with(PartyRoleAltId::altIdTp, "006")
-                        .with(PartyRoleAltId::altIdVal, tpi));
-                tables.insert(entity(PartyRoleAltIdXref.class)
-                        .with(PartyRoleAltIdXref::rowidObject, rowid)
-                        .with(PartyRoleAltIdXref::rowidSystem, "C21")
-                        .with(PartyRoleAltIdXref::hubStateInd, 1)
-                        .with(PartyRoleAltIdXref::srcLastUpdDt, pastDate(1))
-                        .with(PartyRoleAltIdXref::pkeySrcObject,
-                                tpi + (i % 3 == 0 ? "|HCO|Provider" : "|HCP|Provider")));
+                tables.insert(PartyRoleAltId.builder()
+                        .rowidObject(rowid)
+                        .altIdTp("006")
+                        .altIdVal(tpi)
+                        .build());
+                tables.insert(PartyRoleAltIdXref.builder()
+                        .rowidObject(rowid)
+                        .rowidSystem("C21")
+                        .hubStateInd(1)
+                        .srcLastUpdDt(pastDate(1))
+                        .pkeySrcObject(tpi + (i % 3 == 0 ? "|HCO|Provider" : "|HCP|Provider"))
+                        .build());
             }
         }
     }
@@ -359,46 +373,47 @@ public class TrsMockData {
         clean("STG_TRS_D_INDV_ADDR");
         return individuals().stream().map(id -> {
             int i = (int) (id - INDV);
-            return tables.insert(entity(IndvAddrDelta.class)
-                    .with(IndvAddrDelta::indvId, num(id))
-                    .with(IndvAddrDelta::caseNum, num(CASE + i))
-                    .with(IndvAddrDelta::edgNum, num(EDG + i))
-                    .with(IndvAddrDelta::addrTypeCd, i % 2 == 0 ? "MA" : "PH")
-                    .with(IndvAddrDelta::addrStNum, String.valueOf(100 + i))
-                    .with(IndvAddrDelta::addrStNm, tables.text("MOCK " + faker.address().streetName().toUpperCase()))
-                    .with(IndvAddrDelta::addrStTypeCd, "ST")
-                    .with(IndvAddrDelta::addrStDirCd, "NO")
-                    .with(IndvAddrDelta::addrAptNum, i % 3 == 0 ? String.valueOf(i) : null)
-                    .with(IndvAddrDelta::addrDwellingTypeCd, i % 3 == 0 ? "APT" : null)
-                    .with(IndvAddrDelta::addrCity, tables.text("AUSTIN"))
-                    .with(IndvAddrDelta::addrStateCd, "TX")
-                    .with(IndvAddrDelta::addrZip5, "787" + "%02d".formatted(i % 100))
-                    .with(IndvAddrDelta::addrZip4, "1234")
-                    .with(IndvAddrDelta::effBeginDt, pastDate(3))
-                    .with(IndvAddrDelta::createDt, pastDate(1)));
+            return tables.insert(IndvAddrDelta.builder()
+                    .indvId(num(id))
+                    .caseNum(num(CASE + i))
+                    .edgNum(num(EDG + i))
+                    .addrTypeCd(i % 2 == 0 ? "MA" : "PH")
+                    .addrStNum(String.valueOf(100 + i))
+                    .addrStNm(tables.text("MOCK " + faker.address().streetName().toUpperCase()))
+                    .addrStTypeCd("ST")
+                    .addrStDirCd("NO")
+                    .addrAptNum(i % 3 == 0 ? String.valueOf(i) : null)
+                    .addrDwellingTypeCd(i % 3 == 0 ? "APT" : null)
+                    .addrCity(tables.text("AUSTIN"))
+                    .addrStateCd("TX")
+                    .addrZip5("787" + "%02d".formatted(i % 100))
+                    .addrZip4("1234")
+                    .effBeginDt(pastDate(3))
+                    .createDt(pastDate(1))
+                    .build());
         }).toList();
     }
 
     private static UniqueAddressDelta uniqueAddress(IndvAddrDelta a) {
         var line = concat(a.addrStNum(), " ", a.addrStNm());
-        return entity(UniqueAddressDelta.class)
-                .with(UniqueAddressDelta::addrId, Arrays.stream(new String[] {a.addrStNum(), a.addrStNumFrac(),
+        return UniqueAddressDelta.builder()
+                .addrId(Arrays.stream(new String[] {a.addrStNum(), a.addrStNumFrac(),
                                 a.addrStNm(), a.addrStDirCd(), a.addrStTypeCd(), a.addrDwellingTypeCd(),
                                 a.addrAptNum(), a.addrLine(), a.addrCity(), a.addrStateCd(), a.addrZip5(),
                                 a.addrZip4()})
                         .map(value -> Objects.toString(value, "")).collect(Collectors.joining("|")))
-                .with(UniqueAddressDelta::addrLn1, line)
-                .with(UniqueAddressDelta::city, a.addrCity())
-                .with(UniqueAddressDelta::state, "48")
-                .with(UniqueAddressDelta::cntryCd, "US")
-                .with(UniqueAddressDelta::pstlCd, a.addrZip5())
-                .with(UniqueAddressDelta::pstlCdExt, a.addrZip4())
-                .with(UniqueAddressDelta::srcAddrLn1, line)
-                .with(UniqueAddressDelta::srcCity, a.addrCity())
-                .with(UniqueAddressDelta::srcState, a.addrStateCd())
-                .with(UniqueAddressDelta::srcCntry, "US")
-                .with(UniqueAddressDelta::srcPstlCd, a.addrZip5())
-                .with(UniqueAddressDelta::srcPstlCdExt, a.addrZip4())
+                .addrLn1(line)
+                .city(a.addrCity())
+                .state("48")
+                .cntryCd("US")
+                .pstlCd(a.addrZip5())
+                .pstlCdExt(a.addrZip4())
+                .srcAddrLn1(line)
+                .srcCity(a.addrCity())
+                .srcState(a.addrStateCd())
+                .srcCntry("US")
+                .srcPstlCd(a.addrZip5())
+                .srcPstlCdExt(a.addrZip4())
                 .build();
     }
 

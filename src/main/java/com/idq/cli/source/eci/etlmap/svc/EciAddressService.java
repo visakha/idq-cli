@@ -23,10 +23,10 @@ import com.idq.cli.core.target.DqmAddressRepository;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.EciTargets;
+import com.idq.cli.mdmdc.etldb.repo.EciAddressRepository;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyAddress;
 import com.idq.cli.source.eci.etldb.models.EciSources;
-import com.idq.cli.source.eci.etldb.models.EciTargets;
-import com.idq.cli.source.eci.etldb.repo.EciAddressRepository;
 import com.idq.cli.source.eci.etldb.repo.EciFamilyAddressViewRepository;
 import com.idq.cli.source.eci.etldb.repo.EciInactiveStatusRepository;
 import java.util.LinkedHashMap;
@@ -45,7 +45,7 @@ public class EciAddressService {
 
     public static final MappingInfo INFO = MappingInfo.of("015", "m_Tgt_C_S_ECI_Pty_Addr", SourceSystem.ECI,
             List.of("C_S_ECI_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(EciSources.EtlSrcFamilyAddress.class,
-            EciTargets.InactiveStatus.class));
+            EciSources.InactiveStatus.class));
 
     private final EciFamilyAddressViewRepository familyAddresses;
     private final EciInactiveStatusRepository inactiveStatuses;

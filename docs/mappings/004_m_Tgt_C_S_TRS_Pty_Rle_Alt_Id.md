@@ -100,5 +100,5 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Alt_Id_pkey_test`.
 * `Lookups(validSsns)` is the `lkp_Valid_SSN` cache.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.CvDcMciIndvDelta`
   (`STG_TRS_D_CV_DC_MCI_INDV`), `TrsSources.DcIndvDelta` (`STG_TRS_D_DC_INDV`), `TrsSources.CvDcMrgSprtIndvDelta`
-  (`STG_TRS_D_CV_DC_MRG_SPRT_INDV`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`), `TrsSources.DcIndvHist`
+  (`STG_TRS_D_CV_DC_MRG_SPRT_INDV`), `TrsSources.ValidMember` (`STG_TRS_VALID_MEMBERS`), `TrsSources.DcIndvHist`
   (`STG_TRS_H_DC_INDV`).

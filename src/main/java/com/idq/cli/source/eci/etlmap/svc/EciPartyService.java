@@ -7,9 +7,9 @@ import com.idq.cli.core.EtlContext;
 import com.idq.cli.core.EtlPatterns;
 import com.idq.cli.core.InactiveStatus;
 import com.idq.cli.core.MappingOutput;
-import com.idq.cli.core.PartyPattern;
 import com.idq.cli.core.PartyPattern.Check;
 import com.idq.cli.core.PartyPattern.RaceSource;
+import com.idq.cli.core.PartyPattern;
 import com.idq.cli.core.Rows;
 import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.reference.LookupRows;
@@ -18,13 +18,13 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.EciTargets;
+import com.idq.cli.mdmdc.etldb.repo.EciPartyRepository;
+import com.idq.cli.mdmdc.etldb.repo.EciPartyRoleRepository;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.PartyDemographics;
 import com.idq.cli.source.eci.etldb.models.EciSources;
-import com.idq.cli.source.eci.etldb.models.EciTargets;
 import com.idq.cli.source.eci.etldb.repo.EciChildDeltaRepository;
 import com.idq.cli.source.eci.etldb.repo.EciInactiveStatusRepository;
-import com.idq.cli.source.eci.etldb.repo.EciPartyRepository;
-import com.idq.cli.source.eci.etldb.repo.EciPartyRoleRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -40,7 +40,7 @@ public class EciPartyService {
 
     public static final MappingInfo INFO = MappingInfo.of("014", "m_Tgt_C_S_ECI_Pty", SourceSystem.ECI,
             List.of("C_S_ECI_PTY", "C_S_ECI_PTY_RLE"), List.of(EciSources.ChildDelta.class, EciSources.FamilyDelta.class,
-            EciTargets.InactiveStatus.class));
+            EciSources.InactiveStatus.class));
 
     /// Ethnicity, race and language exceptions are only raised for children.
     static final PartyPattern.Spec SPEC = new PartyPattern.Spec("ECI", RaceSource.INDICATORS, true, false,

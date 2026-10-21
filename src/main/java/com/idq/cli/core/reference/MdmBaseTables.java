@@ -16,10 +16,58 @@ public final class MdmBaseTables {
 
     /// Provisional `@Id` `ROWID_OBJECT`: the table has no primary key, Spring Data JDBC needs one.
     @Table("C_B_PTY_RLE_ALT_ID")
-    public record PartyRoleAltId(@Id String rowidObject, String altIdTp, String altIdVal) {}
+    public record PartyRoleAltId(@Id String rowidObject, String altIdTp, String altIdVal) {
+
+        /// `PartyRoleAltId.builder().rowidObject(...).build()`; columns not set are `NULL`.
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public static final class Builder {
+            private String rowidObject;
+            private String altIdTp;
+            private String altIdVal;
+
+            private Builder() {}
+
+            public Builder rowidObject(String value) { rowidObject = value; return this; }
+            public Builder altIdTp(String value) { altIdTp = value; return this; }
+            public Builder altIdVal(String value) { altIdVal = value; return this; }
+
+            public PartyRoleAltId build() {
+                return new PartyRoleAltId(rowidObject, altIdTp, altIdVal);
+            }
+        }
+    }
 
     /// Provisional `@Id` `PKEY_SRC_OBJECT`: the table has no primary key, Spring Data JDBC needs one.
     @Table("C_B_PTY_RLE_ALT_ID_XREF")
     public record PartyRoleAltIdXref(String rowidObject, @Id String pkeySrcObject, LocalDateTime srcLastUpdDt,
-            String rowidSystem, Integer hubStateInd) {}
+            String rowidSystem, Integer hubStateInd) {
+
+        /// `PartyRoleAltIdXref.builder().rowidObject(...).build()`; columns not set are `NULL`.
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public static final class Builder {
+            private String rowidObject;
+            private String pkeySrcObject;
+            private LocalDateTime srcLastUpdDt;
+            private String rowidSystem;
+            private Integer hubStateInd;
+
+            private Builder() {}
+
+            public Builder rowidObject(String value) { rowidObject = value; return this; }
+            public Builder pkeySrcObject(String value) { pkeySrcObject = value; return this; }
+            public Builder srcLastUpdDt(LocalDateTime value) { srcLastUpdDt = value; return this; }
+            public Builder rowidSystem(String value) { rowidSystem = value; return this; }
+            public Builder hubStateInd(Integer value) { hubStateInd = value; return this; }
+
+            public PartyRoleAltIdXref build() {
+                return new PartyRoleAltIdXref(rowidObject, pkeySrcObject, srcLastUpdDt, rowidSystem, hubStateInd);
+            }
+        }
+    }
 }
