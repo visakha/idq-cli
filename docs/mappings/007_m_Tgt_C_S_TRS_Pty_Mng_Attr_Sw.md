@@ -6,7 +6,7 @@
 | Sub-domain | Party-Managed-Attrib |
 | Sources | `STG_TRS_D_DC_INDV`, `STG_TRS_D_CV_DC_MCI_INDV`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_MNG_ATTR` (table emptied first) |
-| Java | `com.idq.cli.source.trs.TrsSwitches` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsSwitchesService` |
 
 ## Business purpose
 
@@ -35,7 +35,7 @@ flowchart LR
 * Joined to the registry on individual **and** source table.
 * No stale filter found (the commented `ora_hash` sample is removed).
 
-Entity: `TrsQueries.MemberSwitches` - named query: `TrsQueries#fetchMemberSwitches`.
+Entity: `TrsQueryRows.MemberSwitches` - named query: `TrsDcIndvDeltaRepository#fetchMemberSwitches`.
 
 ```sql
 WITH daily_indv AS (
@@ -80,7 +80,7 @@ The IDQ comment records a correction (10/24/2020) from the individual id to the 
 
 ## Java implementation
 
-* `TrsSwitches.attributes` = the normalizer (`Attribute` record), `transform` filters, builds
+* `TrsSwitchesService.attributes` = the normalizer (`Attribute` record), `transform` filters, builds
   `TrsTargets.ManagedAttribute`, sorts and keeps one row per key; load `replaceAll`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DcIndvDelta`
   (`STG_TRS_D_DC_INDV`), `TrsSources.CvDcMciIndvDelta` (`STG_TRS_D_CV_DC_MCI_INDV`), `TrsTargets.ValidMember`

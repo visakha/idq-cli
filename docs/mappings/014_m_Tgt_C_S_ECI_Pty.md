@@ -6,7 +6,7 @@
 | Sub-domain | Demographics (plus Role) |
 | Sources | `STG_ECI_D_CHILD`, `STG_ECI_D_FAMILY`, `STG_ECI_PTY_INACTIVE_STS` |
 | Targets | `C_S_ECI_PTY`, `C_S_ECI_PTY_RLE`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.eci.EciParty` |
+| Java | `com.idq.cli.source.eci.etlmap.svc.EciPartyService` |
 
 ## Business purpose
 
@@ -35,7 +35,7 @@ flowchart LR
 * **Stale filter removed**: `ID_CHILD IN ('0001252185','0001252521','0001267262','0001303720','0001252810')` on the
   source qualifier.
 
-Entity: `EciQueries.PartyDemographics` - named query: `EciQueries#fetchPartyDemographics`.
+Entity: `EciQueryRows.PartyDemographics` - named query: `EciChildDeltaRepository#fetchPartyDemographics`.
 
 ```sql
 SELECT 'ECI_CHILD' AS source_table, child.id_child AS id, child.child_ssn, child.first_name,
@@ -53,7 +53,7 @@ SELECT 'ECI_FAMILY', fam.id_family, NULL, fam.first_name, fam.last_name, fam.mid
 FROM stg_eci_d_family fam
 ```
 
-Lookup: `EciQueries#fetchInactiveStatuses` (see [013](013_m_Tgt_C_S_ECI_Pty_Validation.md)).
+Lookup: `EciInactiveStatusRepository#fetchInactiveStatuses` (see [013](013_m_Tgt_C_S_ECI_Pty_Validation.md)).
 
 ## Business rules
 
@@ -81,7 +81,7 @@ Unit test: `EciPkeyTest#m_Tgt_C_S_ECI_Pty_pkey_test`.
 
 ## Java implementation
 
-* `EciParty.transform` -> `PartyPattern.apply(SPEC, ...)` -> `EciTargets.Party` (`Columns.Party` + birth weight and
+* `EciPartyService.transform` -> `PartyPattern.apply(SPEC, ...)` -> `EciTargets.Party` (`Columns.Party` + birth weight and
   language columns) and `EciTargets.PartyRole`; `birthWeightGrams`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.ChildDelta`
   (`STG_ECI_D_CHILD`), `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`), `EciTargets.InactiveStatus`

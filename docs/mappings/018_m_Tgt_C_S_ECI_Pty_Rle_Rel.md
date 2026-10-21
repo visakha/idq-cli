@@ -6,7 +6,7 @@
 | Sub-domain | Role |
 | Sources | `STG_ECI_D_FAMILY`, `STG_ECI_SN_CHILD`, `STG_ECI_PTY_INACTIVE_STS` |
 | Targets | `C_S_ECI_PTY_RLE_REL`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.eci.EciRelationship` |
+| Java | `com.idq.cli.source.eci.etlmap.svc.EciRelationshipService` |
 
 ## Business purpose
 
@@ -31,7 +31,7 @@ flowchart LR
 
 Each family row twice (cartesian join with the two directions). No stale filter.
 
-Entity: `EciQueries.FamilyRelation` - named query: `EciQueries#fetchFamilyRelations`.
+Entity: `EciQueryRows.FamilyRelation` - named query: `EciFamilyDeltaRepository#fetchFamilyRelations`.
 
 ```sql
 SELECT d.relation_direction, f.id_family, f.gender AS family_gender, f.id_child,
@@ -43,7 +43,7 @@ JOIN (SELECT 'From Child' relation_direction FROM dual
       SELECT 'To Child' FROM dual) d ON 1 = 1
 ```
 
-Lookups: `EciQueries#fetchInactiveStatuses`, and the child gender `Lkp_STG_ECI_SN_CHILD`:
+Lookups: `EciInactiveStatusRepository#fetchInactiveStatuses`, and the child gender `Lkp_STG_ECI_SN_CHILD`:
 
 ```sql
 SELECT TO_CHAR(id_child) AS lookup_key, gender AS lookup_value FROM stg_eci_sn_child
@@ -68,7 +68,7 @@ Unit test: `EciPkeyTest#m_Tgt_C_S_ECI_Pty_Rle_Rel_pkey_test`.
 
 ## Java implementation
 
-* `EciRelationship.childKey`, `familyKey`, `fromRole`, `toRole`, `relationCode`, `relationType`, `pkey`; entity
+* `EciRelationshipService.childKey`, `familyKey`, `fromRole`, `toRole`, `relationCode`, `relationType`, `pkey`; entity
   `EciTargets.Relationship`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.FamilyDelta`
   (`STG_ECI_D_FAMILY`), `EciSources.SnChild` (`STG_ECI_SN_CHILD`), `EciTargets.InactiveStatus`

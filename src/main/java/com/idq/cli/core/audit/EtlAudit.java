@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.ResolvableType;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -73,8 +72,8 @@ public class EtlAudit {
 
         public Run initQuery(MemberMapping<?, ?> mapping, List<?> rows) {
             if (settings.enabled()) {
-                var entity = ResolvableType.forClass(mapping.getClass()).as(MemberMapping.class).resolveGeneric(0);
-                publish(new EtlEvent.InitQueryCaptured(id, mapping.info(), new RowSample("IdqMapInitQuery", entity,
+                publish(new EtlEvent.InitQueryCaptured(id, mapping.info(), new RowSample("IdqMapInitQuery",
+                        mapping.rowType(),
                         rows.size(), head(rows), "rows returned by the IdqMapInitQuery")));
             }
             return this;

@@ -6,7 +6,7 @@
 | Sub-domain | Role |
 | Sources | `STG_TRS_D_IN_MANAGED_CARE`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_RLE_PLN`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.trs.TrsPlan` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsPlanService` |
 
 ## Business purpose
 
@@ -31,7 +31,7 @@ flowchart LR
   their MCI key.
 * No stale filter found. The SQL override supersedes the source-qualifier filter / join (identical conditions).
 
-Entity: `TrsQueries.ManagedCarePlan` - named query: `TrsQueries#fetchManagedCarePlans`.
+Entity: `TrsQueryRows.ManagedCarePlan` - named query: `TrsInManagedCareDeltaRepository#fetchManagedCarePlans`.
 
 ```sql
 SELECT DISTINCT m.indv_id, m.begin_dt, m.mc_plan, m.history_seq, m.end_dt, m.create_dt
@@ -63,7 +63,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Pln_pkey_test`.
 
 ## Java implementation
 
-* `TrsPlan.transform`: `master()` = the lookup, `Rows.firstPerKey` for the exceptions, sort + `Rows.lastPerKey` for
+* `TrsPlanService.transform`: `master()` = the lookup, `Rows.firstPerKey` for the exceptions, sort + `Rows.lastPerKey` for
   `agg_Dedup_Rec`; entity `TrsTargets.Plan` (`Columns.Plan`).
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.InManagedCareDelta`
   (`STG_TRS_D_IN_MANAGED_CARE`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`).

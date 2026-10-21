@@ -6,7 +6,7 @@
 | Sub-domain | Alternate-ID |
 | Sources | `V_TTF_ETL_SRC`, `STG_TTF_PTY_INACTIVE_STS` |
 | Targets | `C_S_TTF_PTY_RLE_ALT_ID` |
-| Java | `com.idq.cli.source.ttf.TtfAlternateId` |
+| Java | `com.idq.cli.source.ttf.etlmap.svc.TtfAlternateIdService` |
 
 ## Business purpose
 
@@ -25,7 +25,7 @@ flowchart LR
 
 * **Stale filter removed**: `"V_TTF_ETL_SRC"."CLIENTS_ID" in ('199933','174065',...)` (ten test ids).
 
-Entity: `TtfQueries.ClientIdentifier` - named query: `TtfQueries#fetchClientIdentifiers`.
+Entity: `TtfQueryRows.ClientIdentifier` - named query: `TtfEtlSrcViewRepository#fetchClientIdentifiers`.
 
 ```sql
 SELECT clients_id, submitdate, pty_src_key FROM v_ttf_etl_src
@@ -46,6 +46,6 @@ Unit test: `TtfPkeyTest#m_Tgt_C_S_TTF_Pty_Rle_Alt_Id_pkey_test` (also checks tha
 
 ## Java implementation
 
-* `TtfAlternateId.pkey`, `transform`; entity `TtfTargets.AlternateId`.
+* `TtfAlternateIdService.pkey`, `transform`; entity `TtfTargets.AlternateId`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TtfSources.EtlSrc`
   (`V_TTF_ETL_SRC`), `TtfTargets.InactiveStatus` (`STG_TTF_PTY_INACTIVE_STS`).

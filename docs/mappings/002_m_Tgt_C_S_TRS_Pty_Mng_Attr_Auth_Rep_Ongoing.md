@@ -6,7 +6,7 @@
 | Sub-domain | Party-Managed-Attrib |
 | Sources | `STG_TRS_D_DC_PRIMARY_PAYEE`, `STG_TRS_DC_PRIMARY_PAYEE`, `STG_TRS_CV_ED_MCI_EDG_INDV`, `STG_TRS_D_CV_ED_MCI_EDG_INDV`, `STG_TRS_DC_CASES`, `STG_TRS_D_DC_CASES`, `STG_TRS_DC_CASE_INDV`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_MNG_ATTR` (attribute type `Auth_Rep_Flag` only) |
-| Java | `com.idq.cli.source.trs.TrsAuthorizedRepresentative` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsAuthorizedRepresentativeService` |
 
 ## Business purpose
 
@@ -39,7 +39,7 @@ flowchart LR
 * Only valid members are kept; the result is ordered by individual and eligibility dates.
 * No stale filter found. Comments removed.
 
-Entity: `TrsQueries.AuthorizedRepresentative` - named query: `TrsQueries#fetchAuthorizedRepresentatives`.
+Entity: `TrsQueryRows.AuthorizedRepresentative` - named query: `TrsDcPrimaryPayeeDeltaRepository#fetchAuthorizedRepresentatives`.
 
 ```sql
 SELECT DISTINCT a.indv_id, a.ar_flag, a.eff_begin_dt, a.eff_end_dt, a.create_dt
@@ -125,7 +125,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing_pkey_test`.
 
 ## Java implementation
 
-* `TrsAuthorizedRepresentative.transform`: sort by individual and begin date, compute the maximum end per key,
+* `TrsAuthorizedRepresentativeService.transform`: sort by individual and begin date, compute the maximum end per key,
   keep the last row per key (`Rows.lastPerKey`), build `TrsTargets.ManagedAttribute`.
 * Load mode `TargetBatch.replaceWhere(..., "MNG_ATTR_TP", "Auth_Rep_Flag", rows)` - the IDQ pre-SQL delete.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DcPrimaryPayeeDelta`

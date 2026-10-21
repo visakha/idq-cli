@@ -21,8 +21,8 @@ This document is the business description of each one; the mapping documents lin
 | `rule_MEDICAID_ID_Std` | `IdentifierRules.medicaidId` | TRS 004, ECI 016 |
 | `rule_Member_Id_Std` | `IdentifierRules.memberId` | TRS 004 |
 | `mplt_Global_Addr_Validation` (+ `rule_Addr_Line_Pre_Scrub1`, `rule_Addr_Line_Post_Scrub`) | `AddressValidator`, `AddressRules` | address mappings |
-| `mplt_TRS_Pty_Rle_Alt_Id_Normalization` | `TrsAlternateId.normalize` (source specific) | TRS 004 |
-| `mplt_Member_Pty_Rle_Phn_Normalization` | `TrsPhoneEmail.phoneSlots` (source specific) | TRS 006 |
+| `mplt_TRS_Pty_Rle_Alt_Id_Normalization` | `TrsAlternateIdService.normalize` (source specific) | TRS 004 |
+| `mplt_Member_Pty_Rle_Phn_Normalization` | `TrsPhoneEmailService.phoneSlots` (source specific) | TRS 006 |
 | `mplt_Member_Pty_Rle_Phn_Consolidation`, `mplt_Member_Pty_Rle_EAddr_Consolidation` | `Rows.latestPerKey` | TRS 006 |
 | `mplt_Member_Pty_Rle_Rel_Consolidation` | `Rows.currentSegmentPerKey` | TRS 009, 010 |
 | `mplt_Pty_Rle_Rel_Timeline_Validation`, `mplt_DST_Correction` | not ported (retired MDM timeline) | TRS 009, 010 |

@@ -6,7 +6,7 @@
 | Sub-domain | Address |
 | Sources | `V_ECI_ETL_SRC_FAMILY_ADDRESS`, `STG_ECI_PTY_INACTIVE_STS` |
 | Targets | `C_S_ECI_PTY_RLE_ADDR`, `DQM_ADDRESS`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.eci.EciAddress` |
+| Java | `com.idq.cli.source.eci.etlmap.svc.EciAddressService` |
 
 ## Business purpose
 
@@ -31,7 +31,7 @@ flowchart LR
 
 All rows of the source view (the view's own definition is not part of the exports). No filter in IDQ.
 
-Entity: `EciQueries.FamilyAddress` - named query: `EciQueries#fetchFamilyAddresses`.
+Entity: `EciQueryRows.FamilyAddress` - named query: `EciFamilyAddressViewRepository#fetchFamilyAddresses`.
 
 ```sql
 SELECT source_table, id, id_family_address, address1, address2, address_cd, city_name, county_name,
@@ -64,7 +64,7 @@ FROM v_eci_etl_src_family_address
 
 ## Java implementation
 
-* `EciAddress.pkey` + `AddressPatterns.route` (validate, DQM, score, hold lines, exception) shared with FSS / WIC;
+* `EciAddressService.pkey` + `AddressPatterns.route` (validate, DQM, score, hold lines, exception) shared with FSS / WIC;
   entity `EciTargets.Address`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.EtlSrcFamilyAddress`
   (`V_ECI_ETL_SRC_FAMILY_ADDRESS`), `EciTargets.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`).

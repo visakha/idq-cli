@@ -6,7 +6,7 @@
 | Sub-domain | Demographics (plus Role) |
 | Sources | `V_FSS_ETL_SRC`, `STG_FSS_PTY_INACTIVE_STS` |
 | Targets | `C_S_FSS_PTY`, `C_S_FSS_PTY_RLE`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.fss.FssParty` |
+| Java | `com.idq.cli.source.fss.etlmap.svc.FssPartyService` |
 
 ## Business purpose
 
@@ -30,7 +30,7 @@ flowchart LR
 
 Client view rows that are the last active registration. Commented testing filters were already inactive in IDQ.
 
-Entity: `FssQueries.ClientDemographics` - named query: `FssQueries#fetchClientDemographics`.
+Entity: `FssQueryRows.ClientDemographics` - named query: `FssEtlSrcViewRepository#fetchClientDemographics`.
 
 ```sql
 SELECT source_type, dt_last_update, id_client, pty_src_key, nm_first, nm_last, nm_middle, dt_dob,
@@ -63,6 +63,6 @@ Unit test: `FssPkeyTest#m_Tgt_C_S_FSS_Pty_pkey_test`.
 
 ## Java implementation
 
-* `FssParty.transform` -> `PartyPattern.apply(SPEC, ...)`; entities `FssTargets.Party`, `FssTargets.PartyRole`.
+* `FssPartyService.transform` -> `PartyPattern.apply(SPEC, ...)`; entities `FssTargets.Party`, `FssTargets.PartyRole`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `FssSources.EtlSrc`
   (`V_FSS_ETL_SRC`), `FssTargets.InactiveStatus` (`STG_FSS_PTY_INACTIVE_STS`).

@@ -6,7 +6,7 @@
 | Sub-domain | Demographics (party activation status) |
 | Sources | `V_TTF_ETL_SRC`, `C_B_PTY_XREF`, `STG_TTF_PTY_INACTIVE_STS` |
 | Targets | `STG_TTF_PTY_INACTIVE_STS`, `STG_TTF_PTY_INACTIVE_LOG`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.ttf.TtfPartyValidation` |
+| Java | `com.idq.cli.source.ttf.etlmap.svc.TtfPartyValidationService` |
 
 ## Business purpose
 
@@ -31,14 +31,14 @@ All rows of the TTF client view.
 * **Stale filter removed**: the source qualifier carried the malformed test filter
   `"V_TTF_ETL_SRC"."FYCLIENTS_ID" in '22','60','101',...)` as its SQL query.
 
-Entity: `TtfQueries.ClientName` - named query: `TtfQueries#fetchClientNames`.
+Entity: `TtfQueryRows.ClientName` - named query: `TtfEtlSrcViewRepository#fetchClientNames`.
 
 ```sql
 SELECT clients_id, firstname, lastname, middlename, createddate, dob, submitdate, client_exists_flag
 FROM v_ttf_etl_src
 ```
 
-Lookups: `TtfQueries#fetchInactiveStatuses`, `TtfQueries#fetchHubStates` (`TRIM(ROWID_SYSTEM) = 'TTF'`).
+Lookups: `TtfInactiveStatusRepository#fetchInactiveStatuses`, `TtfPartyXrefRepository#fetchHubStates` (`TRIM(ROWID_SYSTEM) = 'TTF'`).
 
 ## Business rules
 
@@ -56,7 +56,7 @@ No `C_S_*` target; status key = `LPAD(CLIENTS_ID,10)`, `ROWID_SYSTEM` = `TTF`. U
 
 ## Java implementation
 
-* `TtfPartyValidation.nameExceptionCode`, `transform`; `InactiveStatus.Changes` / `output`.
+* `TtfPartyValidationService.nameExceptionCode`, `transform`; `InactiveStatus.Changes` / `output`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TtfSources.EtlSrc`
   (`V_TTF_ETL_SRC`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`), `TtfTargets.InactiveStatus`
   (`STG_TTF_PTY_INACTIVE_STS`).

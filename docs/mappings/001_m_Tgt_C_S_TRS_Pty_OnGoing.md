@@ -6,7 +6,7 @@
 | Sub-domain | Demographics (plus Role) |
 | Sources | `STG_TRS_D_DC_INDV`, `STG_TRS_D_CV_DC_MCI_INDV`, `STG_TRS_D_CV_MCI_EDG_INDV_TOA`, `STG_TRS_VALID_MEMBERS`, `STG_TRS_DEACTIVED_MEMBERS` |
 | Targets | `C_S_TRS_PTY`, `C_S_TRS_PTY_RLE`, `STG_TRS_VALID_MEMBERS` (registry), `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.trs.TrsPartyOnGoing` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsPartyOnGoingService` |
 
 ## Business purpose
 
@@ -51,7 +51,7 @@ flowchart LR
 * IDQ parameters inlined: `$MCI_TBL_SRC = MCI`, `$DC_INDV_TBL_SRC = DC_INDV`. Optimizer hints and commented-out
   code removed.
 
-Entity: `TrsQueries.MemberDemographics` - named query: `TrsQueries#fetchMemberDemographics`.
+Entity: `TrsQueryRows.MemberDemographics` - named query: `TrsDcIndvDeltaRepository#fetchMemberDemographics`.
 
 ```sql
 WITH new_valid_indvs AS (
@@ -92,7 +92,7 @@ ORDER BY a.indv_id, a.src_tbl
 
 ### Lookup: existing valid members
 
-`lkp_Stg_TRS_Valid_Members` - entity `String` - named query `TrsQueries#fetchValidMemberKeys`.
+`lkp_Stg_TRS_Valid_Members` - entity `String` - named query `TrsValidMemberRepository#fetchValidMemberKeys`.
 
 ```sql
 SELECT PTY_PK FROM STG_TRS_VALID_MEMBERS

@@ -6,7 +6,7 @@
 | Sub-domain | Address |
 | Sources | `STG_TRS_D_INDV_ADDR`, `STG_TRS_D_UNQ_ADDR`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_RLE_ADDR`, `DQM_ADDRESS`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.trs.TrsAddress` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsAddressService` |
 
 ## Business purpose
 
@@ -38,7 +38,7 @@ flowchart LR
   reported by two sources gets the address on both keys).
 * No stale filter found.
 
-Entity: `TrsQueries.AddressAssignment` - named query: `TrsQueries#fetchAddressAssignments`.
+Entity: `TrsQueryRows.AddressAssignment` - named query: `TrsIndvAddrDeltaRepository#fetchAddressAssignments`.
 
 ```sql
 WITH addr_de_dup AS (
@@ -94,7 +94,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Addr_2_pkey_test`.
 
 ## Java implementation
 
-* `TrsAddress.transform`, `pkey`, `dqmKey`, `dqmRow`; `AddressRules.score` / `holdLines`;
+* `TrsAddressService.transform`, `pkey`, `dqmKey`, `dqmRow`; `AddressRules.score` / `holdLines`;
   `PersonRules.notBeyondFiftyYears`; `AddressPatterns.badData4Address`; entities `TrsTargets.Address`,
   `DqmAddress`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.IndvAddrDelta`

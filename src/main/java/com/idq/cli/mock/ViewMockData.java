@@ -3,10 +3,10 @@ package com.idq.cli.mock;
 import static com.idq.cli.core.EntityBuilder.entity;
 
 import com.idq.cli.config.EtlSettings;
-import com.idq.cli.source.fss.FssSources;
-import com.idq.cli.source.fss.FssSources.EtlSrcRelations;
-import com.idq.cli.source.ttf.TtfSources;
-import com.idq.cli.source.wic.WicSources;
+import com.idq.cli.source.fss.etldb.models.FssSources;
+import com.idq.cli.source.fss.etldb.models.FssSources.EtlSrcRelations;
+import com.idq.cli.source.ttf.etldb.models.TtfSources;
+import com.idq.cli.source.wic.etldb.models.WicSources;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;

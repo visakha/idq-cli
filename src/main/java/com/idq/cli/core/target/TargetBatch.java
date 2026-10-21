@@ -1,8 +1,6 @@
 package com.idq.cli.core.target;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import org.springframework.data.relational.core.mapping.Table;
 
 /// Rows for one target table plus the way they are loaded.
@@ -20,9 +18,8 @@ public record TargetBatch<T>(Class<T> entity, List<T> rows, LoadMode<T> mode) {
         return new TargetBatch<>(entity, rows, new LoadMode.Append<>());
     }
 
-    public static <T> TargetBatch<T> deleteByKey(Class<T> entity, List<T> rows,
-            Function<T, Map<String, Object>> key) {
-        return new TargetBatch<>(entity, rows, new LoadMode.DeleteByKey<>(key));
+    public static <T> TargetBatch<T> deleteByKey(Class<T> entity, List<T> rows) {
+        return new TargetBatch<>(entity, rows, new LoadMode.DeleteByKey<>());
     }
 
     public String table() {

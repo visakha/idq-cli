@@ -4,7 +4,6 @@ import com.idq.cli.core.exception.BadRecord;
 import com.idq.cli.core.target.TargetBatch;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,13 +49,12 @@ public final class InactiveStatus {
     /// Log rows appended, reactivated statuses deleted by key, new statuses appended - then the exception rows.
     public static <S, L> MappingOutput output(Changes changes, List<BadRecord> bad, Class<S> statusType,
             RowFactory<S> status, Class<L> logType, RowFactory<L> log) {
-        var removed = new LinkedHashMap<S, Map<String, Object>>();
-        changes.removedStatuses.forEach(s -> removed.put(status.create(s.srcKey(), s.rowidSystem(), null, null),
-                Map.of("SRC_KEY", s.srcKey(), "ROWID_SYSTEM", s.rowidSystem())));
+        var removed = changes.removedStatuses.stream()
+                .map(s -> status.create(s.srcKey(), s.rowidSystem(), null, null)).distinct().toList();
         return MappingOutput.empty()
                 .load(TargetBatch.append(logType, changes.logs.stream()
                         .map(l -> log.create(l.srcKey(), l.rowidSystem(), l.action(), l.actionDt())).toList()))
-                .load(TargetBatch.deleteByKey(statusType, List.copyOf(removed.keySet()), removed::get))
+                .load(TargetBatch.deleteByKey(statusType, removed))
                 .load(TargetBatch.append(statusType, changes.newStatuses.stream()
                         .map(s -> status.create(s.srcKey(), s.rowidSystem(), s.deactivationSts(), s.deactivationDt()))
                         .toList()))

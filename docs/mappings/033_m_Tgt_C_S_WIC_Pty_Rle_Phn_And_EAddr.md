@@ -6,7 +6,7 @@
 | Sub-domain | Phone-email |
 | Sources | `V_WIC_ETL_SRC`, `STG_WIC_PTY_INACTIVE_STS` |
 | Targets | `C_S_WIC_PTY_RLE_PHN`, `C_S_WIC_PTY_RLE_EADDR`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.wic.WicPhoneEmail` |
+| Java | `com.idq.cli.source.wic.etlmap.svc.WicPhoneEmailService` |
 
 ## Business purpose
 
@@ -29,7 +29,7 @@ flowchart LR
 
 All rows of the WIC view. No filter in IDQ.
 
-Entity: `WicQueries.FamilyContact` - named query: `WicQueries#fetchFamilyContacts`.
+Entity: `WicQueryRows.FamilyContact` - named query: `WicEtlSrcViewRepository#fetchFamilyContacts`.
 
 ```sql
 SELECT fid, datekey, phone, email, source_table, pty_src_key, id FROM v_wic_etl_src
@@ -52,6 +52,6 @@ Unit test: `WicPkeyTest#m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr_pkey_test`.
 
 ## Java implementation
 
-* `WicPhoneEmail.phoneKey`, `emailKey`, `transform`; entities `WicTargets.Phone`, `WicTargets.Email`.
+* `WicPhoneEmailService.phoneKey`, `emailKey`, `transform`; entities `WicTargets.Phone`, `WicTargets.Email`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
   (`V_WIC_ETL_SRC`), `WicTargets.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).

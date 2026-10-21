@@ -6,7 +6,7 @@
 | Sub-domain | Demographics (party activation status) |
 | Sources | `V_WIC_ETL_SRC`, `C_B_PTY_XREF`, `STG_WIC_PTY_INACTIVE_STS` |
 | Targets | `STG_WIC_PTY_INACTIVE_STS`, `STG_WIC_PTY_INACTIVE_LOG`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.wic.WicPartyValidation` |
+| Java | `com.idq.cli.source.wic.etlmap.svc.WicPartyValidationService` |
 
 ## Business purpose
 
@@ -27,14 +27,14 @@ flowchart LR
 
 All rows of the WIC view. No filter in IDQ.
 
-Entity: `WicQueries.ClientName` - named query: `WicQueries#fetchClientNames`.
+Entity: `WicQueryRows.ClientName` - named query: `WicEtlSrcViewRepository#fetchClientNames`.
 
 ```sql
 SELECT id, first_name, last_name, middle_name, datekey, load_date, source_table, pty_src_key, dob
 FROM v_wic_etl_src
 ```
 
-Lookups: `WicQueries#fetchInactiveStatuses`, `WicQueries#fetchHubStates`.
+Lookups: `WicInactiveStatusRepository#fetchInactiveStatuses`, `WicPartyXrefRepository#fetchHubStates`.
 
 ## Business rules
 
@@ -49,7 +49,7 @@ No `C_S_*` target; status key = `PTY_SRC_KEY`, `ROWID_SYSTEM` = `WIC`. Unit test
 
 ## Java implementation
 
-* `WicPartyValidation.transform`; `InactiveStatus.Changes` / `output`.
+* `WicPartyValidationService.transform`; `InactiveStatus.Changes` / `output`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
   (`V_WIC_ETL_SRC`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`), `WicTargets.InactiveStatus`
   (`STG_WIC_PTY_INACTIVE_STS`).

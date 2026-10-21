@@ -6,7 +6,7 @@
 | Sub-domain | Role |
 | Sources | `STG_TRS_D_IN_MANAGED_CARE`, `STG_TRS_VALID_MEMBERS`, `C_B_PTY_RLE_ALT_ID`, `C_B_PTY_RLE_ALT_ID_XREF` |
 | Targets | `C_S_TRS_PTY_RLE_REL_PROV`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.trs.TrsPrimaryCareProvider` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsPrimaryCareProviderService` |
 
 ## Business purpose
 
@@ -34,7 +34,7 @@ flowchart LR
 * Managed care rows with a provider number for registered individuals, one source key per individual (MCI first).
 * No stale filter (commented `ora_hash` sample and the old query are removed).
 
-Entity: `TrsQueries.PrimaryCareProvider` - named query: `TrsQueries#fetchPrimaryCareProviders`.
+Entity: `TrsQueryRows.PrimaryCareProvider` - named query: `TrsInManagedCareDeltaRepository#fetchPrimaryCareProviders`.
 
 ```sql
 WITH min_pk AS (
@@ -52,7 +52,7 @@ ORDER BY mc.indv_id, mc.end_dt
 
 `Lookup_C_B_PTY_RLE_ALT_ID` (MDM base object, connection `HHS_MDM_ORS`): alternate ids of type `006` (TPI) whose
 C21 cross-reference is active; when a provider was re-classed, the source key with the latest source update wins.
-Entity `TrsQueries.ProviderKey` - named query `TrsQueries#fetchProviderKeys`.
+Entity `TrsQueryRows.ProviderKey` - named query `TrsPartyRoleAltIdRepository#fetchProviderKeys`.
 
 ```sql
 WITH tpi_src_key AS (
@@ -90,7 +90,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP_pkey_test`.
 
 ## Java implementation
 
-* `TrsPrimaryCareProvider.transform`, `providerRoleKey`, `pkey`; `Lookups(providerKeyByTpi)`;
+* `TrsPrimaryCareProviderService.transform`, `providerRoleKey`, `pkey`; `Lookups(providerKeyByTpi)`;
   `Rows.currentSegmentPerKey`; entity `TrsTargets.ProviderRelationship`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.InManagedCareDelta`
   (`STG_TRS_D_IN_MANAGED_CARE`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`), `MdmBaseTables.PartyRoleAltId`

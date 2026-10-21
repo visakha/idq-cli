@@ -6,7 +6,7 @@
 | Sub-domain | Alternate-ID |
 | Sources | `STG_TRS_D_CV_DC_MCI_INDV`, `STG_TRS_D_DC_INDV`, `STG_TRS_D_CV_DC_MRG_SPRT_INDV`, `STG_TRS_VALID_MEMBERS`, `STG_TRS_H_DC_INDV` |
 | Targets | `C_S_TRS_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.trs.TrsAlternateId` (with `mplt_TRS_Pty_Rle_Alt_Id_Normalization`) |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsAlternateIdService` (with `mplt_TRS_Pty_Rle_Alt_Id_Normalization`) |
 
 ## Business purpose
 
@@ -39,7 +39,7 @@ flowchart LR
   kept (`key_rn = 1`) - a business de-duplication, kept as is.
 * **Stale filter removed**: `INDV_ID=504937068` on the source qualifier.
 
-Entity: `TrsQueries.MemberIdentifiers` - named query: `TrsQueries#fetchMemberIdentifiers`.
+Entity: `TrsQueryRows.MemberIdentifiers` - named query: `TrsDcIndvDeltaRepository#fetchMemberIdentifiers`.
 
 ```sql
 WITH all_indv AS (
@@ -64,7 +64,7 @@ SELECT pty_pkey, member_id, start_dt, ssn, cv_ind FROM de_dup_indv WHERE key_rn 
 
 ### Lookup: SSA validated SSNs
 
-`lkp_Valid_SSN` - entity `TrsQueries.ValidSsn` - named query `TrsQueries#fetchValidSsns`.
+`lkp_Valid_SSN` - entity `TrsQueryRows.ValidSsn` - named query `TrsDcIndvHistRepository#fetchValidSsns`.
 
 ```sql
 SELECT DISTINCT indv_id, ssn FROM stg_trs_h_dc_indv WHERE ssa_validation_sw = 'Y' AND ssn > 0
@@ -95,7 +95,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Alt_Id_pkey_test`.
 
 ## Java implementation
 
-* `TrsAlternateId.normalize` = the normalizer (one `Candidate` per type), `IdentifierRules` = the rules,
+* `TrsAlternateIdService.normalize` = the normalizer (one `Candidate` per type), `IdentifierRules` = the rules,
   `transform` routes candidates to `TrsTargets.AlternateId` or `BadRecords`.
 * `Lookups(validSsns)` is the `lkp_Valid_SSN` cache.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.CvDcMciIndvDelta`

@@ -1,6 +1,5 @@
 package com.idq.cli.core;
 
-import com.idq.cli.core.target.TargetWriter;
 import com.idq.cli.domain.MemberMapping;
 import java.time.Duration;
 import java.time.Instant;
@@ -10,7 +9,7 @@ import java.util.function.Consumer;
 /// Fluent driver of one mapping run:
 ///
 /// ```java
-/// MappingFlow.of(mapping).read().peek(audit).transform(ctx).writeWith(writer);
+/// MappingFlow.of(mapping).read().peek(audit).transform(ctx).load();
 /// ```
 public final class MappingFlow {
 
@@ -34,15 +33,16 @@ public final class MappingFlow {
         }
 
         public Writer transform(EtlContext ctx) {
-            return new Writer(reader.mapping().info().name(), reader.started(), rows.size(),
+            return new Writer(reader.mapping(), reader.started(), rows.size(),
                     reader.mapping().transform(rows, lookups, ctx));
         }
     }
 
-    public record Writer(String mapping, Instant started, int rowsRead, MappingOutput output) {
-        public MappingResult writeWith(TargetWriter writer) {
-            var written = writer.write(output);
-            return new MappingResult(mapping, MappingResult.Status.SUCCEEDED, rowsRead, written,
+    public record Writer(MemberMapping<?, ?> mapping, Instant started, int rowsRead, MappingOutput output) {
+        /// Loads the output through the mapping's own repositories.
+        public MappingResult load() {
+            var written = mapping.load(output);
+            return new MappingResult(mapping.info().name(), MappingResult.Status.SUCCEEDED, rowsRead, written,
                     output.badRecords().size(), Duration.between(started, Instant.now()), null);
         }
     }

@@ -46,6 +46,35 @@ drop all
   any ETL mapping components like the Expression Transformation, when the refere to these ports, ignore them
 
 
+# about the Spring Data JDBC
+we have integrated Spring Data JDBC to interact with the database, allowing us to map SQL queries to Java entities and perform CRUD operations efficiently.
+however the current code is using reflection based mini ORM like behavior, which is less efficient and harder to maintain compared to Spring Data JDBC.
+Lets migrate the existing reflection-based mini ORM code to use Spring Data JDBC for better readability and maintainability.
+
+also 
+the code is too complicated to untangle mentally, for example
+we have
+'public record InactiveStatus' in com.idq.cli.source.eci.EciTargets
+and I do not understand why we have 'public interface EciQueries extends Repository<EciTargets.InactiveStatus, String>' in the EciQueries class.
+the objectives are embedded in way down and deep, I do not want that.
+Those objectives can be methods that implement the business logic.
+
+simplify the Data Layer only, without changing the business logic itself.
+Implement the Repository interfaces using Spring Data JDBC for each of the target tables, ensuring that the data access layer is simplified and consistent.
+Implement the Service layer that uses these Repository interfaces, ensuring that the business logic remains intact while the data access layer is simplified.
+Ensure that the Service layer methods are clearly named and represent the business objectives, making it easier to understand the flow of the application.
+
+## package structure
+
+The package structure should NOT follow the domain and sub-domain organization for interfaces for implementations. For example:
+- DO NOT DO THIS : `com.idq.cli.domain.<sub-domain>` for domain interfaces
+- DO THIS - let us be source specific - `com.idq.cli.source.eci.etldb.models`,`com.idq.cli.source.eci.etldb.repo`, `com.idq.cli.source.eci.etldb.svc`  for source system specific implementations	
+
+
+
+
+
+
 
 # about the source specific tables (STG tables )
 for example `stg_eci_d_child`  the naming coventions is  

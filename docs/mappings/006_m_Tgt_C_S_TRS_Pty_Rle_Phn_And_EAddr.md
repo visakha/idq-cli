@@ -6,7 +6,7 @@
 | Sub-domain | Phone-email |
 | Sources | `STG_TRS_D_DC_CASES`, `STG_TRS_DC_CASE_INDV`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_RLE_PHN`, `C_S_TRS_PTY_RLE_EADDR`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.trs.TrsPhoneEmail` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsPhoneEmailService` |
 
 ## Business purpose
 
@@ -35,7 +35,7 @@ flowchart LR
 * Delta cases joined to all individuals of the case; only registered valid members (MCI key).
 * **Stale filter removed**: `rownum < 100000` on the source qualifier (a volume limit left from testing).
 
-Entity: `TrsQueries.CaseContact` - named query: `TrsQueries#fetchCaseContacts`.
+Entity: `TrsQueryRows.CaseContact` - named query: `TrsDcCasesDeltaRepository#fetchCaseContacts`.
 
 ```sql
 SELECT DISTINCT i.indv_id, c.case_num, c.create_dt, c.work_ph_num, c.other_ph_num, c.email, c.ph_num,
@@ -77,7 +77,7 @@ JOIN stg_trs_valid_members vm ON TO_CHAR(i.indv_id) = vm.pty_pk
 
 ## Java implementation
 
-* `TrsPhoneEmail.phoneSlots` = the normalizer; `ContactRules.phone` / `ContactRules.email`;
+* `TrsPhoneEmailService.phoneSlots` = the normalizer; `ContactRules.phone` / `ContactRules.email`;
   `EtlPatterns.write2TargetPhone` / `write2TargetEmail` / `badData4Phone` / `badData4Email`; `Rows.latestPerKey`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DcCasesDelta`
   (`STG_TRS_D_DC_CASES`), `TrsSources.DcCaseIndv` (`STG_TRS_DC_CASE_INDV`), `TrsTargets.ValidMember`

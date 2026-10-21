@@ -6,7 +6,7 @@
 | Sub-domain | Alternate-Name |
 | Sources | `STG_TRS_D_CV_DC_MCI_ALIAS`, `STG_TRS_D_DC_ALIAS`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_NM` |
-| Java | `com.idq.cli.source.trs.TrsPartyName` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsPartyNameService` |
 
 ## Business purpose
 
@@ -33,7 +33,7 @@ flowchart LR
 * Only aliases of registered valid members (`PTY_PK` match) are returned; names are trimmed.
 * No stale filter found; the commented-out absent-parent branch is removed.
 
-Entity: `TrsQueries.MemberAlias` - named query: `TrsQueries#fetchMemberAliases`.
+Entity: `TrsQueryRows.MemberAlias` - named query: `TrsDcAliasDeltaRepository#fetchMemberAliases`.
 
 ```sql
 SELECT DISTINCT a.indv_id, a.pkey_pty, RTRIM(LTRIM(a.first_name)) AS first_name,
@@ -75,7 +75,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Nm_pkey_test`.
 
 ## Java implementation
 
-* `TrsPartyName.transform`: filter, `NameStandardization.removeTrailingNumbers`, `NameStandardization.standardize`,
+* `TrsPartyNameService.transform`: filter, `NameStandardization.removeTrailingNumbers`, `NameStandardization.standardize`,
   build `TrsTargets.PartyName` (`Columns.PartyName`), `Rows.lastPerKey`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.CvDcMciAliasDelta`
   (`STG_TRS_D_CV_DC_MCI_ALIAS`), `TrsSources.DcAliasDelta` (`STG_TRS_D_DC_ALIAS`), `TrsTargets.ValidMember`

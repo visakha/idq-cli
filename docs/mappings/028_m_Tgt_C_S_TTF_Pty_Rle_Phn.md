@@ -6,7 +6,7 @@
 | Sub-domain | Phone-email |
 | Sources | `V_TTF_ETL_SRC`, `STG_TTF_PTY_INACTIVE_STS` |
 | Targets | `C_S_TTF_PTY_RLE_PHN`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.ttf.TtfPhone` |
+| Java | `com.idq.cli.source.ttf.etlmap.svc.TtfPhoneService` |
 
 ## Business purpose
 
@@ -26,7 +26,7 @@ flowchart LR
 
 * **Stale filter removed**: `"V_TTF_ETL_SRC"."PHONE"in ()` (an empty, invalid test filter).
 
-Entity: `TtfQueries.ClientPhone` - named query: `TtfQueries#fetchClientPhones`.
+Entity: `TtfQueryRows.ClientPhone` - named query: `TtfEtlSrcViewRepository#fetchClientPhones`.
 
 ```sql
 SELECT submitdate, phone, pty_src_key FROM v_ttf_etl_src
@@ -49,6 +49,6 @@ The key keeps the reported text; `PHN_NUM` holds the standardized digits. Unit t
 
 ## Java implementation
 
-* `TtfPhone.pkey`, `transform`; `EtlPatterns.write2TargetPhone`; entity `TtfTargets.Phone`.
+* `TtfPhoneService.pkey`, `transform`; `EtlPatterns.write2TargetPhone`; entity `TtfTargets.Phone`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TtfSources.EtlSrc`
   (`V_TTF_ETL_SRC`), `TtfTargets.InactiveStatus` (`STG_TTF_PTY_INACTIVE_STS`).

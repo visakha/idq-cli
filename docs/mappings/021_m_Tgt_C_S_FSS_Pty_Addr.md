@@ -6,7 +6,7 @@
 | Sub-domain | Address |
 | Sources | `V_FSS_ETL_SRC`, `STG_FSS_PTY_INACTIVE_STS` |
 | Targets | `C_S_FSS_PTY_RLE_ADDR`, `DQM_ADDRESS`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.fss.FssAddress` |
+| Java | `com.idq.cli.source.fss.etlmap.svc.FssAddressService` |
 
 ## Business purpose
 
@@ -31,7 +31,7 @@ flowchart LR
 
 Client view rows whose capture action is not delete (`DTL__CAPXACTION <> 'D'`). No stale filter.
 
-Entity: `FssQueries.ClientAddress` - named query: `FssQueries#fetchClientAddresses`.
+Entity: `FssQueryRows.ClientAddress` - named query: `FssEtlSrcViewRepository#fetchClientAddresses`.
 
 ```sql
 SELECT source_type, id_client, id_registration_client, pty_src_key, addr_line1, addr_line2, addr_city,
@@ -60,6 +60,6 @@ Unit test: `FssPkeyTest#m_Tgt_C_S_FSS_Pty_Addr_pkey_test`.
 
 ## Java implementation
 
-* `FssAddress.pkey` + `AddressPatterns.route`; entity `FssTargets.Address`.
+* `FssAddressService.pkey` + `AddressPatterns.route`; entity `FssTargets.Address`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `FssSources.EtlSrc`
   (`V_FSS_ETL_SRC`), `FssTargets.InactiveStatus` (`STG_FSS_PTY_INACTIVE_STS`).
