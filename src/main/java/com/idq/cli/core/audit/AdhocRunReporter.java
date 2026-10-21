@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.relational.core.mapping.RelationalMappingContext;
 import org.springframework.stereotype.Component;
 
 /// Listens to the [EtlEvent]s of a run and, when it completes, writes one Markdown audit report per target table to
@@ -42,11 +43,13 @@ public class AdhocRunReporter {
     private static final String EXCEPTIONS = "EXC_STG_BAD_REC_MEMB";
 
     private final ReportSettings settings;
+    private final MarkdownTable tables;
     private final Map<RunId, Map<String, MappingLog>> runs = new ConcurrentHashMap<>();
     private final Map<String, MockDataGenerated> mockData = new ConcurrentHashMap<>();
 
-    public AdhocRunReporter(ReportSettings settings) {
+    public AdhocRunReporter(ReportSettings settings, RelationalMappingContext mapping) {
         this.settings = settings;
+        this.tables = new MarkdownTable(mapping);
     }
 
     /// Everything captured for one mapping of a run.
@@ -207,14 +210,14 @@ public class AdhocRunReporter {
                 r.message() == null ? "" : MarkdownTable.format(r.message()));
     }
 
-    private static void section(StringBuilder md, String level, RowSample sample) {
+    private void section(StringBuilder md, String level, RowSample sample) {
         md.append(level).append(" ").append(sample.name());
         if (sample.entity() != null) {
             md.append(" (`").append(entityName(sample.entity())).append("`)");
         }
         md.append("\n\n").append(sample.total()).append(" rows, ").append(sample.rows().size()).append(" shown - ")
                 .append(sample.note()).append("\n\n")
-                .append(MarkdownTable.of(sample.entity(), sample.rows())).append("\n");
+                .append(tables.of(sample.entity(), sample.rows())).append("\n");
     }
 
     /// `EciQueryRows.FamilyRelation` rather than `com.idq.cli.source.eci.etldb.models.EciQueryRows$FamilyRelation`
