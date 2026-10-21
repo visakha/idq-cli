@@ -21,13 +21,13 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.WicTargets;
+import com.idq.cli.mdmdc.etldb.repo.WicEmailRepository;
+import com.idq.cli.mdmdc.etldb.repo.WicPhoneRepository;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.FamilyContact;
 import com.idq.cli.source.wic.etldb.models.WicSources;
-import com.idq.cli.source.wic.etldb.models.WicTargets;
-import com.idq.cli.source.wic.etldb.repo.WicEmailRepository;
 import com.idq.cli.source.wic.etldb.repo.WicEtlSrcViewRepository;
 import com.idq.cli.source.wic.etldb.repo.WicInactiveStatusRepository;
-import com.idq.cli.source.wic.etldb.repo.WicPhoneRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,7 +42,7 @@ public class WicPhoneEmailService {
 
     public static final MappingInfo INFO = MappingInfo.of("033", "m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr",
             SourceSystem.WIC, List.of("C_S_WIC_PTY_RLE_PHN", "C_S_WIC_PTY_RLE_EADDR"), List.of(WicSources.EtlSrc.class,
-            WicTargets.InactiveStatus.class));
+            WicSources.InactiveStatus.class));
 
     private final WicEtlSrcViewRepository etlSrc;
     private final WicInactiveStatusRepository inactiveStatuses;

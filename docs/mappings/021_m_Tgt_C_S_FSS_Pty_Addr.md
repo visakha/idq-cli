@@ -62,4 +62,4 @@ Unit test: `FssPkeyTest#m_Tgt_C_S_FSS_Pty_Addr_pkey_test`.
 
 * `FssAddressService.pkey` + `AddressPatterns.route`; entity `FssTargets.Address`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `FssSources.EtlSrc`
-  (`V_FSS_ETL_SRC`), `FssTargets.InactiveStatus` (`STG_FSS_PTY_INACTIVE_STS`).
+  (`V_FSS_ETL_SRC`), `FssSources.InactiveStatus` (`STG_FSS_PTY_INACTIVE_STS`).

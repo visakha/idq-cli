@@ -2,7 +2,7 @@ package com.idq.cli.source.wic.etldb.repo;
 
 import com.idq.cli.core.reference.LookupRows.KeyValue;
 import com.idq.cli.core.repo.InsertRepository;
-import com.idq.cli.source.wic.etldb.models.WicTargets;
+import com.idq.cli.source.wic.etldb.models.WicSources;
 import java.util.List;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -11,8 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 /// `STG_WIC_PTY_INACTIVE_STS` - the parties currently deactivated. Written by the WIC validation mapping, read by every
 /// later mapping of the workflow to drop deactivated parties.
-public interface WicInactiveStatusRepository extends Repository<WicTargets.InactiveStatus, String>,
-        InsertRepository<WicTargets.InactiveStatus> {
+public interface WicInactiveStatusRepository extends Repository<WicSources.InactiveStatus, String>,
+        InsertRepository<WicSources.InactiveStatus> {
 
     String TABLE = "STG_WIC_PTY_INACTIVE_STS";
 

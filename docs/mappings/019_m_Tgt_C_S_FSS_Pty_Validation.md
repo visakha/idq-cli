@@ -79,5 +79,5 @@ No `C_S_*` target; status / log key `SRC_KEY` = `PTY_SRC_KEY`, `ROWID_SYSTEM` = 
 * `FssPartyValidationService.transform` with `InactiveStatus.Changes`; reactivation log rows are converted into status rows
   to mirror IDQ; `InactiveStatus.output`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `FssSources.EtlSrc`
-  (`V_FSS_ETL_SRC`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`), `FssTargets.InactiveStatus`
+  (`V_FSS_ETL_SRC`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`), `FssSources.InactiveStatus`
   (`STG_FSS_PTY_INACTIVE_STS`).

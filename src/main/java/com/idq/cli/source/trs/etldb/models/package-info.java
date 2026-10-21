@@ -4,6 +4,8 @@
 /// to end and the audit reports can print any table.
 ///
 /// * [TrsSources] - source tables and views
-/// * [TrsTargets] - target tables `C_S_TRS_*` and the other tables the mappings write
+/// * the workflow tables the mappings write are in [TrsSources] too (`STG_TRS_VALID_MEMBERS`, `STG_TRS_D_UNQ_ADDR`)
 /// * [TrsQueryRows] - rows returned by the `IdqMapInitQuery`s and lookups; projections, not tables
+///
+/// The `C_S_TRS_*` tables the mappings load are MDM tables: `com.idq.cli.mdmdc.etldb.models.TrsTargets`.
 package com.idq.cli.source.trs.etldb.models;

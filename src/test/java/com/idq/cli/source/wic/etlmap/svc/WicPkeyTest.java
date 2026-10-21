@@ -11,22 +11,23 @@ import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.rules.PassThroughAddressValidator;
 import com.idq.cli.core.target.DqmAddressRepository;
 import com.idq.cli.core.target.StagingRow;
+import com.idq.cli.mdmdc.etldb.models.WicTargets;
+import com.idq.cli.mdmdc.etldb.repo.WicAddressRepository;
+import com.idq.cli.mdmdc.etldb.repo.WicAlternateIdRepository;
+import com.idq.cli.mdmdc.etldb.repo.WicEmailRepository;
+import com.idq.cli.mdmdc.etldb.repo.WicPartyRepository;
+import com.idq.cli.mdmdc.etldb.repo.WicPartyRoleRepository;
+import com.idq.cli.mdmdc.etldb.repo.WicPhoneRepository;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.ClientDemographics;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.ClientIdentifier;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.ClientName;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.FamilyAddress;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.FamilyContact;
-import com.idq.cli.source.wic.etldb.models.WicTargets;
-import com.idq.cli.source.wic.etldb.repo.WicAddressRepository;
-import com.idq.cli.source.wic.etldb.repo.WicAlternateIdRepository;
-import com.idq.cli.source.wic.etldb.repo.WicEmailRepository;
+import com.idq.cli.source.wic.etldb.models.WicSources;
 import com.idq.cli.source.wic.etldb.repo.WicEtlSrcViewRepository;
 import com.idq.cli.source.wic.etldb.repo.WicInactiveLogRepository;
 import com.idq.cli.source.wic.etldb.repo.WicInactiveStatusRepository;
-import com.idq.cli.source.wic.etldb.repo.WicPartyRepository;
-import com.idq.cli.source.wic.etldb.repo.WicPartyRoleRepository;
 import com.idq.cli.source.wic.etldb.repo.WicPartyXrefRepository;
-import com.idq.cli.source.wic.etldb.repo.WicPhoneRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -75,8 +76,8 @@ class WicPkeyTest {
                 new WicPartyValidationService.Lookups(InactiveStatus.Lookup.NONE, Map.of("0000000051", -1)),
                 ctx(WicPartyValidationService.INFO));
 
-        assertThat(out.rows(WicTargets.InactiveStatus.class))
-                .extracting(WicTargets.InactiveStatus::srcKey, WicTargets.InactiveStatus::deactivationSts)
+        assertThat(out.rows(WicSources.InactiveStatus.class))
+                .extracting(WicSources.InactiveStatus::srcKey, WicSources.InactiveStatus::deactivationSts)
                 .containsExactly(org.assertj.core.groups.Tuple.tuple("0000000051", "D"));
     }
 

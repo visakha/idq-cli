@@ -48,4 +48,4 @@ Unit test: `WicPkeyTest#m_Tgt_C_S_WIC_Pty_Rle_Alt_Id_pkey_test`.
 
 * `WicAlternateIdService.altIdType`, `pkey`, `transform`; entity `WicTargets.AlternateId`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
-  (`V_WIC_ETL_SRC`), `WicTargets.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).
+  (`V_WIC_ETL_SRC`), `WicSources.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).

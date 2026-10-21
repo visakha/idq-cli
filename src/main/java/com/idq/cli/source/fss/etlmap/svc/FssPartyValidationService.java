@@ -18,7 +18,6 @@ import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientName;
 import com.idq.cli.source.fss.etldb.models.FssSources;
-import com.idq.cli.source.fss.etldb.models.FssTargets;
 import com.idq.cli.source.fss.etldb.repo.FssEtlSrcViewRepository;
 import com.idq.cli.source.fss.etldb.repo.FssInactiveLogRepository;
 import com.idq.cli.source.fss.etldb.repo.FssInactiveStatusRepository;
@@ -37,7 +36,7 @@ public class FssPartyValidationService {
 
     public static final MappingInfo INFO = MappingInfo.of("019", "m_Tgt_C_S_FSS_Pty_Validation", SourceSystem.FSS,
             List.of("STG_FSS_PTY_INACTIVE_STS", "STG_FSS_PTY_INACTIVE_LOG"), List.of(FssSources.EtlSrc.class,
-            MdmBaseTables.PartyXref.class, FssTargets.InactiveStatus.class));
+            MdmBaseTables.PartyXref.class, FssSources.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, Integer> hubStates) {}
 
@@ -96,12 +95,12 @@ public class FssPartyValidationService {
             }
         }
         var reactivations = changes.logs.stream().filter(l -> l.action().equals("Reactivation"))
-                .map(l -> new FssTargets.InactiveStatus(l.srcKey(), l.rowidSystem(), l.action(), l.actionDt()))
+                .map(l -> new FssSources.InactiveStatus(l.srcKey(), l.rowidSystem(), l.action(), l.actionDt()))
                 .toList();
         changes.logs.removeIf(l -> l.action().equals("Reactivation"));
-        return InactiveStatus.output(changes, bad, FssTargets.InactiveStatus.class, FssTargets.InactiveStatus::new,
-                FssTargets.InactiveLog.class, FssTargets.InactiveLog::new)
-                .load(TargetBatch.append(FssTargets.InactiveStatus.class, reactivations));
+        return InactiveStatus.output(changes, bad, FssSources.InactiveStatus.class, FssSources.InactiveStatus::new,
+                FssSources.InactiveLog.class, FssSources.InactiveLog::new)
+                .load(TargetBatch.append(FssSources.InactiveStatus.class, reactivations));
     }
 
     static boolean hasLength(String value) {
@@ -111,8 +110,8 @@ public class FssPartyValidationService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(FssInactiveLogRepository.TABLE, logActivationChanges(output.rows(FssTargets.InactiveLog.class)));
-        for (var batch : output.batches(FssTargets.InactiveStatus.class)) {
+        loaded.put(FssInactiveLogRepository.TABLE, logActivationChanges(output.rows(FssSources.InactiveLog.class)));
+        for (var batch : output.batches(FssSources.InactiveStatus.class)) {
             loaded.merge(FssInactiveStatusRepository.TABLE, batch.mode() instanceof LoadMode.DeleteByKey<?>
                     ? removeReactivatedStatuses(batch.rows()) : recordNewDeactivations(batch.rows()), Integer::sum);
         }
@@ -122,16 +121,16 @@ public class FssPartyValidationService {
         return loaded;
     }
 
-    int logActivationChanges(List<FssTargets.InactiveLog> logs) {
+    int logActivationChanges(List<FssSources.InactiveLog> logs) {
         return inactiveLog.insertAll(logs).size();
     }
 
-    int removeReactivatedStatuses(List<FssTargets.InactiveStatus> reactivated) {
+    int removeReactivatedStatuses(List<FssSources.InactiveStatus> reactivated) {
         return reactivated.stream()
                 .mapToInt(s -> inactiveStatuses.deleteBySrcKeyAndRowidSystem(s.srcKey(), s.rowidSystem())).sum();
     }
 
-    int recordNewDeactivations(List<FssTargets.InactiveStatus> deactivated) {
+    int recordNewDeactivations(List<FssSources.InactiveStatus> deactivated) {
         return inactiveStatuses.insertAll(deactivated).size();
     }
 }

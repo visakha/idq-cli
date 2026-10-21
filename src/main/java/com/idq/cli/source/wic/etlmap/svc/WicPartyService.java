@@ -20,13 +20,13 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.WicTargets;
+import com.idq.cli.mdmdc.etldb.repo.WicPartyRepository;
+import com.idq.cli.mdmdc.etldb.repo.WicPartyRoleRepository;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.ClientDemographics;
 import com.idq.cli.source.wic.etldb.models.WicSources;
-import com.idq.cli.source.wic.etldb.models.WicTargets;
 import com.idq.cli.source.wic.etldb.repo.WicEtlSrcViewRepository;
 import com.idq.cli.source.wic.etldb.repo.WicInactiveStatusRepository;
-import com.idq.cli.source.wic.etldb.repo.WicPartyRepository;
-import com.idq.cli.source.wic.etldb.repo.WicPartyRoleRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,7 +42,7 @@ public class WicPartyService {
 
     public static final MappingInfo INFO = MappingInfo.of("030", "m_Tgt_C_S_WIC_Pty", SourceSystem.WIC,
             List.of("C_S_WIC_PTY", "C_S_WIC_PTY_RLE"), List.of(WicSources.EtlSrc.class,
-            WicTargets.InactiveStatus.class));
+            WicSources.InactiveStatus.class));
 
     /// Gender, ethnicity and race exceptions only for `CLIENT` rows; language for all rows.
     static final PartyPattern.Spec SPEC = new PartyPattern.Spec("WIC", RaceSource.INDICATORS, true, false,

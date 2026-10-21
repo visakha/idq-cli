@@ -48,4 +48,4 @@ Unit test: `TtfPkeyTest#m_Tgt_C_S_TTF_Pty_Rle_Alt_Id_pkey_test` (also checks tha
 
 * `TtfAlternateIdService.pkey`, `transform`; entity `TtfTargets.AlternateId`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TtfSources.EtlSrc`
-  (`V_TTF_ETL_SRC`), `TtfTargets.InactiveStatus` (`STG_TTF_PTY_INACTIVE_STS`).
+  (`V_TTF_ETL_SRC`), `TtfSources.InactiveStatus` (`STG_TTF_PTY_INACTIVE_STS`).

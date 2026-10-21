@@ -1,6 +1,5 @@
 package com.idq.cli.mock;
 
-import static com.idq.cli.core.EntityBuilder.entity;
 import static com.idq.cli.mock.MockTables.MARKER;
 
 import com.idq.cli.core.reference.ReferenceTables.AreaCode;
@@ -50,13 +49,14 @@ public class ReferenceMockData {
         tables.deleteMarked("EXC_LOOKUP_CODE_VALUE", "CREATED_BY");
         for (int i = 0; i < EXCEPTIONS.size(); i++) {
             var code = EXCEPTIONS.get(i);
-            tables.insert(entity(ExceptionCode.class)
-                    .with(ExceptionCode::excLookupCodeValueId, 990_000L + i)
-                    .with(ExceptionCode::createdBy, MARKER)
-                    .with(ExceptionCode::createDate, now)
-                    .with(ExceptionCode::exceptionCode, code)
-                    .with(ExceptionCode::exceptionDesc, code.replace('_', ' '))
-                    .with(ExceptionCode::exceptionType, "Bad Value"));
+            tables.insert(ExceptionCode.builder()
+                    .excLookupCodeValueId(990_000L + i)
+                    .createdBy(MARKER)
+                    .createDate(now)
+                    .exceptionCode(code)
+                    .exceptionDesc(code.replace('_', ' '))
+                    .exceptionType("Bad Value")
+                    .build());
         }
     }
 
@@ -101,28 +101,32 @@ public class ReferenceMockData {
     private void areaCodes() {
         tables.execute("DELETE FROM REF_PHN_AREA_CD WHERE NOTES = :m", Map.of("m", MARKER));
         for (var npa : List.of("512", "214", "713", "210", "817")) {
-            tables.insert(entity(AreaCode.class)
-                    .with(AreaCode::npaId, npa)
-                    .with(AreaCode::country, "US")
-                    .with(AreaCode::inService, "Y")
-                    .with(AreaCode::notes, MARKER));
+            tables.insert(AreaCode.builder()
+                    .npaId(npa)
+                    .country("US")
+                    .inService("Y")
+                    .notes(MARKER)
+                    .build());
         }
-        tables.insert(entity(AreaCode.class)
-                .with(AreaCode::npaId, "800")
-                .with(AreaCode::service, "Toll-Free")
-                .with(AreaCode::inService, "Y")
-                .with(AreaCode::notes, MARKER));
+        tables.insert(AreaCode.builder()
+                .npaId("800")
+                .service("Toll-Free")
+                .inService("Y")
+                .notes(MARKER)
+                .build());
     }
 
     private void junkNames() {
         tables.deleteMarked("REF_JUNK_NAME_LIST", "NOTES");
-        tables.insert(entity(JunkName.class)
-                .with(JunkName::name, "UNKNOWN")
-                .with(JunkName::notes, MARKER));
-        tables.insert(entity(JunkName.class)
-                .with(JunkName::name, "BABY")
-                .with(JunkName::editLimitation, "FIRST")
-                .with(JunkName::notes, MARKER));
+        tables.insert(JunkName.builder()
+                .name("UNKNOWN")
+                .notes(MARKER)
+                .build());
+        tables.insert(JunkName.builder()
+                .name("BABY")
+                .editLimitation("FIRST")
+                .notes(MARKER)
+                .build());
     }
 
     private void streetTypes() {
@@ -132,12 +136,13 @@ public class ReferenceMockData {
     }
 
     private void codeValue(String type, String source, String sourceValue, String master, String label) {
-        tables.insert(entity(CodeValue.class)
-                .with(CodeValue::createdBy, MARKER)
-                .with(CodeValue::createDate, LocalDateTime.now())
-                .with(CodeValue::key, new CodeValue.Key(type, sourceValue, source))
-                .with(CodeValue::mstrRefCode, master)
-                .with(CodeValue::mstrRefLabel, label));
+        tables.insert(CodeValue.builder()
+                .createdBy(MARKER)
+                .createDate(LocalDateTime.now())
+                .key(new CodeValue.Key(type, sourceValue, source))
+                .mstrRefCode(master)
+                .mstrRefLabel(label)
+                .build());
     }
 
     /// `V_LOOKUP_CODE_VALUE` has no marker column: the exact seeded row is deleted before it is inserted again.
@@ -146,18 +151,20 @@ public class ReferenceMockData {
                 DELETE FROM V_LOOKUP_CODE_VALUE
                 WHERE CODE_TYPE = :t AND SRC_SYS = :s AND SRC_CODE_VALUE = :v AND MSTR_CODE_VALUE = :m
                 """, Map.of("t", type, "s", source, "v", sourceValue, "m", master));
-        tables.insert(entity(MasterCodeValue.class)
-                .with(MasterCodeValue::codeType, type)
-                .with(MasterCodeValue::srcSys, source)
-                .with(MasterCodeValue::srcCodeValue, sourceValue)
-                .with(MasterCodeValue::mstrCodeValue, master));
+        tables.insert(MasterCodeValue.builder()
+                .codeType(type)
+                .srcSys(source)
+                .srcCodeValue(sourceValue)
+                .mstrCodeValue(master)
+                .build());
     }
 
     private void streetType(long id, String code, String description) {
-        tables.insert(entity(CdRef.class)
-                .with(CdRef::refId, id)
-                .with(CdRef::tablename, "STREET_TYPE")
-                .with(CdRef::code, code)
-                .with(CdRef::description, description));
+        tables.insert(CdRef.builder()
+                .refId(id)
+                .tablename("STREET_TYPE")
+                .code(code)
+                .description(description)
+                .build());
     }
 }

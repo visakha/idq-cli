@@ -14,11 +14,11 @@ import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping.NoLookups;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsManagedAttributeRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.MemberSwitches;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
 import com.idq.cli.source.trs.etldb.repo.TrsDcIndvDeltaRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsManagedAttributeRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class TrsSwitchesService {
 
     public static final MappingInfo INFO = MappingInfo.of("007", "m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw", SourceSystem.TRS,
             List.of("C_S_TRS_PTY_MNG_ATTR"), List.of(TrsSources.DcIndvDelta.class, TrsSources.CvDcMciIndvDelta.class,
-            TrsTargets.ValidMember.class));
+            TrsSources.ValidMember.class));
 
     private final TrsDcIndvDeltaRepository dcIndvDelta;
     private final TrsManagedAttributeRepository managedAttributes;

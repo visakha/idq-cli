@@ -17,10 +17,10 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.FssTargets;
+import com.idq.cli.mdmdc.etldb.repo.FssAlternateIdRepository;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientIdentifier;
 import com.idq.cli.source.fss.etldb.models.FssSources;
-import com.idq.cli.source.fss.etldb.models.FssTargets;
-import com.idq.cli.source.fss.etldb.repo.FssAlternateIdRepository;
 import com.idq.cli.source.fss.etldb.repo.FssEtlSrcViewRepository;
 import com.idq.cli.source.fss.etldb.repo.FssInactiveStatusRepository;
 import java.util.LinkedHashMap;
@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FssAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("022", "m_Tgt_C_S_FSS_Pty_Rle_Alt_Id", SourceSystem.FSS,
-            List.of("C_S_FSS_PTY_RLE_ALT_ID"), List.of(FssSources.EtlSrc.class, FssTargets.InactiveStatus.class));
+            List.of("C_S_FSS_PTY_RLE_ALT_ID"), List.of(FssSources.EtlSrc.class, FssSources.InactiveStatus.class));
 
     private final FssEtlSrcViewRepository etlSrc;
     private final FssInactiveStatusRepository inactiveStatuses;

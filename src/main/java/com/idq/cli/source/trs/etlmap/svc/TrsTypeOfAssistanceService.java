@@ -16,11 +16,11 @@ import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping.NoLookups;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsTypeOfAssistanceRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AssistanceSegment;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
 import com.idq.cli.source.trs.etldb.repo.TrsCvMciEdgIndvToaDeltaRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsTypeOfAssistanceRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsTypeOfAssistanceService {
 
     public static final MappingInfo INFO = MappingInfo.of("008", "m_Tgt_C_S_TRS_Pty_Rle_TOA", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_RLE_TOA"), List.of(TrsSources.CvMciEdgIndvToaDelta.class, TrsTargets.ValidMember.class));
+            List.of("C_S_TRS_PTY_RLE_TOA"), List.of(TrsSources.CvMciEdgIndvToaDelta.class, TrsSources.ValidMember.class));
 
     private final TrsCvMciEdgIndvToaDeltaRepository cvMciEdgIndvToaDelta;
     private final TrsTypeOfAssistanceRepository typesOfAssistance;

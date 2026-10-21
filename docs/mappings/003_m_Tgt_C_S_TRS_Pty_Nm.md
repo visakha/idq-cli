@@ -78,5 +78,5 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Nm_pkey_test`.
 * `TrsPartyNameService.transform`: filter, `NameStandardization.removeTrailingNumbers`, `NameStandardization.standardize`,
   build `TrsTargets.PartyName` (`Columns.PartyName`), `Rows.lastPerKey`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.CvDcMciAliasDelta`
-  (`STG_TRS_D_CV_DC_MCI_ALIAS`), `TrsSources.DcAliasDelta` (`STG_TRS_D_DC_ALIAS`), `TrsTargets.ValidMember`
+  (`STG_TRS_D_CV_DC_MCI_ALIAS`), `TrsSources.DcAliasDelta` (`STG_TRS_D_DC_ALIAS`), `TrsSources.ValidMember`
   (`STG_TRS_VALID_MEMBERS`).

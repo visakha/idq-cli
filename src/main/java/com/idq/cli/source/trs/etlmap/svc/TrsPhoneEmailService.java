@@ -24,12 +24,12 @@ import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping.NoLookups;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsEmailRepository;
+import com.idq.cli.mdmdc.etldb.repo.TrsPhoneRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.CaseContact;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
 import com.idq.cli.source.trs.etldb.repo.TrsDcCasesDeltaRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsEmailRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsPhoneRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,7 +45,7 @@ public class TrsPhoneEmailService {
 
     public static final MappingInfo INFO = MappingInfo.of("006", "m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr",
             SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_PHN", "C_S_TRS_PTY_RLE_EADDR"),
-            List.of(TrsSources.DcCasesDelta.class, TrsSources.DcCaseIndv.class, TrsTargets.ValidMember.class));
+            List.of(TrsSources.DcCasesDelta.class, TrsSources.DcCaseIndv.class, TrsSources.ValidMember.class));
 
     public static final String TELEPHONE = "Telephone";
 

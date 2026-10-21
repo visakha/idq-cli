@@ -43,7 +43,7 @@ The entity models behind the reports (all Spring Data JDBC records, no JPA):
 |---|---|---|
 | IdqMapInitQuery rows | records in `<Src>QueryRows` | `EciQueryRows.FamilyRelation` |
 | Source tables and views | `<Src>Sources` | `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`) |
-| Target tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
+| Target tables | `mdmdc.etldb.models.<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
 | MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
 | Lookup / reference tables | `ReferenceTables` | `ReferenceTables.CodeValue` (`LOOKUP_CODE_VALUE`) |
 

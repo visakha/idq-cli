@@ -15,10 +15,10 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TtfTargets;
+import com.idq.cli.mdmdc.etldb.repo.TtfAlternateIdRepository;
 import com.idq.cli.source.ttf.etldb.models.TtfQueryRows.ClientIdentifier;
 import com.idq.cli.source.ttf.etldb.models.TtfSources;
-import com.idq.cli.source.ttf.etldb.models.TtfTargets;
-import com.idq.cli.source.ttf.etldb.repo.TtfAlternateIdRepository;
 import com.idq.cli.source.ttf.etldb.repo.TtfEtlSrcViewRepository;
 import com.idq.cli.source.ttf.etldb.repo.TtfInactiveStatusRepository;
 import java.util.LinkedHashMap;
@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TtfAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("027", "m_Tgt_C_S_TTF_Pty_Rle_Alt_Id", SourceSystem.TTF,
-            List.of("C_S_TTF_PTY_RLE_ALT_ID"), List.of(TtfSources.EtlSrc.class, TtfTargets.InactiveStatus.class));
+            List.of("C_S_TTF_PTY_RLE_ALT_ID"), List.of(TtfSources.EtlSrc.class, TtfSources.InactiveStatus.class));
 
     public static final String ALT_ID_TYPE = "024";
 

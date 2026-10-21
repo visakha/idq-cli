@@ -11,29 +11,30 @@ import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.rules.PassThroughAddressValidator;
 import com.idq.cli.core.target.DqmAddressRepository;
 import com.idq.cli.core.target.StagingRow;
+import com.idq.cli.mdmdc.etldb.models.EciTargets;
+import com.idq.cli.mdmdc.etldb.repo.EciAddressRepository;
+import com.idq.cli.mdmdc.etldb.repo.EciAlternateIdRepository;
+import com.idq.cli.mdmdc.etldb.repo.EciEmailRepository;
+import com.idq.cli.mdmdc.etldb.repo.EciPartyRepository;
+import com.idq.cli.mdmdc.etldb.repo.EciPartyRoleRepository;
+import com.idq.cli.mdmdc.etldb.repo.EciPhoneRepository;
+import com.idq.cli.mdmdc.etldb.repo.EciRelationshipRepository;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyAddress;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyContact;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyRelation;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.PartyDemographics;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.PartyIdentifier;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.PartyName;
-import com.idq.cli.source.eci.etldb.models.EciTargets;
-import com.idq.cli.source.eci.etldb.repo.EciAddressRepository;
-import com.idq.cli.source.eci.etldb.repo.EciAlternateIdRepository;
+import com.idq.cli.source.eci.etldb.models.EciSources;
 import com.idq.cli.source.eci.etldb.repo.EciChildDeltaRepository;
 import com.idq.cli.source.eci.etldb.repo.EciDupCasesViewRepository;
-import com.idq.cli.source.eci.etldb.repo.EciEmailRepository;
 import com.idq.cli.source.eci.etldb.repo.EciFamilyAddressViewRepository;
 import com.idq.cli.source.eci.etldb.repo.EciFamilyDeltaRepository;
 import com.idq.cli.source.eci.etldb.repo.EciFamilyPhoneViewRepository;
 import com.idq.cli.source.eci.etldb.repo.EciFamilyValidationViewRepository;
 import com.idq.cli.source.eci.etldb.repo.EciInactiveLogRepository;
 import com.idq.cli.source.eci.etldb.repo.EciInactiveStatusRepository;
-import com.idq.cli.source.eci.etldb.repo.EciPartyRepository;
-import com.idq.cli.source.eci.etldb.repo.EciPartyRoleRepository;
 import com.idq.cli.source.eci.etldb.repo.EciPartyXrefRepository;
-import com.idq.cli.source.eci.etldb.repo.EciPhoneRepository;
-import com.idq.cli.source.eci.etldb.repo.EciRelationshipRepository;
 import com.idq.cli.source.eci.etldb.repo.EciSnChildRepository;
 import java.math.BigDecimal;
 import java.util.List;
@@ -69,9 +70,9 @@ public class EciPkeyTest {
                 new EciPartyValidationService.Lookups(new InactiveStatus.Lookup(Map.of("0000000042", "P")), Map.of(),
                         Set.of(), Set.of()), ctx(EciPartyValidationService.INFO));
 
-        assertThat(out.rows(EciTargets.InactiveStatus.class)).extracting(EciTargets.InactiveStatus::srcKey)
+        assertThat(out.rows(EciSources.InactiveStatus.class)).extracting(EciSources.InactiveStatus::srcKey)
                 .containsExactly("0000000042", "0000000007F");
-        assertThat(out.rows(EciTargets.InactiveLog.class)).extracting(EciTargets.InactiveLog::action)
+        assertThat(out.rows(EciSources.InactiveLog.class)).extracting(EciSources.InactiveLog::action)
                 .containsExactly("Reactivation", "Deactivation");
     }
 

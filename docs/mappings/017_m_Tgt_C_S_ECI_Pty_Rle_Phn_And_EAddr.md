@@ -65,4 +65,4 @@ FROM v_eci_etl_src_family_phone
 * `EciPhoneEmailService.partyKey`, `pkey`, `srcRowid`, `transform`; `ContactRules`; entities `EciTargets.Phone`
   (`PHN_NUM_EXT`), `EciTargets.Email`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.EtlSrcFamilyPhone`
-  (`V_ECI_ETL_SRC_FAMILY_PHONE`), `EciTargets.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`).
+  (`V_ECI_ETL_SRC_FAMILY_PHONE`), `EciSources.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`).

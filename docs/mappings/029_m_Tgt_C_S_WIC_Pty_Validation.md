@@ -51,5 +51,5 @@ No `C_S_*` target; status key = `PTY_SRC_KEY`, `ROWID_SYSTEM` = `WIC`. Unit test
 
 * `WicPartyValidationService.transform`; `InactiveStatus.Changes` / `output`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
-  (`V_WIC_ETL_SRC`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`), `WicTargets.InactiveStatus`
+  (`V_WIC_ETL_SRC`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`), `WicSources.InactiveStatus`
   (`STG_WIC_PTY_INACTIVE_STS`).

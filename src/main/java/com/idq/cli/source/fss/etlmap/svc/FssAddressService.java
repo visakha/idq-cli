@@ -22,10 +22,10 @@ import com.idq.cli.core.target.DqmAddressRepository;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.FssTargets;
+import com.idq.cli.mdmdc.etldb.repo.FssAddressRepository;
 import com.idq.cli.source.fss.etldb.models.FssQueryRows.ClientAddress;
 import com.idq.cli.source.fss.etldb.models.FssSources;
-import com.idq.cli.source.fss.etldb.models.FssTargets;
-import com.idq.cli.source.fss.etldb.repo.FssAddressRepository;
 import com.idq.cli.source.fss.etldb.repo.FssEtlSrcViewRepository;
 import com.idq.cli.source.fss.etldb.repo.FssInactiveStatusRepository;
 import java.util.LinkedHashMap;
@@ -41,7 +41,7 @@ public class FssAddressService {
 
     public static final MappingInfo INFO = MappingInfo.of("021", "m_Tgt_C_S_FSS_Pty_Addr", SourceSystem.FSS,
             List.of("C_S_FSS_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(FssSources.EtlSrc.class,
-            FssTargets.InactiveStatus.class));
+            FssSources.InactiveStatus.class));
 
     public static final String ADDRESS_TYPE = "002";
 

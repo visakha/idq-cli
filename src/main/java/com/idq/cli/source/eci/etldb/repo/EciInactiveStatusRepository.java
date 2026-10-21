@@ -2,7 +2,7 @@ package com.idq.cli.source.eci.etldb.repo;
 
 import com.idq.cli.core.reference.LookupRows.KeyValue;
 import com.idq.cli.core.repo.InsertRepository;
-import com.idq.cli.source.eci.etldb.models.EciTargets;
+import com.idq.cli.source.eci.etldb.models.EciSources;
 import java.util.List;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -11,8 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 /// `STG_ECI_PTY_INACTIVE_STS` - the parties currently deactivated. Written by `m_Tgt_C_S_ECI_Pty_Validation`, read
 /// by every later ECI mapping to drop deactivated parties.
-public interface EciInactiveStatusRepository extends Repository<EciTargets.InactiveStatus, String>,
-        InsertRepository<EciTargets.InactiveStatus> {
+public interface EciInactiveStatusRepository extends Repository<EciSources.InactiveStatus, String>,
+        InsertRepository<EciSources.InactiveStatus> {
 
     String TABLE = "STG_ECI_PTY_INACTIVE_STS";
 

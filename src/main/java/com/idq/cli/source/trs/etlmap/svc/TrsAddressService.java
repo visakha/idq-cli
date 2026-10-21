@@ -22,10 +22,10 @@ import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping.NoLookups;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsAddressRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AddressAssignment;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
-import com.idq.cli.source.trs.etldb.repo.TrsAddressRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsIndvAddrDeltaRepository;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -41,7 +41,7 @@ public class TrsAddressService {
 
     public static final MappingInfo INFO = MappingInfo.of("012", "m_Tgt_C_S_TRS_Addr_2", SourceSystem.TRS,
             List.of("C_S_TRS_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(TrsSources.IndvAddrDelta.class,
-            TrsTargets.UniqueAddressDelta.class, TrsTargets.ValidMember.class));
+            TrsSources.UniqueAddressDelta.class, TrsSources.ValidMember.class));
 
     private final TrsIndvAddrDeltaRepository indvAddrDelta;
     private final DqmAddressRepository dqmAddresses;

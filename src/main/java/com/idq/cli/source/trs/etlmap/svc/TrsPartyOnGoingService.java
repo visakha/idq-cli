@@ -28,12 +28,12 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsPartyRepository;
+import com.idq.cli.mdmdc.etldb.repo.TrsPartyRoleRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.MemberDemographics;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
 import com.idq.cli.source.trs.etldb.repo.TrsDcIndvDeltaRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsPartyRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsPartyRoleRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsValidMemberRepository;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,7 +52,7 @@ public class TrsPartyOnGoingService {
 
     public static final MappingInfo INFO = MappingInfo.of("001", "m_Tgt_C_S_TRS_Pty_OnGoing", SourceSystem.TRS,
             List.of("C_S_TRS_PTY", "C_S_TRS_PTY_RLE", "STG_TRS_VALID_MEMBERS"), List.of(TrsSources.DcIndvDelta.class,
-            TrsSources.CvDcMciIndvDelta.class, TrsSources.CvMciEdgIndvToaDelta.class, TrsTargets.ValidMember.class,
+            TrsSources.CvDcMciIndvDelta.class, TrsSources.CvMciEdgIndvToaDelta.class, TrsSources.ValidMember.class,
             TrsSources.DeactivedMembers.class));
 
     /// @param validMemberKeys `STG_TRS_VALID_MEMBERS.PTY_PK` before the run
@@ -141,13 +141,13 @@ public class TrsPartyOnGoingService {
 
         var newValidMembers = Rows.firstPerKey(Rows.where(validParties,
                         v -> !lookups.validMemberKeys().contains(v.pkey())), Validated::pkey).stream()
-                .map(v -> new TrsTargets.ValidMember(v.src().indvId(), v.pkey(), v.src().srcTbl(), ctx.runStart()))
+                .map(v -> new TrsSources.ValidMember(v.src().indvId(), v.pkey(), v.src().srcTbl(), ctx.runStart()))
                 .toList();
 
         return MappingOutput.empty()
                 .load(TargetBatch.replaceAll(TrsTargets.Party.class, parties))
                 .load(TargetBatch.replaceAll(TrsTargets.PartyRole.class, roles))
-                .load(TargetBatch.append(TrsTargets.ValidMember.class, newValidMembers))
+                .load(TargetBatch.append(TrsSources.ValidMember.class, newValidMembers))
                 .reject(bad);
     }
 
@@ -185,7 +185,7 @@ public class TrsPartyOnGoingService {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(TrsPartyRepository.TABLE, replaceParties(output.rows(TrsTargets.Party.class)));
         loaded.put(TrsPartyRoleRepository.TABLE, replacePartyRoles(output.rows(TrsTargets.PartyRole.class)));
-        loaded.put(TrsValidMemberRepository.TABLE, recordNewValidMembers(output.rows(TrsTargets.ValidMember.class)));
+        loaded.put(TrsValidMemberRepository.TABLE, recordNewValidMembers(output.rows(TrsSources.ValidMember.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
@@ -204,7 +204,7 @@ public class TrsPartyOnGoingService {
         return partyRoles.insertAll(rows).size();
     }
 
-    int recordNewValidMembers(List<TrsTargets.ValidMember> rows) {
+    int recordNewValidMembers(List<TrsSources.ValidMember> rows) {
         return validMembers.insertAll(rows).size();
     }
 }

@@ -132,5 +132,5 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing_pkey_test`.
   (`STG_TRS_D_DC_PRIMARY_PAYEE`), `TrsSources.DcPrimaryPayee` (`STG_TRS_DC_PRIMARY_PAYEE`),
   `TrsSources.CvEdMciEdgIndv` (`STG_TRS_CV_ED_MCI_EDG_INDV`), `TrsSources.CvEdMciEdgIndvDelta`
   (`STG_TRS_D_CV_ED_MCI_EDG_INDV`), `TrsSources.DcCases` (`STG_TRS_DC_CASES`), `TrsSources.DcCasesDelta`
-  (`STG_TRS_D_DC_CASES`), `TrsSources.DcCaseIndv` (`STG_TRS_DC_CASE_INDV`), `TrsTargets.ValidMember`
+  (`STG_TRS_D_DC_CASES`), `TrsSources.DcCaseIndv` (`STG_TRS_DC_CASE_INDV`), `TrsSources.ValidMember`
   (`STG_TRS_VALID_MEMBERS`).

@@ -17,11 +17,11 @@ import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping.NoLookups;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsRelationshipRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.MemberRelationship;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
 import com.idq.cli.source.trs.etldb.repo.TrsDcRelationshipsDeltaRepository;
-import com.idq.cli.source.trs.etldb.repo.TrsRelationshipRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -37,7 +37,7 @@ public class TrsMemberRelationshipService {
 
     public static final MappingInfo INFO = MappingInfo.of("009", "m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem",
             SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL"), List.of(TrsSources.DcRelationshipsDelta.class,
-            TrsTargets.ValidMember.class));
+            TrsSources.ValidMember.class));
 
     private final TrsDcRelationshipsDeltaRepository dcRelationshipsDelta;
     private final TrsRelationshipRepository relationships;

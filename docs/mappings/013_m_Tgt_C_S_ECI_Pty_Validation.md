@@ -101,9 +101,9 @@ No `C_S_*` target. Status / log key `SRC_KEY` = party key, `ROWID_SYSTEM` = `ECI
 ## Java implementation
 
 * `EciPartyValidationService.transform` + `InactiveStatus.Changes` (deactivate / reactivate) + `InactiveStatus.output`
-  (log append, status delete by key, status append). Entities `EciTargets.InactiveStatus`,
-  `EciTargets.InactiveLog`.
+  (log append, status delete by key, status append). Entities `EciSources.InactiveStatus`,
+  `EciSources.InactiveLog`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.ChildDelta`
   (`STG_ECI_D_CHILD`), `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`),
-  `EciTargets.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`), `EciSources.EtlLuDupCases` (`V_ECI_ETL_LU_DUP_CASES`),
+  `EciSources.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`), `EciSources.EtlLuDupCases` (`V_ECI_ETL_LU_DUP_CASES`),
   `EciSources.EtlLuFamilyValidation` (`V_ECI_ETL_LU_FAMILY_VALIDATION`).

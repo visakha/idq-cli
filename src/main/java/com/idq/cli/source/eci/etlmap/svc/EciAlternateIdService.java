@@ -18,10 +18,10 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.EciTargets;
+import com.idq.cli.mdmdc.etldb.repo.EciAlternateIdRepository;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.PartyIdentifier;
 import com.idq.cli.source.eci.etldb.models.EciSources;
-import com.idq.cli.source.eci.etldb.models.EciTargets;
-import com.idq.cli.source.eci.etldb.repo.EciAlternateIdRepository;
 import com.idq.cli.source.eci.etldb.repo.EciChildDeltaRepository;
 import com.idq.cli.source.eci.etldb.repo.EciInactiveStatusRepository;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class EciAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("016", "m_Tgt_C_S_ECI_Pty_Rle_Alt_Id", SourceSystem.ECI,
             List.of("C_S_ECI_PTY_RLE_ALT_ID"), List.of(EciSources.ChildDelta.class, EciSources.FamilyDelta.class,
-            EciSources.MedicaidDelta.class, EciSources.SnCase.class, EciTargets.InactiveStatus.class));
+            EciSources.MedicaidDelta.class, EciSources.SnCase.class, EciSources.InactiveStatus.class));
 
     private final EciChildDeltaRepository childDelta;
     private final EciInactiveStatusRepository inactiveStatuses;

@@ -22,10 +22,10 @@ import com.idq.cli.core.target.DqmAddressRepository;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.WicTargets;
+import com.idq.cli.mdmdc.etldb.repo.WicAddressRepository;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.FamilyAddress;
 import com.idq.cli.source.wic.etldb.models.WicSources;
-import com.idq.cli.source.wic.etldb.models.WicTargets;
-import com.idq.cli.source.wic.etldb.repo.WicAddressRepository;
 import com.idq.cli.source.wic.etldb.repo.WicEtlSrcViewRepository;
 import com.idq.cli.source.wic.etldb.repo.WicInactiveStatusRepository;
 import java.util.LinkedHashMap;
@@ -41,7 +41,7 @@ public class WicAddressService {
 
     public static final MappingInfo INFO = MappingInfo.of("031", "m_Tgt_C_S_WIC_Pty_Addr", SourceSystem.WIC,
             List.of("C_S_WIC_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(WicSources.EtlSrc.class,
-            WicTargets.InactiveStatus.class));
+            WicSources.InactiveStatus.class));
 
     public static final String ADDRESS_TYPE = "002";
 

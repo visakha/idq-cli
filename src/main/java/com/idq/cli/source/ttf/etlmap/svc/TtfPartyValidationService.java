@@ -20,7 +20,6 @@ import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.source.ttf.etldb.models.TtfQueryRows.ClientName;
 import com.idq.cli.source.ttf.etldb.models.TtfSources;
-import com.idq.cli.source.ttf.etldb.models.TtfTargets;
 import com.idq.cli.source.ttf.etldb.repo.TtfEtlSrcViewRepository;
 import com.idq.cli.source.ttf.etldb.repo.TtfInactiveLogRepository;
 import com.idq.cli.source.ttf.etldb.repo.TtfInactiveStatusRepository;
@@ -39,7 +38,7 @@ public class TtfPartyValidationService {
 
     public static final MappingInfo INFO = MappingInfo.of("025", "m_Tgt_C_S_TTF_Pty_Validation", SourceSystem.TTF,
             List.of("STG_TTF_PTY_INACTIVE_STS", "STG_TTF_PTY_INACTIVE_LOG"), List.of(TtfSources.EtlSrc.class,
-            MdmBaseTables.PartyXref.class, TtfTargets.InactiveStatus.class));
+            MdmBaseTables.PartyXref.class, TtfSources.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, Integer> hubStates) {}
 
@@ -122,15 +121,15 @@ public class TtfPartyValidationService {
                 changes.reactivate(key);
             }
         }
-        return InactiveStatus.output(changes, bad, TtfTargets.InactiveStatus.class, TtfTargets.InactiveStatus::new,
-                TtfTargets.InactiveLog.class, TtfTargets.InactiveLog::new);
+        return InactiveStatus.output(changes, bad, TtfSources.InactiveStatus.class, TtfSources.InactiveStatus::new,
+                TtfSources.InactiveLog.class, TtfSources.InactiveLog::new);
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TtfInactiveLogRepository.TABLE, logActivationChanges(output.rows(TtfTargets.InactiveLog.class)));
-        for (var batch : output.batches(TtfTargets.InactiveStatus.class)) {
+        loaded.put(TtfInactiveLogRepository.TABLE, logActivationChanges(output.rows(TtfSources.InactiveLog.class)));
+        for (var batch : output.batches(TtfSources.InactiveStatus.class)) {
             loaded.merge(TtfInactiveStatusRepository.TABLE, batch.mode() instanceof LoadMode.DeleteByKey<?>
                     ? removeReactivatedStatuses(batch.rows()) : recordNewDeactivations(batch.rows()), Integer::sum);
         }
@@ -140,16 +139,16 @@ public class TtfPartyValidationService {
         return loaded;
     }
 
-    int logActivationChanges(List<TtfTargets.InactiveLog> logs) {
+    int logActivationChanges(List<TtfSources.InactiveLog> logs) {
         return inactiveLog.insertAll(logs).size();
     }
 
-    int removeReactivatedStatuses(List<TtfTargets.InactiveStatus> reactivated) {
+    int removeReactivatedStatuses(List<TtfSources.InactiveStatus> reactivated) {
         return reactivated.stream()
                 .mapToInt(s -> inactiveStatuses.deleteBySrcKeyAndRowidSystem(s.srcKey(), s.rowidSystem())).sum();
     }
 
-    int recordNewDeactivations(List<TtfTargets.InactiveStatus> deactivated) {
+    int recordNewDeactivations(List<TtfSources.InactiveStatus> deactivated) {
         return inactiveStatuses.insertAll(deactivated).size();
     }
 }

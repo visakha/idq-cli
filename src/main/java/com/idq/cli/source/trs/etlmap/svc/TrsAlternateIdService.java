@@ -19,10 +19,10 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.TrsTargets;
+import com.idq.cli.mdmdc.etldb.repo.TrsAlternateIdRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.MemberIdentifiers;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
-import com.idq.cli.source.trs.etldb.models.TrsTargets;
-import com.idq.cli.source.trs.etldb.repo.TrsAlternateIdRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsDcIndvDeltaRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsDcIndvHistRepository;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class TrsAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("004", "m_Tgt_C_S_TRS_Pty_Rle_Alt_Id", SourceSystem.TRS,
             List.of("C_S_TRS_PTY_RLE_ALT_ID"), List.of(TrsSources.CvDcMciIndvDelta.class, TrsSources.DcIndvDelta.class,
-            TrsSources.CvDcMrgSprtIndvDelta.class, TrsTargets.ValidMember.class, TrsSources.DcIndvHist.class));
+            TrsSources.CvDcMrgSprtIndvDelta.class, TrsSources.ValidMember.class, TrsSources.DcIndvHist.class));
 
     public static final String MEDICAID_ID = "002";
     public static final String SSN = "004";

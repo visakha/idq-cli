@@ -4,6 +4,8 @@
 /// to end and the audit reports can print any table.
 ///
 /// * [TtfSources] - source tables and views
-/// * [TtfTargets] - target tables `C_S_TTF_*` and the other tables the mappings write
+/// * the workflow tables the mappings write are in [TtfSources] too (`STG_TTF_PTY_INACTIVE_STS` / `_LOG`)
 /// * [TtfQueryRows] - rows returned by the `IdqMapInitQuery`s and lookups; projections, not tables
+///
+/// The `C_S_TTF_*` tables the mappings load are MDM tables: `com.idq.cli.mdmdc.etldb.models.TtfTargets`.
 package com.idq.cli.source.ttf.etldb.models;

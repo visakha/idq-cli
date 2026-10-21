@@ -16,10 +16,10 @@ import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
+import com.idq.cli.mdmdc.etldb.models.WicTargets;
+import com.idq.cli.mdmdc.etldb.repo.WicAlternateIdRepository;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.ClientIdentifier;
 import com.idq.cli.source.wic.etldb.models.WicSources;
-import com.idq.cli.source.wic.etldb.models.WicTargets;
-import com.idq.cli.source.wic.etldb.repo.WicAlternateIdRepository;
 import com.idq.cli.source.wic.etldb.repo.WicEtlSrcViewRepository;
 import com.idq.cli.source.wic.etldb.repo.WicInactiveStatusRepository;
 import java.util.LinkedHashMap;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WicAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("032", "m_Tgt_C_S_WIC_Pty_Rle_Alt_Id", SourceSystem.WIC,
-            List.of("C_S_WIC_PTY_RLE_ALT_ID"), List.of(WicSources.EtlSrc.class, WicTargets.InactiveStatus.class));
+            List.of("C_S_WIC_PTY_RLE_ALT_ID"), List.of(WicSources.EtlSrc.class, WicSources.InactiveStatus.class));
 
     private final WicEtlSrcViewRepository etlSrc;
     private final WicInactiveStatusRepository inactiveStatuses;
