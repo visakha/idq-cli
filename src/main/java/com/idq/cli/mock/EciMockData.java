@@ -40,7 +40,8 @@ public class EciMockData {
         return LocalDateTime.now().minusDays(faker.number().numberBetween(30, 365L * years)).withNano(0);
     }
 
-    /// Every fourth child has the dummy SSN `000123456`, child 2 no first name, every fifth an unknown language.
+    /// Every fourth child has the dummy SSN `000123456`, child 2 a blank first name (a space: the `ADMIN` schema's
+    /// `FIRST_NAME` is `NOT NULL`, and Oracle stores `''` as `NULL`), every fifth an unknown language.
     private void childrenAndFamilies() {
         tables.deleteRange("STG_ECI_D_CHILD", "ID_CHILD", ID, ID + 999_999);
         tables.deleteRange("STG_ECI_D_FAMILY", "ID_FAMILY", ID, ID + 999_999);
@@ -51,7 +52,7 @@ public class EciMockData {
             tables.insert(ChildDelta.builder()
                     .idChild(id)
                     .childSsn(i % 4 == 0 ? "000123456" : "%09d".formatted(123_450_000 + i))
-                    .firstName(i == 2 ? null : tables.text(faker.name().firstName()))
+                    .firstName(i == 2 ? " " : tables.text(faker.name().firstName()))
                     .lastName(tables.text(faker.name().lastName()))
                     .middleInitial("A")
                     .dob(past(3))
@@ -134,8 +135,10 @@ public class EciMockData {
                     .idMedicaid(800L + i)
                     .idCase(id)
                     .medicaidNbr(i % 4 == 0 ? "12-34" : "%09d".formatted(512_000_000 + i))
+                    .eligDate(past(2))
                     .dateCreated(past(2))
                     .dateModified(past(1))
+                    .loadDate(LocalDateTime.now())
                     .build());
         }
     }
