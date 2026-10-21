@@ -65,6 +65,61 @@ WITH tpi_src_key AS (
 SELECT alt_id_val, pkey_src_object FROM tpi_src_key WHERE src_key_rn = 1
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `Exp_safe_STG_TRS_D_IN_MANAGED_CARE` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_C_B_PTY_RLE_ALT_ID` | `C_B_PTY_RLE_ALT_ID` (HHS_MDM_ORS)<br>SQL override (below)<br>multiple match: any row | `ALT_ID_VAL = PROVIDER_NUM` | `PROVIDER_NUM` &larr; `PROVIDER_NUM` | `PKEY_SRC_OBJECT` &rarr; `Exp_Build_FK.in_PTY_RLE_FK_PROVIDER` (Expression) |
+
+### Fed by `Expression` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXC_ID_INV_PCP` | `EXC_ID_INV_PCP` &larr; `EXC_CODE_INV_PCP` | `EXCEPTION_DESC` &rarr; `Exp_safe_EXC_STG_BAD_REC_MEMB.EXCEPTION_DESC_PCP` (Expression)<br>`EXCEPTION_TYPE` &rarr; `Exp_safe_EXC_STG_BAD_REC_MEMB.EXCEPTION_TYPE_PCP` (Expression) |
+| `Lookup_EXC_LOOKUP_CODE_VALUE1` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXC_ID_INV_MEMB` | `EXC_ID_INV_MEMB` &larr; `EXC_CODE_INV_MEMB` | `EXCEPTION_DESC` &rarr; `Exp_safe_EXC_STG_BAD_REC_MEMB.EXCEPTION_DESC_MEMB` (Expression)<br>`EXCEPTION_TYPE` &rarr; `Exp_safe_EXC_STG_BAD_REC_MEMB.EXCEPTION_TYPE_MEMB` (Expression) |
+
+### Fed by `EXC_STG_BAD_REC_REL_TP_Start_Date_End_Date` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE2` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXC_CODE_LKP` | `EXC_CODE_LKP` &larr; `EXC_CODE_LKP` | `EXCEPTION_DESC` &rarr; `Write_EXC_STG_BAD_REC_MEMB_Start_Date_End_Date.EXCEPTION_DESC` (Target)<br>`EXCEPTION_TYPE` &rarr; `Write_EXC_STG_BAD_REC_MEMB_Start_Date_End_Date.EXCEPTION_TYPE` (Target) |
+
+SQL override of `Lookup_C_B_PTY_RLE_ALT_ID`:
+
+```sql
+with tpi_src_key as
+(
+select
+	bo.alt_id_val
+	,xr.pkey_src_object
+	-- In the event the record has been re-classed use the source key with the latest system update date via row number
+	,row_number() over (partition by bo.alt_id_val order by xr.src_last_upd_dt desc) src_key_rn
+from c_b_pty_rle_alt_id bo
+inner join c_b_pty_rle_alt_id_xref xr
+	on bo.rowid_object = xr.rowid_object
+where bo.alt_id_tp = '006'
+	and xr.rowid_system = 'C21'
+	and xr.hub_state_ind = 1
+)
+select
+	alt_id_val
+	,pkey_src_object
+from tpi_src_key
+where  src_key_rn = 1
+```
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `mplt_DST_Correction`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Only numeric provider numbers are kept (`IS_NUMBER`).

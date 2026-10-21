@@ -41,6 +41,34 @@ WHERE m.mc_plan IS NOT NULL AND (m.begin_dt < m.end_dt OR m.end_dt IS NULL)
 ORDER BY m.indv_id, m.mc_plan, m.begin_dt, m.end_dt
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `exp_Pty_Rle_Fk` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `lkp_Plan_Cd` | `V_LOOKUP_CODE_VALUE` (STAGING)<br>filter (below)<br>multiple match: any row | `SRC_CODE_VALUE = in_MC_PLAN` | `in_MC_PLAN` &larr; `in_MC_PLAN` | `MSTR_CODE_VALUE` &rarr; `exp_Pty_Rle_Plan.PLN_MSTR_CD` (Expression) |
+
+### Fed by `fltr_Rank` (Filter)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXC_CODE_INV_PLN_CD` | `EXC_CODE_INV_PLN_CD` &larr; `EXC_CODE_INV_PLN_CD` | `EXCEPTION_DESC` &rarr; `exp_Plan_Cd_Exc.EXCEPTION_DESC` (Expression)<br>`EXCEPTION_TYPE` &rarr; `exp_Plan_Cd_Exc.EXCEPTION_TYPE` (Expression) |
+
+Filter of `lkp_Plan_Cd`:
+
+```sql
+"V_LOOKUP_CODE_VALUE"."CODE_TYPE"='PLAN_CD'
+AND "V_LOOKUP_CODE_VALUE"."SRC_SYS"='MAX'
+```
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Plan translation: `V_LOOKUP_CODE_VALUE` code type `PLAN_CD`, source system `MAX`.

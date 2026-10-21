@@ -51,6 +51,16 @@ FROM (
 JOIN stg_trs_valid_members vm ON a.pkey_pty = vm.pty_pk
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+This mapping has no lookup transformations of its own.
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `mplt_Name_Standardization_Indv_Member`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Aliases without a first **and** a last name are dropped (`fltr_Null_Fn_Ln`).

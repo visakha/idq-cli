@@ -54,6 +54,33 @@ FROM toa_src
 WHERE key_rn = 1
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `exp_Stage_Source_Attributes` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `lkp_LOOKUP_CODE_VALUE` | `LOOKUP_CODE_VALUE` (STAGING)<br>filter: `"LOOKUP_CODE_VALUE"."CODE_TYPE" = 'TOA'`<br>multiple match: any row | `SRC_SYS = in_SRC_SYS AND SRC_CODE_VALUE = in_TYPE_OF_ASSISTANCE_CD` | `in_TYPE_OF_ASSISTANCE_CD` &larr; `TYPE_OF_ASSISTANCE_CD`<br>`in_SRC_SYS` &larr; `out_SRC_SYS` | `in_TYPE_OF_ASSISTANCE_CD` (pass-through) &rarr; `exp_Setup_PKey.TYPE_OF_ASSISTANCE_CD` (Expression)<br>`in_SRC_SYS` (pass-through) &rarr; `exp_Setup_PKey.SRC_SYS` (Expression)<br>`MSTR_REF_CODE` &rarr; `exp_Setup_PKey.TOA_CD` (Expression) |
+
+### Fed by `exp_Stage_Exceptions` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `lkp_Exc_Lookup_Code_Value` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = in_EXCEPTION_CODE` | `in_EXCEPTION_CODE` &larr; `out_EXCEPTION_CODE` | `EXCEPTION_CODE` &rarr; `Write_Exc_Stg_Bad_Rec_Memb.EXCEPTION_CODE` (Target)<br>`EXCEPTION_DESC` &rarr; `Write_Exc_Stg_Bad_Rec_Memb.EXCEPTION_DESC` (Target)<br>`EXCEPTION_TYPE` &rarr; `Write_Exc_Stg_Bad_Rec_Memb.EXCEPTION_TYPE` (Target) |
+
+### Fed by `EXC_STG_BAD_REC_Start_Date_End_Date` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE2` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXC_CODE_LKP` | `EXC_CODE_LKP` &larr; `EXC_CODE_LKP` | `EXCEPTION_DESC` &rarr; `Write_EXC_STG_BAD_REC_MEMB_Start_Date_End_Date.EXCEPTION_DESC` (Target)<br>`EXCEPTION_TYPE` &rarr; `Write_EXC_STG_BAD_REC_MEMB_Start_Date_End_Date.EXCEPTION_TYPE` (Target) |
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. TOA source: `MCI_EDG_INDV` -> `TIERS`, `LTSS_ELIG_PER` -> `DADS`.

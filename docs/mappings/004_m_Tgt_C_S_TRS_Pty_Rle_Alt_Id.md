@@ -70,6 +70,33 @@ SELECT pty_pkey, member_id, start_dt, ssn, cv_ind FROM de_dup_indv WHERE key_rn 
 SELECT DISTINCT indv_id, ssn FROM stg_trs_h_dc_indv WHERE ssa_validation_sw = 'Y' AND ssn > 0
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `exp_TRS_Pty_Rle_Alt_Id` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `lkp_Valid_SSN` | `STG_TRS_H_DC_INDV` (STAGING)<br>SQL override (below)<br>multiple match: any row | `INDV_ID = MEMBER_ID AND SSN = SSN1` | `SSN1` &larr; `SSN`<br>`MEMBER_ID` &larr; `out_Member_Id` | `SSN` &rarr; `mplt_TRS_Pty_Rle_Alt_Id_Normalization.ALT_ID_VAL_SSN` (Mapplet) |
+
+SQL override of `lkp_Valid_SSN`:
+
+```sql
+select /*+ parallel (4) */ distinct INDV_ID as INDV_ID, SSN as SSN
+from STG_TRS_H_DC_INDV
+where SSA_VALIDATION_SW = 'Y'
+and SSN > 0
+```
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `mplt_TRS_Pty_Rle_Alt_Id_Normalization`, `rule_MEDICAID_ID_Std`, `rule_Member_Id_Std`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. The SSN is used only if the pair (member id, SSN) is SSA validated; it is left-padded to 9 digits.
