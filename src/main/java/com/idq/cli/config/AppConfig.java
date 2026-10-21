@@ -19,6 +19,7 @@ public class AppConfig {
         return new EtlSettings(
                 EtlProcess.valueOf(env.getProperty("etl_process", "JAVA").trim().toUpperCase()),
                 env.getProperty("mock_infacmd", Boolean.class, true),
+                env.getProperty("mock_ora_sp", Boolean.class, true),
                 env.getProperty("mock_data", Boolean.class, true),
                 env.getProperty("idq.mock.rows-per-table", Integer.class, 20),
                 env.getProperty("mock-data-pre-fix", "").strip(),
@@ -29,7 +30,8 @@ public class AppConfig {
                         env.getProperty("idq.infacmd.script", "docs/batch-script-windows.original.bat"),
                         env.getProperty("idq.infacmd.domain", ""),
                         env.getProperty("idq.infacmd.service", ""),
-                        env.getProperty("idq.infacmd.application", "")));
+                        env.getProperty("idq.infacmd.application", "")),
+                Path.of(env.getProperty("idq.ora-sp.dir", "idq-to-oracle")));
     }
 
     @Bean

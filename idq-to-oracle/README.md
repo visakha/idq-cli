@@ -116,6 +116,12 @@ Run a whole workflow with `@<workflow>/run_<workflow>.sql`, or call a single pro
 Where IDQ runs mappings in parallel, the scripts run those paths one after another and keep every dependency. The
 IDQ command task (`touch <workflow>.ind`) is left to the scheduler.
 
+From the CLI, start with `-Detl_process=ORA_SP -Dmock_ora_sp=false` and use `run-etl`. `OraSpRunner` reads the `EXEC`
+lines of the run script (folder set by `idq.ora-sp.dir`, default `idq-to-oracle`) and calls each procedure over JDBC
+in that order. It stops at the first failure, and the run is audited in the `adhoc_runs_<SOURCE>/*_$ORA_SP$_*.md`
+reports. Keep each run script to one `EXEC sp_ors_main_<mapping>` per line without arguments, because the CLI reads
+only lines in that form.
+
 ## How a mapping becomes a procedure
 
 | IDQ | Oracle |

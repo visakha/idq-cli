@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 class MockTablesTest {
 
     static MockTables tables(String prefix) {
-        return new MockTables(null, null, new EtlSettings(EtlProcess.JAVA, true, true, 20, prefix, true, Set.of(),
-                null));
+        return new MockTables(null, null, new EtlSettings(EtlProcess.JAVA, true, true, true, 20, prefix, true,
+                Set.of(), null, null));
     }
 
     @Test
