@@ -15,8 +15,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 class OraSpRunnerTest {
 
     static OraSpRunner runner(boolean mock) {
-        return new OraSpRunner(null, new EtlSettings(EtlProcess.ORA_SP, true, mock, true, 20, "", true, null,
-                Path.of("idq-to-oracle")));
+        return new OraSpRunner(null, new EtlSettings(EtlProcess.ORA_SP, true, mock, true, true, 20, "", true, null,
+                Path.of("idq-to-oracle"), Path.of("idq-to-snowflake")));
     }
 
     @Test

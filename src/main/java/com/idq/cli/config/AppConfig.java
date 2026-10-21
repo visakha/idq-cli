@@ -16,6 +16,7 @@ public class AppConfig {
                 EtlProcess.valueOf(env.getProperty("etl_process", "JAVA").trim().toUpperCase()),
                 env.getProperty("mock_infacmd", Boolean.class, true),
                 env.getProperty("mock_ora_sp", Boolean.class, true),
+                env.getProperty("mock_snowflake_sp", Boolean.class, true),
                 env.getProperty("mock_data", Boolean.class, true),
                 env.getProperty("idq.mock.rows-per-table", Integer.class, 20),
                 env.getProperty("mock-data-pre-fix", "").strip(),
@@ -25,7 +26,16 @@ public class AppConfig {
                         env.getProperty("idq.infacmd.domain", ""),
                         env.getProperty("idq.infacmd.service", ""),
                         env.getProperty("idq.infacmd.application", "")),
-                Path.of(env.getProperty("idq.ora-sp.dir", "idq-to-oracle")));
+                Path.of(env.getProperty("idq.ora-sp.dir", "idq-to-oracle")),
+                Path.of(env.getProperty("idq.snowflake-sp.dir", "idq-to-snowflake")));
+    }
+
+    @Bean
+    SnowflakeSettings snowflakeSettings(Environment env) {
+        return new SnowflakeSettings(
+                env.getProperty("idq.snowflake.url", "").strip(),
+                env.getProperty("idq.snowflake.user", "").strip(),
+                env.getProperty("idq.snowflake.password", ""));
     }
 
     @Bean

@@ -133,10 +133,12 @@ Port `8085`, base path `/api/etl`; every CLI command has an endpoint (table in `
 
 | Property | Default | Meaning |
 |---|---|---|
-| `etl_process` | `JAVA` | `JAVA` runs the ported mappings, `IDQ` runs `infacmd`, `ORA_SP` calls the `idq-to-oracle` stored procedures |
+| `etl_process` | `JAVA` | `JAVA` runs the ported mappings, `IDQ` runs `infacmd`, `ORA_SP` calls the `idq-to-oracle` stored procedures, `SNOWFLAKE_SP` the `idq-to-snowflake` stored procedures |
 | `mock_infacmd` | `true` | With `IDQ`, log the infacmd call instead of running `idq.infacmd.script` |
 | `mock_ora_sp` | `true` | With `ORA_SP`, report each `EXEC sp_ors_main_*` instead of calling it |
 | `idq.ora-sp.dir` | `idq-to-oracle` | Folder with the `<workflow>/run_<workflow>.sql` scripts that give the procedure order |
+| `mock_snowflake_sp` | `true` | With `SNOWFLAKE_SP`, report each `CALL sp_snow_main_*()` instead of calling it |
+| `idq.snowflake-sp.dir` | `idq-to-snowflake` | Same for the Snowflake procedures; connection from `SNOWFLAKE_JDBC_URL` / `SNOWFLAKE_USER` / `SNOWFLAKE_PASSWORD` |
 | `mock_data` | `true` | `run-etl` fills every mapping's source tables with mock rows before the run |
 | `idq.mock.rows-per-table` | `20` | Mock rows per source table |
 | `mock-data-pre-fix` | (empty) | Prefix for free-text mock values: `Test_001` gives `Test_001-JaneDoe@gmail.com` |
@@ -149,7 +151,7 @@ Port `8085`, base path `/api/etl`; every CLI command has an endpoint (table in `
 
 ## Notes
 
-* Nothing is ever deleted, truncated or dropped, in Java or in the `idq-to-oracle` procedures: loads and mock fills
+* Nothing is ever deleted, truncated or dropped, in Java or in the `idq-to-oracle` and `idq-to-snowflake` procedures: loads and mock fills
   only insert (safe for production data). The IDQ *Truncate target table* option and `DD_DELETE` are therefore not
   reproduced; empty the targets yourself before a reload. Never run `docs/*_EXPORT_OCT_16.sql`: they contain `DROP TABLE`.
 * `db/missing-objects.sql` holds `CREATE TABLE` statements (generated from the workflow XML) for objects missing in

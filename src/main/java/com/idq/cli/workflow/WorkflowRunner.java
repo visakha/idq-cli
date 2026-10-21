@@ -28,8 +28,9 @@ import org.springframework.stereotype.Component;
 /// In Java mode every mapping runs in workflow order. A failing mapping is reported and the workflow continues
 /// (the CLI only cares about the latched mapping; the others typically have empty sources).
 ///
-/// In ORA_SP mode the `sp_ors_main_*` procedures run in the order of the workflow's run script ([OraSpRunner]). The
-/// first failing procedure stops the run and the rest are `SKIPPED`, as `WHENEVER SQLERROR EXIT` does in the script.
+/// In ORA_SP mode the `sp_ors_main_*` procedures run in the order of the workflow's run script ([OraSpRunner]), in
+/// SNOWFLAKE_SP mode the `sp_snow_main_*` procedures ([SnowflakeSpRunner]). The first failing procedure stops the run
+/// and the rest are `SKIPPED`, as `WHENEVER SQLERROR EXIT` / `exit_on_error` do in the scripts.
 ///
 /// Every run is recorded through [EtlAudit]: source tables, `IdqMapInitQuery` rows and target rows are published as
 /// events and written to the `adhoc_runs_<SOURCE>` Markdown reports.
@@ -42,16 +43,19 @@ public class WorkflowRunner {
     private final ReferenceLoader referenceLoader;
     private final IdqCommandRunner idq;
     private final OraSpRunner oraSp;
+    private final SnowflakeSpRunner snowflakeSp;
     private final EtlSettings settings;
     private final EtlAudit audit;
     private final ReportSettings reports;
 
     public WorkflowRunner(MappingCatalog catalog, ReferenceLoader referenceLoader, IdqCommandRunner idq,
-            OraSpRunner oraSp, EtlSettings settings, EtlAudit audit, ReportSettings reports) {
+            OraSpRunner oraSp, SnowflakeSpRunner snowflakeSp, EtlSettings settings, EtlAudit audit,
+            ReportSettings reports) {
         this.catalog = catalog;
         this.referenceLoader = referenceLoader;
         this.idq = idq;
         this.oraSp = oraSp;
+        this.snowflakeSp = snowflakeSp;
         this.settings = settings;
         this.audit = audit;
         this.reports = reports;
@@ -70,7 +74,8 @@ public class WorkflowRunner {
         return switch (engine) {
             case JAVA -> runJava(source, mappings);
             case IDQ -> runIdq(source, mappings);
-            case ORA_SP -> runOraSp(source, mappings);
+            case ORA_SP -> runProcedures(source, mappings, oraSp);
+            case SNOWFLAKE_SP -> runProcedures(source, mappings, snowflakeSp);
         };
     }
 
@@ -113,19 +118,25 @@ public class WorkflowRunner {
     /// The procedures do the work. For each one that replaces a mapping of the catalog, the audit trail records the
     /// sources and `IdqMapInitQuery` rows before the call and the target tables after it. Procedures without a Java
     /// mapping (e.g. the ECI reactivation mappings) are called and reported in the output only.
-    private WorkflowRun runOraSp(SourceSystem source, List<MemberMapping<?, ?>> mappings) {
-        var trail = audit.start(source, EtlProcess.ORA_SP, now());
+    ///
+    /// The audit reads tables through the Oracle data source, so for SNOWFLAKE_SP (whose tables live in Snowflake) it
+    /// records only the procedure results.
+    private WorkflowRun runProcedures(SourceSystem source, List<MemberMapping<?, ?>> mappings,
+            StoredProcedureRunner runner) {
+        var engine = runner.engine();
+        var readTables = engine == EtlProcess.ORA_SP;
+        var trail = audit.start(source, engine, now());
         var byName = mappings.stream().collect(Collectors.toMap(m -> m.info().name(), m -> m));
         var results = new ArrayList<MappingResult>();
         var failed = false;
-        for (var procedure : oraSp.procedures(source)) {
-            var mapping = byName.get(OraSpRunner.mappingName(procedure));
+        for (var procedure : runner.procedures(source)) {
+            var mapping = byName.get(runner.mapping(procedure));
             MappingResult result;
             if (failed) {
-                result = new MappingResult(OraSpRunner.mappingName(procedure), MappingResult.Status.SKIPPED, 0,
+                result = new MappingResult(runner.mapping(procedure), MappingResult.Status.SKIPPED, 0,
                         Map.of(), 0, Duration.ZERO, "not run: an earlier procedure failed");
             } else {
-                if (mapping != null) {
+                if (mapping != null && readTables) {
                     trail.sources(mapping.info());
                     try {
                         trail.initQuery(mapping, mapping.fetchIdqMapInitQueryResults());
@@ -133,9 +144,9 @@ public class WorkflowRunner {
                         log.warn("{} IdqMapInitQuery failed: {}", mapping.info().name(), e.getMessage());
                     }
                 }
-                result = oraSp.call(procedure);
+                result = runner.call(procedure);
                 failed = result.status() == MappingResult.Status.FAILED;
-                if (mapping != null && !failed) {
+                if (mapping != null && !failed && readTables) {
                     trail.tablesAfter(mapping.info());
                 }
             }
@@ -147,7 +158,7 @@ public class WorkflowRunner {
         }
         var output = withReportLine(source, results.stream().map(MappingResult::summary));
         trail.completed(output);
-        return new WorkflowRun(source, EtlProcess.ORA_SP, List.copyOf(results), output);
+        return new WorkflowRun(source, engine, List.copyOf(results), output);
     }
 
     private MappingResult runOne(MemberMapping<?, ?> mapping, EtlContext ctx, EtlAudit.Run trail) {
@@ -180,6 +191,6 @@ public class WorkflowRunner {
 
     public Map<String, Object> describe() {
         return Map.of("etl_process", settings.etlProcess(), "mock_infacmd", settings.mockInfacmd(), "mock_ora_sp",
-                settings.mockOraSp());
+                settings.mockOraSp(), "mock_snowflake_sp", settings.mockSnowflakeSp());
     }
 }

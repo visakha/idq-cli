@@ -1,5 +1,6 @@
 package com.idq.cli.workflow;
 
+import com.idq.cli.config.EtlProcess;
 import com.idq.cli.config.EtlSettings;
 import com.idq.cli.core.MappingResult;
 import com.idq.cli.domain.SourceSystem;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Component;
 /// `<idq.ora-sp.dir>/<workflow>/run_<workflow>.sql` (its `EXEC sp_ors_main_<mapping>` lines, in taskflow order). Each
 /// procedure commits on success and rolls back and re-raises on error. With `mock_ora_sp=true` nothing is called; the `EXEC` that would run is reported instead.
 @Component
-public class OraSpRunner {
+public class OraSpRunner implements StoredProcedureRunner {
 
     static final String PREFIX = "sp_ors_main_";
     private static final Pattern EXEC = Pattern.compile("^EXEC\\s+(" + PREFIX + "\\w+)\\s*;?\\s*$",
@@ -37,12 +38,18 @@ public class OraSpRunner {
         this.settings = settings;
     }
 
+    @Override
+    public EtlProcess engine() {
+        return EtlProcess.ORA_SP;
+    }
+
     /// `<idq.ora-sp.dir>/<workflow>/run_<workflow>.sql`
     public Path script(SourceSystem source) {
         return settings.oraSpDir().resolve(source.workflow).resolve("run_" + source.workflow + ".sql");
     }
 
     /// Procedure names of the source's run script, in the order the script executes them.
+    @Override
     public List<String> procedures(SourceSystem source) {
         var script = script(source);
         try {
@@ -61,7 +68,13 @@ public class OraSpRunner {
         return procedure.substring(PREFIX.length());
     }
 
+    @Override
+    public String mapping(String procedure) {
+        return mappingName(procedure);
+    }
+
     /// Runs one procedure; a database error is returned as a `FAILED` result, never thrown.
+    @Override
     public MappingResult call(String procedure) {
         var started = Instant.now();
         var name = mappingName(procedure);
