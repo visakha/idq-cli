@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TtfPartyValidationService {
 
     public static final MappingInfo INFO = MappingInfo.of("025", "m_Tgt_C_S_TTF_Pty_Validation", SourceSystem.TTF,
-            List.of("STG_TTF_PTY_INACTIVE_STS", "STG_TTF_PTY_INACTIVE_LOG"), List.of(TtfSources.EtlSrc.class,
+            List.of(TtfSources.InactiveStatus.class, TtfSources.InactiveLog.class), List.of(TtfSources.EtlSrc.class,
             MdmBaseTables.PartyXref.class, TtfSources.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, Integer> hubStates) {}

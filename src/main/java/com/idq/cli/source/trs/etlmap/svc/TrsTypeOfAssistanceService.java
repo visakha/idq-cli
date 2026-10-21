@@ -34,7 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsTypeOfAssistanceService {
 
     public static final MappingInfo INFO = MappingInfo.of("008", "m_Tgt_C_S_TRS_Pty_Rle_TOA", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_RLE_TOA"), List.of(TrsSources.CvMciEdgIndvToaDelta.class, TrsSources.ValidMember.class));
+            List.of(TrsTargets.TypeOfAssistance.class), List.of(TrsSources.CvMciEdgIndvToaDelta.class,
+            TrsSources.ValidMember.class));
 
     private final TrsCvMciEdgIndvToaDeltaRepository cvMciEdgIndvToaDelta;
     private final TrsTypeOfAssistanceRepository typesOfAssistance;

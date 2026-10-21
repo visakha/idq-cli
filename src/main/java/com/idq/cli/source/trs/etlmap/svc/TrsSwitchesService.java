@@ -32,8 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsSwitchesService {
 
     public static final MappingInfo INFO = MappingInfo.of("007", "m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_MNG_ATTR"), List.of(TrsSources.DcIndvDelta.class, TrsSources.CvDcMciIndvDelta.class,
-            TrsSources.ValidMember.class));
+            List.of(TrsTargets.ManagedAttribute.class), List.of(TrsSources.DcIndvDelta.class,
+            TrsSources.CvDcMciIndvDelta.class, TrsSources.ValidMember.class));
 
     private final TrsDcIndvDeltaRepository dcIndvDelta;
     private final TrsManagedAttributeRepository managedAttributes;

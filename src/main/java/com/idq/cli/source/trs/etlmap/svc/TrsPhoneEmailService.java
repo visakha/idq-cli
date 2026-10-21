@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsPhoneEmailService {
 
     public static final MappingInfo INFO = MappingInfo.of("006", "m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr",
-            SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_PHN", "C_S_TRS_PTY_RLE_EADDR"),
+            SourceSystem.TRS, List.of(TrsTargets.Phone.class, TrsTargets.Email.class),
             List.of(TrsSources.DcCasesDelta.class, TrsSources.DcCaseIndv.class, TrsSources.ValidMember.class));
 
     public static final String TELEPHONE = "Telephone";

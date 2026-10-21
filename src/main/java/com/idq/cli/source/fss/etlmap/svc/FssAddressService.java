@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FssAddressService {
 
     public static final MappingInfo INFO = MappingInfo.of("021", "m_Tgt_C_S_FSS_Pty_Addr", SourceSystem.FSS,
-            List.of("C_S_FSS_PTY_RLE_ADDR", "DQM_ADDRESS"), List.of(FssSources.EtlSrc.class,
+            List.of(FssTargets.Address.class, DqmAddress.class), List.of(FssSources.EtlSrc.class,
             FssSources.InactiveStatus.class));
 
     public static final String ADDRESS_TYPE = "002";

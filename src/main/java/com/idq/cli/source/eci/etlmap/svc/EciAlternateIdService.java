@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EciAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("016", "m_Tgt_C_S_ECI_Pty_Rle_Alt_Id", SourceSystem.ECI,
-            List.of("C_S_ECI_PTY_RLE_ALT_ID"), List.of(EciSources.ChildDelta.class, EciSources.FamilyDelta.class,
+            List.of(EciTargets.AlternateId.class), List.of(EciSources.ChildDelta.class, EciSources.FamilyDelta.class,
             EciSources.MedicaidDelta.class, EciSources.SnCase.class, EciSources.InactiveStatus.class));
 
     private final EciChildDeltaRepository childDelta;

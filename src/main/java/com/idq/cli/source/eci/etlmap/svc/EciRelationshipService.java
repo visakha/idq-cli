@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EciRelationshipService {
 
     public static final MappingInfo INFO = MappingInfo.of("018", "m_Tgt_C_S_ECI_Pty_Rle_Rel", SourceSystem.ECI,
-            List.of("C_S_ECI_PTY_RLE_REL"), List.of(EciSources.FamilyDelta.class, EciSources.SnChild.class,
+            List.of(EciTargets.Relationship.class), List.of(EciSources.FamilyDelta.class, EciSources.SnChild.class,
             EciSources.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, String> childGender) {}

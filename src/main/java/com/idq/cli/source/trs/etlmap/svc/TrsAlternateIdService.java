@@ -41,8 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("004", "m_Tgt_C_S_TRS_Pty_Rle_Alt_Id", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_RLE_ALT_ID"), List.of(TrsSources.CvDcMciIndvDelta.class, TrsSources.DcIndvDelta.class,
-            TrsSources.CvDcMrgSprtIndvDelta.class, TrsSources.ValidMember.class, TrsSources.DcIndvHist.class));
+            List.of(TrsTargets.AlternateId.class), List.of(TrsSources.CvDcMciIndvDelta.class,
+            TrsSources.DcIndvDelta.class, TrsSources.CvDcMrgSprtIndvDelta.class, TrsSources.ValidMember.class,
+            TrsSources.DcIndvHist.class));
 
     public static final String MEDICAID_ID = "002";
     public static final String SSN = "004";

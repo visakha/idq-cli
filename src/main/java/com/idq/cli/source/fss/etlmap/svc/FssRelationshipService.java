@@ -35,7 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class FssRelationshipService {
 
     public static final MappingInfo INFO = MappingInfo.of("024", "m_Tgt_C_S_FSS_Pty_Rle_Rel", SourceSystem.FSS,
-            List.of("C_S_FSS_PTY_RLE_REL"), List.of(FssSources.EtlSrcRelations.class, FssSources.InactiveStatus.class));
+            List.of(FssTargets.Relationship.class), List.of(FssSources.EtlSrcRelations.class,
+            FssSources.InactiveStatus.class));
 
     private final FssEtlSrcRelationsViewRepository etlSrcRelations;
     private final FssInactiveStatusRepository inactiveStatuses;

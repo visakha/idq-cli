@@ -51,9 +51,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsPartyOnGoingService {
 
     public static final MappingInfo INFO = MappingInfo.of("001", "m_Tgt_C_S_TRS_Pty_OnGoing", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY", "C_S_TRS_PTY_RLE", "STG_TRS_VALID_MEMBERS"), List.of(TrsSources.DcIndvDelta.class,
-            TrsSources.CvDcMciIndvDelta.class, TrsSources.CvMciEdgIndvToaDelta.class, TrsSources.ValidMember.class,
-            TrsSources.DeactivedMembers.class));
+            List.of(TrsTargets.Party.class, TrsTargets.PartyRole.class, TrsSources.ValidMember.class),
+            List.of(TrsSources.DcIndvDelta.class, TrsSources.CvDcMciIndvDelta.class,
+            TrsSources.CvMciEdgIndvToaDelta.class, TrsSources.ValidMember.class, TrsSources.DeactivedMembers.class));
 
     /// @param validMemberKeys `STG_TRS_VALID_MEMBERS.PTY_PK` before the run
     public record Lookups(Set<String> validMemberKeys) {}

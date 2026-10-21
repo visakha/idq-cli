@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FssPhoneEmailService {
 
     public static final MappingInfo INFO = MappingInfo.of("023", "m_Tgt_C_S_FSS_Pty_Rle_Phn_And_EAddr",
-            SourceSystem.FSS, List.of("C_S_FSS_PTY_RLE_PHN", "C_S_FSS_PTY_RLE_EADDR"), List.of(FssSources.EtlSrc.class,
+            SourceSystem.FSS, List.of(FssTargets.Phone.class, FssTargets.Email.class), List.of(FssSources.EtlSrc.class,
             FssSources.InactiveStatus.class));
 
     private final FssEtlSrcViewRepository etlSrc;

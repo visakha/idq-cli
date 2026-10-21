@@ -33,14 +33,11 @@ public class EtlAudit {
 
     private final ApplicationEventPublisher events;
     private final JdbcAggregateTemplate aggregates;
-    private final TableEntities entities;
     private final ReportSettings settings;
 
-    public EtlAudit(ApplicationEventPublisher events, JdbcAggregateTemplate aggregates, TableEntities entities,
-            ReportSettings settings) {
+    public EtlAudit(ApplicationEventPublisher events, JdbcAggregateTemplate aggregates, ReportSettings settings) {
         this.events = events;
         this.aggregates = aggregates;
-        this.entities = entities;
         this.settings = settings;
     }
 
@@ -82,7 +79,7 @@ public class EtlAudit {
         /// The Java engine's load: each batch read back from its table by key.
         public Run written(MappingInfo mapping, MappingOutput output) {
             if (settings.enabled()) {
-                mapping.targets().forEach(sourceCache::remove);
+                mapping.targetTables().forEach(sourceCache::remove);
                 publish(new EtlEvent.TargetsWritten(id, mapping, output.batches().stream()
                         .map(EtlAudit.this::readBack).toList()));
             }
@@ -93,9 +90,7 @@ public class EtlAudit {
         public Run tablesAfterIdq(MappingInfo mapping) {
             if (settings.enabled()) {
                 publish(new EtlEvent.TargetsWritten(id, mapping, mapping.targets().stream()
-                        .map(table -> entities.of(table)
-                                .map(entity -> table(entity, "table content after the IDQ workflow (all rows)"))
-                                .orElseGet(() -> new RowSample(table, null, 0, List.of(), "no entity for " + table)))
+                        .map(entity -> table(entity, "table content after the IDQ workflow (all rows)"))
                         .toList()));
             }
             return this;

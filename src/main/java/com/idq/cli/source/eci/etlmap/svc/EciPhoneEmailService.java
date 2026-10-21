@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EciPhoneEmailService {
 
     public static final MappingInfo INFO = MappingInfo.of("017", "m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr",
-            SourceSystem.ECI, List.of("C_S_ECI_PTY_RLE_PHN", "C_S_ECI_PTY_RLE_EADDR"),
+            SourceSystem.ECI, List.of(EciTargets.Phone.class, EciTargets.Email.class),
             List.of(EciSources.EtlSrcFamilyPhone.class, EciSources.InactiveStatus.class));
 
     private final EciFamilyPhoneViewRepository familyPhones;

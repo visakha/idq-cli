@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FssAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("022", "m_Tgt_C_S_FSS_Pty_Rle_Alt_Id", SourceSystem.FSS,
-            List.of("C_S_FSS_PTY_RLE_ALT_ID"), List.of(FssSources.EtlSrc.class, FssSources.InactiveStatus.class));
+            List.of(FssTargets.AlternateId.class), List.of(FssSources.EtlSrc.class, FssSources.InactiveStatus.class));
 
     private final FssEtlSrcViewRepository etlSrc;
     private final FssInactiveStatusRepository inactiveStatuses;

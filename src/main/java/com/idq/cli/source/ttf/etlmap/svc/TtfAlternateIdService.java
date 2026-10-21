@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TtfAlternateIdService {
 
     public static final MappingInfo INFO = MappingInfo.of("027", "m_Tgt_C_S_TTF_Pty_Rle_Alt_Id", SourceSystem.TTF,
-            List.of("C_S_TTF_PTY_RLE_ALT_ID"), List.of(TtfSources.EtlSrc.class, TtfSources.InactiveStatus.class));
+            List.of(TtfTargets.AlternateId.class), List.of(TtfSources.EtlSrc.class, TtfSources.InactiveStatus.class));
 
     public static final String ALT_ID_TYPE = "024";
 

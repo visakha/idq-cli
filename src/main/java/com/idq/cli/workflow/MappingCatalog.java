@@ -53,13 +53,13 @@ public class MappingCatalog {
 
     /// Mappings of a source that load the given target table.
     public List<MemberMapping<?, ?>> loading(SourceSystem source, String targetTable) {
-        return of(source).stream().filter(m -> m.info().targets().stream().anyMatch(targetTable::equalsIgnoreCase))
+        return of(source).stream().filter(m -> m.info().targetTables().stream().anyMatch(targetTable::equalsIgnoreCase))
                 .toList();
     }
 
     /// `C_S_*` target tables of a source, in workflow order.
     public List<String> targetTables(SourceSystem source) {
-        return of(source).stream().flatMap(m -> m.info().targets().stream()).filter(t -> t.startsWith("C_S_"))
+        return of(source).stream().flatMap(m -> m.info().targetTables().stream()).filter(t -> t.startsWith("C_S_"))
                 .distinct().toList();
     }
 

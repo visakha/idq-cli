@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrsMemberRelationshipService {
 
     public static final MappingInfo INFO = MappingInfo.of("009", "m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem",
-            SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL"), List.of(TrsSources.DcRelationshipsDelta.class,
+            SourceSystem.TRS, List.of(TrsTargets.Relationship.class), List.of(TrsSources.DcRelationshipsDelta.class,
             TrsSources.ValidMember.class));
 
     private final TrsDcRelationshipsDeltaRepository dcRelationshipsDelta;

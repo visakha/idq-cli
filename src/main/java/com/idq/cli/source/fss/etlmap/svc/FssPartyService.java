@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FssPartyService {
 
     public static final MappingInfo INFO = MappingInfo.of("020", "m_Tgt_C_S_FSS_Pty", SourceSystem.FSS,
-            List.of("C_S_FSS_PTY", "C_S_FSS_PTY_RLE"), List.of(FssSources.EtlSrc.class,
+            List.of(FssTargets.Party.class, FssTargets.PartyRole.class), List.of(FssSources.EtlSrc.class,
             FssSources.InactiveStatus.class));
 
     /// Gender, ethnicity and race exceptions only for `CLIENT` rows; language and suffix for all rows.

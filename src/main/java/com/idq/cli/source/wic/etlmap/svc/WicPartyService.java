@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WicPartyService {
 
     public static final MappingInfo INFO = MappingInfo.of("030", "m_Tgt_C_S_WIC_Pty", SourceSystem.WIC,
-            List.of("C_S_WIC_PTY", "C_S_WIC_PTY_RLE"), List.of(WicSources.EtlSrc.class,
+            List.of(WicTargets.Party.class, WicTargets.PartyRole.class), List.of(WicSources.EtlSrc.class,
             WicSources.InactiveStatus.class));
 
     /// Gender, ethnicity and race exceptions only for `CLIENT` rows; language for all rows.
