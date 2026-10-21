@@ -86,11 +86,16 @@ public class EtlAudit {
             return this;
         }
 
-        /// The IDQ engine's load: the whole content of each target table after the workflow.
-        public Run tablesAfterIdq(MappingInfo mapping) {
+        /// The IDQ and ORA_SP engines' load: the whole content of each target table after the workflow (IDQ) or the
+        /// mapping's stored procedure (ORA_SP).
+        public Run tablesAfter(MappingInfo mapping) {
             if (settings.enabled()) {
+                var note = id.engine() == EtlProcess.ORA_SP
+                        ? "table content after the Oracle stored procedure (all rows)"
+                        : "table content after the IDQ workflow (all rows)";
+                mapping.targetTables().forEach(sourceCache::remove);
                 publish(new EtlEvent.TargetsWritten(id, mapping, mapping.targets().stream()
-                        .map(entity -> table(entity, "table content after the IDQ workflow (all rows)"))
+                        .map(entity -> table(entity, note))
                         .toList()));
             }
             return this;

@@ -176,6 +176,9 @@ for each of the mapping identify its target table(s),  write a Unit test cases t
 The `etl_process` setting determines which ETL process should be executed.
 - If etl_process is set to 'IDQ', the Informatica IDQ mappings will be used for the ETL via command line shell.
 - If etl_process is set to 'JAVA', the JAva-based ETL code will be used for the ETL. (note: this is the default)
+- If etl_process is set to 'ORA_SP', the Oracle stored procedures of `idq-to-oracle/` (drop-in replacements of the
+  IDQ mappings) are called over JDBC, in the order of `idq-to-oracle/<workflow>/run_<workflow>.sql`
+  (simulated when `mock_ora_sp=true`).
 
 # CLI driven usage
 I want to have the ability to use this application via the CLI, and use the spring-shell-starter  the library to build the CLI interface. This will allow me to define commands, options, and arguments in a structured way, and provide automatic help and completion features.

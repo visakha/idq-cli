@@ -33,7 +33,7 @@ Contents
 | Target table | The `C_S_*` staging table a mapping loads, e.g. `C_S_ECI_PTY_RLE_REL`. |
 | IdqMapInitQuery | The first SQL a mapping runs to read its source rows. In Java it is a `@Query` method on the repository of the table it reads, returning a record, e.g. `EciFamilyDeltaRepository#fetchFamilyRelations` returning `EciQueryRows.FamilyRelation`. |
 | Latch | The CLI's working context: one source system, optionally one target table and one mapping (plus one or more domains). Commands act on what is latched. |
-| Engine (`etl_process`) | `JAVA` (default) runs the Java mappings; `IDQ` calls the Informatica `infacmd` script instead (simulated when `mock_infacmd=true`). |
+| Engine (`etl_process`) | `JAVA` (default) runs the Java mappings; `IDQ` calls the Informatica `infacmd` script instead (simulated when `mock_infacmd=true`); `ORA_SP` calls the Oracle stored procedures of `idq-to-oracle/` over JDBC (simulated when `mock_ora_sp=true`). |
 | Mock data | Synthetic source rows generated with Datafaker by `fill_sample_mock_data_<mapping>` functions. Controlled by `mock_data`, `idq.mock.rows-per-table` and `mock-data-pre-fix`. |
 | Audit report | After every run, one Markdown file per target table in `adhoc_runs_<SOURCE>/` showing the source tables, the IdqMapInitQuery rows and the target rows, plus a `.sql` file that replays the mock data. |
 
@@ -136,7 +136,8 @@ idq (no context)> exit
 | Domains, sub-domains and the mappings in each (all sources) | `show-domains` |
 | Source systems, their workflow, source tables and target tables | `show-sources` |
 
-`show-menu` also prints the active switches, e.g. `Commands  ({etl_process=JAVA, mock_infacmd=true, mock_data=true})`.
+`show-menu` also prints the active switches, e.g.
+`Commands  ({etl_process=JAVA, mock_infacmd=true, mock_ora_sp=true, mock_data=true})`.
 Each line shows `[requires ...]` for commands that need a latch first.
 
 ```text
@@ -318,7 +319,15 @@ What happens:
    you are testing should not stop the run.
 4. With `etl_process=IDQ`, the Informatica workflow is started through `idq.infacmd.script`
    (`infacmd wfs startWorkflow`). With `mock_infacmd=true` the call is only simulated and its output printed.
-5. The audit reports are written (section 8); the last line gives their directory.
+5. With `etl_process=ORA_SP`, the Oracle stored procedures that replace the mappings (`sp_ors_main_<mapping>`, see
+   `idq-to-oracle/README.md`) are called over JDBC, one `BEGIN ...; END;` per procedure, in the order of the
+   workflow's run script `<idq.ora-sp.dir>/<workflow>/run_<workflow>.sql`. That script also lists procedures that
+   have no Java mapping (the ECI reactivation mappings, the TRS deactivation mappings); they are called and shown in
+   the output but have no audit report. Each procedure commits on its own. The first failure stops the run, and the
+   procedures after it are shown as `SKIPPED`, as `WHENEVER SQLERROR EXIT` does in the script. With
+   `mock_ora_sp=true` nothing is executed and each result line says `[mock] EXEC sp_ors_main_...`. The procedures
+   must be installed first (`@install.sql` in `idq-to-oracle/`).
+6. The audit reports are written (section 8); the last line gives their directory.
 
 Result line per mapping: status, rows read by the IdqMapInitQuery, rows written per table (including the bad-data
 table `EXC_STG_BAD_REC_MEMB`), number of data-quality exceptions and elapsed time.
@@ -348,7 +357,7 @@ adhoc_runs_ECI\C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_10_58_AM.sql    mock data o
 ```
 
 * Directory: `<idq.report.base-dir>/adhoc_runs_<SOURCE>` (base dir defaults to the working directory).
-* Name: `<TABLE>_$<Java|IDQ>$_<dd_MM_yyyy_h_mm_AM|PM>`. A second run in the same minute adds `_2`, `_3`, ...
+* Name: `<TABLE>_$<Java|IDQ|ORA_SP>$_<dd_MM_yyyy_h_mm_AM|PM>`. A second run in the same minute adds `_2`, `_3`, ...
 * The `$` signs are part of the name: quote it in a shell, e.g. `type "adhoc_runs_ECI\C_S_ECI_PTY_$Java$_19_10_2026_10_58_AM.md"`.
 * The reports are produced by Spring events (`EtlEvent`) published during the run and written by the
   `AdhocRunReporter` listener; switch them off with `idq.report.enabled=false`.
@@ -366,6 +375,7 @@ adhoc_runs_ECI\C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_10_58_AM.sql    mock data o
      `EciQueryRows.FamilyRelation`).
    * **Target** - the rows this run loaded into the table, read back from Oracle by `PKEY_SRC_OBJECT` through the
      target entity (e.g. `EciTargets.Relationship`). With `etl_process=IDQ`: the table content after the workflow.
+     With `etl_process=ORA_SP`: the table content after the mapping's stored procedure.
    * **EXC_STG_BAD_REC_MEMB** - the data-quality exceptions the mapping raised, when there are any.
 
 Column headers are the database column names; values are plain ASCII.
@@ -529,6 +539,15 @@ under `EXC_STG_BAD_REC_MEMB`.
    sources and IdqMapInitQuery rows before the run and the target tables after it.
 3. Run the same data with `-Detl_process=JAVA -Dmock_data=false` and compare the two `C_S_*` sections.
 
+### 11.5 Compare with the Oracle stored procedures
+
+1. Install the procedures in the OCI schema: `@install.sql` from `idq-to-oracle/` (see its README).
+2. Start with `-Detl_process=ORA_SP -Dmock_ora_sp=false`.
+3. `latch-source-system ECI`, `run-etl`: every `sp_ors_main_*` of `run_wf_ECI_Stage_Load.sql` runs in order; the
+   reports (`$ORA_SP$` in the name) show the sources and IdqMapInitQuery rows before each procedure and the target
+   tables after it.
+4. Run the same data with `-Detl_process=JAVA -Dmock_data=false` (or `IDQ`) and compare the `C_S_*` sections.
+
 ---
 
 ## 12. Configuration reference
@@ -537,8 +556,10 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 
 | Property | Default | Meaning |
 |---|---|---|
-| `etl_process` | `JAVA` | `JAVA` runs the Java mappings, `IDQ` runs the Informatica workflow via `infacmd` |
+| `etl_process` | `JAVA` | `JAVA` runs the Java mappings, `IDQ` runs the Informatica workflow via `infacmd`, `ORA_SP` calls the Oracle stored procedures |
 | `mock_infacmd` | `true` | With `IDQ`: print the simulated `infacmd` call instead of running `idq.infacmd.script` |
+| `mock_ora_sp` | `true` | With `ORA_SP`: report each `EXEC sp_ors_main_*` instead of calling it |
+| `idq.ora-sp.dir` | `idq-to-oracle` | Folder with `<workflow>/run_<workflow>.sql`, which gives the procedures and their order (ORA_SP engine) |
 | `mock_data` | `true` | Allow mock data; `run-etl` generates it for every mapping before the run |
 | `idq.mock.rows-per-table` | `20` | Mock rows per source table |
 | `mock-data-pre-fix` | (empty) | Prefix for free-text mock values, e.g. `Test_001` gives `Test_001-JaneDoe@gmail.com` |
@@ -569,6 +590,8 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 | `mock_data=false: mock data generation is disabled` | Start with `-Dmock_data=true` to generate mock rows. |
 | A mapping shows `FAILED ... is not on the clearable-tables whitelist` | The mapping empties its target before loading; add the table to `db/clearable-tables.txt` if that is intended. |
 | A mapping shows `FAILED` with an `ORA-` error | Check the source objects exist (`idq.bootstrap-missing-objects=true` creates the missing ones on the next mock fill) and the wallet / network. |
+| `Cannot read the ORA_SP run script ...` | `etl_process=ORA_SP` needs `<idq.ora-sp.dir>/<workflow>/run_<workflow>.sql`; start the CLI from the project directory or set `-Didq.ora-sp.dir`. |
+| A procedure shows `FAILED ... PLS-00201` / `ORA-06550` | The procedure is not installed (or not valid) in the schema: run `@install.sql` from `idq-to-oracle/`. `ORA-20999` means the `fn_dq_*` contract stubs are installed instead of the real functions. |
 | A report section says `could not be read: ...` | That table could not be queried; the run itself is unaffected. The message names the cause. |
 | A property seems ignored | Pass it before `-jar` (`java -Dname=value -jar ...`), not after. |
 | `type adhoc_runs_ECI\C_S_...$Java$...md` finds nothing | Quote the file name; the `$` signs are part of it. |

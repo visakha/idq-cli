@@ -312,3 +312,13 @@ The other rows, with `ADDRESS_CD=1`, take the success branch and end up as `EciT
 
 Steps 2–5 are replaced by `runIdq` (`WorkflowRunner.java:83`). The init queries still run, but only for the audit.
 Informatica does the transform through the infacmd script, and the audit snapshots the target tables afterwards.
+
+## With `etl_process=ORA_SP`
+
+Steps 2–5 are replaced by `runOraSp` (`workflow/WorkflowRunner.java`). `OraSpRunner.procedures(ECI)` reads the `EXEC`
+lines of `idq-to-oracle/wf_ECI_Stage_Load/run_wf_ECI_Stage_Load.sql`, which gives nine procedures in taskflow order.
+For each procedure that matches a catalog mapping (`sp_ors_main_m_Tgt_C_S_ECI_Pty_Addr` → 015), the audit captures
+the sources and the init query, `OraSpRunner.call` runs `BEGIN sp_ors_main_m_Tgt_C_S_ECI_Pty_Addr; END;`, and the
+audit snapshots the target tables. The three reactivation procedures have no Java mapping, so they are called
+without an audit. The first `FAILED` call stops the run, and the remaining procedures are `SKIPPED`. With
+`mock_ora_sp=true` (the default) no procedure is called.

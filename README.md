@@ -117,7 +117,8 @@ tables.insert(ChildDelta.builder()
 
 `MappingInfo.sourceEntities` lists the source entities of each mapping. During a run `EtlAudit` publishes Spring
 events (`EtlEvent`): source tables before each mapping, the `IdqMapInitQuery` rows, and the target rows read back by
-`PKEY_SRC_OBJECT` (with `etl_process=IDQ`: the target tables after the workflow). `AdhocRunReporter` listens and
+`PKEY_SRC_OBJECT` (with `etl_process=IDQ`: the target tables after the workflow; with `etl_process=ORA_SP`: the
+target tables after each stored procedure). `AdhocRunReporter` listens and
 writes one Markdown file per target table, e.g. `adhoc_runs_ECI/C_S_ECI_PTY_RLE_$Java$_19_10_2026_9_54_AM.md`,
 plus a `.sql` with the same name holding the statements that generated the run's mock data.
 Quote the name in a shell because of the `$` signs.
@@ -131,8 +132,10 @@ Port `8085`, base path `/api/etl`; every CLI command has an endpoint (table in `
 
 | Property | Default | Meaning |
 |---|---|---|
-| `etl_process` | `JAVA` | `JAVA` runs the ported mappings, `IDQ` runs `infacmd` |
+| `etl_process` | `JAVA` | `JAVA` runs the ported mappings, `IDQ` runs `infacmd`, `ORA_SP` calls the `idq-to-oracle` stored procedures |
 | `mock_infacmd` | `true` | With `IDQ`, log the infacmd call instead of running `idq.infacmd.script` |
+| `mock_ora_sp` | `true` | With `ORA_SP`, report each `EXEC sp_ors_main_*` instead of calling it |
+| `idq.ora-sp.dir` | `idq-to-oracle` | Folder with the `<workflow>/run_<workflow>.sql` scripts that give the procedure order |
 | `mock_data` | `true` | `run-etl` fills every mapping's source tables with mock rows before the run |
 | `idq.mock.rows-per-table` | `20` | Mock rows per source table |
 | `mock-data-pre-fix` | (empty) | Prefix for free-text mock values: `Test_001` gives `Test_001-JaneDoe@gmail.com` |
