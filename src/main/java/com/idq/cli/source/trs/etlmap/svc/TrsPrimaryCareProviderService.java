@@ -116,7 +116,7 @@ public class TrsPrimaryCareProviderService {
                         .attribute("Provider", r.providerNum()).period(r.beginDt(), r.endDt()).build());
             }
         });
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsTargets.ProviderRelationship.class,
+        return MappingOutput.empty().load(TargetBatch.append(TrsTargets.ProviderRelationship.class,
                 Rows.currentSegmentPerKey(relationships))).reject(bad);
     }
 
@@ -124,16 +124,14 @@ public class TrsPrimaryCareProviderService {
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(TrsProviderRelationshipRepository.TABLE,
-                replaceProviderRelationships(output.rows(TrsTargets.ProviderRelationship.class)));
+                insertProviderRelationships(output.rows(TrsTargets.ProviderRelationship.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceProviderRelationships(List<TrsTargets.ProviderRelationship> rows) {
-        settings.requireClearable(TrsProviderRelationshipRepository.TABLE);
-        providerRelationships.deleteAll();
+    int insertProviderRelationships(List<TrsTargets.ProviderRelationship> rows) {
         return providerRelationships.insertAll(rows).size();
     }
 }

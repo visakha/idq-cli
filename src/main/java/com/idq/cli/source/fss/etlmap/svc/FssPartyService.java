@@ -97,9 +97,9 @@ public class FssPartyService {
                     new Columns.PartyRole(key, EtlPatterns.MEMBER)));
         }
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(FssTargets.Party.class,
+                .load(TargetBatch.append(FssTargets.Party.class,
                         Rows.lastPerKey(parties, FssTargets.Party::pkeySrcObject)))
-                .load(TargetBatch.replaceAll(FssTargets.PartyRole.class,
+                .load(TargetBatch.append(FssTargets.PartyRole.class,
                         Rows.lastPerKey(roles, FssTargets.PartyRole::pkeySrcObject)))
                 .reject(bad);
     }
@@ -107,23 +107,19 @@ public class FssPartyService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(FssPartyRepository.TABLE, replaceParties(output.rows(FssTargets.Party.class)));
-        loaded.put(FssPartyRoleRepository.TABLE, replacePartyRoles(output.rows(FssTargets.PartyRole.class)));
+        loaded.put(FssPartyRepository.TABLE, insertParties(output.rows(FssTargets.Party.class)));
+        loaded.put(FssPartyRoleRepository.TABLE, insertPartyRoles(output.rows(FssTargets.PartyRole.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceParties(List<FssTargets.Party> rows) {
-        settings.requireClearable(FssPartyRepository.TABLE);
-        parties.deleteAll();
+    int insertParties(List<FssTargets.Party> rows) {
         return parties.insertAll(rows).size();
     }
 
-    int replacePartyRoles(List<FssTargets.PartyRole> rows) {
-        settings.requireClearable(FssPartyRoleRepository.TABLE);
-        partyRoles.deleteAll();
+    int insertPartyRoles(List<FssTargets.PartyRole> rows) {
         return partyRoles.insertAll(rows).size();
     }
 }

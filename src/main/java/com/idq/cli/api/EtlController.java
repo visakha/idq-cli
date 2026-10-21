@@ -4,6 +4,7 @@ import com.idq.cli.cli.EtlConsole;
 import com.idq.cli.core.MappingResult;
 import com.idq.cli.domain.Domain;
 import com.idq.cli.domain.SubDomain;
+import com.idq.cli.workflow.EtlCompareRunner;
 import com.idq.cli.workflow.WorkflowRunner;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 /// | run-etl                 | `POST /api/etl/run`                    |
 /// | (single mapping)        | `POST /api/etl/run/mapping`            |
 /// | run-unit-tests          | `POST /api/etl/unit-tests`             |
+/// | compare-etl-process X   | `POST /api/etl/compare/X`              |
 @RestController
 @RequestMapping("/api/etl")
 public class EtlController {
@@ -147,6 +149,11 @@ public class EtlController {
     @PostMapping("/run/mapping")
     public MappingResult runMapping() {
         return console.runLatchedMapping();
+    }
+
+    @PostMapping("/compare/{source}")
+    public EtlCompareRunner.Comparison compare(@PathVariable String source) {
+        return console.compareEtlProcesses(source);
     }
 
     @PostMapping("/unit-tests")

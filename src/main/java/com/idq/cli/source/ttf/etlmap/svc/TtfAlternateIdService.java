@@ -75,23 +75,21 @@ public class TtfAlternateIdService {
             return new TtfTargets.AlternateId(key, audit, new Columns.AlternateId(memberRole(r.ptySrcKey()),
                     ALT_ID_TYPE, r.ptySrcKey(), "Issued", ALT_ID_TYPE, null));
         }).toList();
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TtfTargets.AlternateId.class,
+        return MappingOutput.empty().load(TargetBatch.append(TtfTargets.AlternateId.class,
                 Rows.lastPerKey(ids, TtfTargets.AlternateId::pkeySrcObject)));
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TtfAlternateIdRepository.TABLE, replaceAlternateIds(output.rows(TtfTargets.AlternateId.class)));
+        loaded.put(TtfAlternateIdRepository.TABLE, insertAlternateIds(output.rows(TtfTargets.AlternateId.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceAlternateIds(List<TtfTargets.AlternateId> rows) {
-        settings.requireClearable(TtfAlternateIdRepository.TABLE);
-        alternateIds.deleteAll();
+    int insertAlternateIds(List<TtfTargets.AlternateId> rows) {
         return alternateIds.insertAll(rows).size();
     }
 }

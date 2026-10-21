@@ -1,21 +1,17 @@
 package com.idq.cli.config;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.client.RestClient;
 
 @Configuration
 public class AppConfig {
 
     @Bean
-    EtlSettings etlSettings(Environment env, ResourceLoader resources) {
+    EtlSettings etlSettings(Environment env) {
         return new EtlSettings(
                 EtlProcess.valueOf(env.getProperty("etl_process", "JAVA").trim().toUpperCase()),
                 env.getProperty("mock_infacmd", Boolean.class, true),
@@ -24,8 +20,6 @@ public class AppConfig {
                 env.getProperty("idq.mock.rows-per-table", Integer.class, 20),
                 env.getProperty("mock-data-pre-fix", "").strip(),
                 env.getProperty("idq.bootstrap-missing-objects", Boolean.class, true),
-                clearableTables(resources, env.getProperty("idq.clearable-tables-file",
-                        "classpath:db/clearable-tables.txt")),
                 new EtlSettings.Infacmd(
                         env.getProperty("idq.infacmd.script", "docs/batch-script-windows.original.bat"),
                         env.getProperty("idq.infacmd.domain", ""),
@@ -43,21 +37,21 @@ public class AppConfig {
     }
 
     @Bean
+    CompareSettings compareSettings(Environment env) {
+        var ignore = env.getProperty("idq.compare.ignore-columns",
+                "ROWID_OBJECT,CREATE_DATE,LAST_UPDATE_DATE,CREATOR,UPDATED_BY,PERIOD_START_DATE,PERIOD_END_DATE");
+        return new CompareSettings(
+                java.util.Arrays.stream(ignore.split(","))
+                        .map(String::strip)
+                        .filter(column -> !column.isEmpty())
+                        .map(String::toUpperCase)
+                        .collect(Collectors.toUnmodifiableSet()));
+    }
+
+    @Bean
     RestClient etlRestClient(Environment env) {
         return RestClient.builder()
                 .baseUrl("http://localhost:" + env.getProperty("server.port", "8085") + "/api/etl")
                 .build();
-    }
-
-    private static java.util.Set<String> clearableTables(ResourceLoader resources, String location) {
-        try (var in = resources.getResource(location).getInputStream()) {
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8).lines()
-                    .map(String::strip)
-                    .filter(line -> !line.isEmpty() && !line.startsWith("#"))
-                    .map(String::toUpperCase)
-                    .collect(Collectors.toUnmodifiableSet());
-        } catch (IOException e) {
-            throw new UncheckedIOException("Cannot read clearable-tables whitelist " + location, e);
-        }
     }
 }

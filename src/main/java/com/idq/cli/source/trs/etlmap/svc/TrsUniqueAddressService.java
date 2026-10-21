@@ -93,23 +93,21 @@ public class TrsUniqueAddressService {
                     av.cassErrorCode(), av.deliveryPointValidation(), l1, l2, a.addrCity(), null, a.addrStateCd(),
                     "US", a.addrZip5(), a.addrZip4());
         }).toList();
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsSources.UniqueAddressDelta.class, addresses));
+        return MappingOutput.empty().load(TargetBatch.append(TrsSources.UniqueAddressDelta.class, addresses));
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(TrsUniqueAddressDeltaRepository.TABLE,
-                replaceUniqueAddresses(output.rows(TrsSources.UniqueAddressDelta.class)));
+                insertUniqueAddresses(output.rows(TrsSources.UniqueAddressDelta.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceUniqueAddresses(List<TrsSources.UniqueAddressDelta> rows) {
-        settings.requireClearable(TrsUniqueAddressDeltaRepository.TABLE);
-        uniqueAddresses.deleteAll();
+    int insertUniqueAddresses(List<TrsSources.UniqueAddressDelta> rows) {
         return uniqueAddresses.insertAll(rows).size();
     }
 }

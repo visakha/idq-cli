@@ -10,7 +10,7 @@
 --   -> lkp_Address_Type (V_LOOKUP_CODE_VALUE ADDR_TP, 'TRS') -> exp_Score_and_Exception_details
 --   -> rtr_Good_vs_Exception_Pty_Records
 --        Good ('100')     -> exp_Address_Hold -> srt_Party_Role_Addr_By_PKey_Beg_Date
---                            -> exp_Party_Role_Address_Attribute_Hold (VERSION_SEQ) -> C_S_TRS_PTY_RLE_ADDR (truncated)
+--                            -> exp_Party_Role_Address_Attribute_Hold (VERSION_SEQ) -> C_S_TRS_PTY_RLE_ADDR (insert only)
 --        Exception ('40') -> EXC_STG_BAD_REC_MEMB ('Invalid_Address', looked-up code)
 --        Default          -> not linked (the score is always '40' or '100')
 --
@@ -35,7 +35,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TRS_Addr_2';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime
 BEGIN
-    sp_ors_helper01_common('C_S_TRS_PTY_RLE_ADDR');
+    -- Not performed: IDQ "truncate target table" of C_S_TRS_PTY_RLE_ADDR. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Write_DQM_ADDRESS (every row)

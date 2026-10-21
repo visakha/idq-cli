@@ -12,7 +12,6 @@ import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.reference.LookupRows;
 import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.rules.NameStandardization;
-import com.idq.cli.core.target.LoadMode;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
@@ -112,8 +111,7 @@ public class FssPartyValidationService {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(FssInactiveLogRepository.TABLE, logActivationChanges(output.rows(FssSources.InactiveLog.class)));
         for (var batch : output.batches(FssSources.InactiveStatus.class)) {
-            loaded.merge(FssInactiveStatusRepository.TABLE, batch.mode() instanceof LoadMode.DeleteByKey<?>
-                    ? removeReactivatedStatuses(batch.rows()) : recordNewDeactivations(batch.rows()), Integer::sum);
+            loaded.merge(FssInactiveStatusRepository.TABLE, recordNewDeactivations(batch.rows()), Integer::sum);
         }
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
@@ -123,11 +121,6 @@ public class FssPartyValidationService {
 
     int logActivationChanges(List<FssSources.InactiveLog> logs) {
         return inactiveLog.insertAll(logs).size();
-    }
-
-    int removeReactivatedStatuses(List<FssSources.InactiveStatus> reactivated) {
-        return reactivated.stream()
-                .mapToInt(s -> inactiveStatuses.deleteBySrcKeyAndRowidSystem(s.srcKey(), s.rowidSystem())).sum();
     }
 
     int recordNewDeactivations(List<FssSources.InactiveStatus> deactivated) {

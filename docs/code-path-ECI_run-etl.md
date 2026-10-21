@@ -45,7 +45,7 @@ var methods = functions.stream().map(function -> find(function).orElseThrow(...)
      **table** in OCI (`missing-objects.sql:192`), so mock rows can be inserted into a "view".
   2. **`ReferenceMockData.seed()`** (`mock/ReferenceMockData.java:39`). This seeds the exception catalog, code values,
      master codes, area codes, junk names and street types. Every seeded row carries `CREATED_BY='IDQ_CLI_MOCK'`, so
-     it can be deleted with `deleteMarked` and re-seeded on each run.
+     `skipIfMarked` can tell that it is already seeded; it is then kept, never deleted and re-seeded.
 - Each generator call is wrapped in `recorded(group, ...)`. That calls `MockTables.record(...)` and publishes a
   `MockDataGenerated` event, which the audit reports use (more in 1d).
 
@@ -54,7 +54,7 @@ var methods = functions.stream().map(function -> find(function).orElseThrow(...)
 For 015, `fill_sample_mock_data_m_Tgt_C_S_ECI_Pty_Addr()` is at `EciMockData.java:101`:
 
 ```java
-tables.deleteRange("V_ECI_ETL_SRC_FAMILY_ADDRESS", "ID", ID, ID + 999_999);   // 1. clear the mock id range only
+tables.skipIfPresent("V_ECI_ETL_SRC_FAMILY_ADDRESS", "ID", ID, ID + 999_999); // 1. keep earlier mock rows, if any
 for (var id : ids()) {                                                      // 9100000001 .. 9100000020
     tables.insert(entity(EtlSrcFamilyAddress.class)                          // 2. typed builder
         .with(EtlSrcFamilyAddress::sourceTable, i % 2 == 0 ? "ECI_FAMILY" : "ECI_CHILD")
@@ -64,8 +64,8 @@ for (var id : ids()) {                                                      // 9
 }
 ```
 
-- **Ids**: `ID = 9_100_000_000L` plus 1 to `idq.mock.rows-per-table` (default 20). Deletes only touch this range, so
-  real data is never removed.
+- **Ids**: `ID = 9_100_000_000L` plus 1 to `idq.mock.rows-per-table` (default 20). Nothing is ever deleted: when rows in
+  this range already exist, `MockTables` skips every insert into that table for the rest of the fill.
 - **Datafaker** uses a fixed seed, `new Faker(new Random(7))`, so the data is the same on every run.
 - **Edge cases are built in**: every 6th row gets the unknown address code 9, every 3rd row has a line 2, and rows
   alternate between `ECI_FAMILY` and `ECI_CHILD`. These are what drive the exception and lookup branches later.
@@ -105,8 +105,8 @@ public <R extends Record> R insert(R row) {
 - There is no surrounding transaction here. Each insert auto-commits.
 
 **One thing to know:** `childrenAndFamilies()` is called by the generators for 013, 014, 016 and 018. On ECI it runs 4
-times per `run-etl`. Each call deletes the range and re-inserts, so the row counts stay correct. But the Faker sequence
-moves on each time, so the names left in the tables come from the last call.
+times per `run-etl`. The first call inserts the rows; the later calls find
+them in the mock range and insert nothing, so the row counts stay correct and nothing is deleted.
 
 ---
 
@@ -237,7 +237,7 @@ entity.
 ```java
 return MappingOutput.empty()
         .load(TargetBatch.append(DqmAddress.class, routed.dqm()))
-        .load(TargetBatch.replaceAll(EciTargets.Address.class,
+        .load(TargetBatch.append(EciTargets.Address.class,
                 Rows.lastPerKey(routed.addresses(), EciTargets.Address::pkeySrcObject)))   // IDQ aggregator on PKEY
         .reject(routed.exceptions());
 ```
@@ -275,12 +275,12 @@ tx.executeWithoutResult(_ -> output.batches().forEach(batch -> counts.merge(batc
   it as FAILED.
 - `output.batches()` returns the target batches plus a final `TargetBatch.append(BadRecord.class, badRecords)`. That is
   how exceptions reach `EXC_STG_BAD_REC_MEMB`.
-- `apply` switches on the sealed `LoadMode`:
+- `LoadMode` has a single mode, `Append`; every batch is inserted:
 
 | Batch | Mode | SQL |
 |---|---|---|
 | `DQM_ADDRESS` | `Append` | inserts only |
-| `C_S_ECI_PTY_RLE_ADDR` | `ReplaceAll` | `clear()` checks the `db/clearable-tables.txt` whitelist (the table is on line 18; anything not listed throws), then `DELETE FROM C_S_ECI_PTY_RLE_ADDR`, then inserts. This is IDQ's "truncate target". |
+| `C_S_ECI_PTY_RLE_ADDR` | `Append` | inserts only. IDQ's "truncate target" is deliberately not reproduced: nothing is deleted. |
 | `EXC_STG_BAD_REC_MEMB` | `Append` | inserts only |
 
 - Finally, `aggregates.insertAll(batch.rows())` hands the records to Spring Data JDBC. It flattens the embedded groups

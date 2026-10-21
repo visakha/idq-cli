@@ -103,13 +103,7 @@ BEGIN
 
     -- Rtr_Valid_Party.Reactivation -> Upd_Delete_Inactive (DD_DELETE) -> Write_STG_FSS_PTY_INACTIVE_STS1:
     -- delete the earlier status rows of every key that was just given a 'Reactivation' status row.
-    DELETE FROM STG_FSS_PTY_INACTIVE_STS t
-     WHERE (t.SRC_KEY, t.ROWID_SYSTEM) IN (SELECT r.SRC_KEY, r.ROWID_SYSTEM
-                                             FROM STG_FSS_PTY_INACTIVE_STS r
-                                            WHERE r.DEACTIVATION_STS = 'Reactivation'
-                                              AND r.DEACTIVATION_DT = l_run_ts)
-       AND NOT (t.DEACTIVATION_STS = 'Reactivation' AND t.DEACTIVATION_DT = l_run_ts);
-    sp_ors_helper02_common(c_mapping, 'delete STG_FSS_PTY_INACTIVE_STS (reactivations)', SQL%ROWCOUNT);
+    -- Not performed: the IDQ DD_DELETE of STG_FSS_PTY_INACTIVE_STS. This code base never deletes, truncates or drops (rows are only inserted).
     COMMIT;
 EXCEPTION
     WHEN OTHERS THEN

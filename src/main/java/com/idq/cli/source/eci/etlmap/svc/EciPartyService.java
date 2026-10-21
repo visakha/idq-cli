@@ -102,9 +102,9 @@ public class EciPartyService {
                     .sourceUpdated(r.dateModified()), new Columns.PartyRole(key, EtlPatterns.MEMBER)));
         }
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(EciTargets.Party.class,
+                .load(TargetBatch.append(EciTargets.Party.class,
                         Rows.lastPerKey(parties, EciTargets.Party::pkeySrcObject)))
-                .load(TargetBatch.replaceAll(EciTargets.PartyRole.class,
+                .load(TargetBatch.append(EciTargets.PartyRole.class,
                         Rows.lastPerKey(roles, EciTargets.PartyRole::pkeySrcObject)))
                 .reject(bad);
     }
@@ -118,23 +118,19 @@ public class EciPartyService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(EciPartyRepository.TABLE, replaceParties(output.rows(EciTargets.Party.class)));
-        loaded.put(EciPartyRoleRepository.TABLE, replacePartyRoles(output.rows(EciTargets.PartyRole.class)));
+        loaded.put(EciPartyRepository.TABLE, insertParties(output.rows(EciTargets.Party.class)));
+        loaded.put(EciPartyRoleRepository.TABLE, insertPartyRoles(output.rows(EciTargets.PartyRole.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceParties(List<EciTargets.Party> rows) {
-        settings.requireClearable(EciPartyRepository.TABLE);
-        parties.deleteAll();
+    int insertParties(List<EciTargets.Party> rows) {
         return parties.insertAll(rows).size();
     }
 
-    int replacePartyRoles(List<EciTargets.PartyRole> rows) {
-        settings.requireClearable(EciPartyRoleRepository.TABLE);
-        partyRoles.deleteAll();
+    int insertPartyRoles(List<EciTargets.PartyRole> rows) {
         return partyRoles.insertAll(rows).size();
     }
 }

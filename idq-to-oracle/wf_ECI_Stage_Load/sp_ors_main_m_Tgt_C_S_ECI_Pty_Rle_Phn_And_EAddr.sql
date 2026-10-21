@@ -4,7 +4,7 @@
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr (workflow wf_ECI_Stage_Load).
 --
 -- Phones and e-mail addresses of the ECI parties (V_ECI_ETL_SRC_FAMILY_PHONE) into C_S_ECI_PTY_RLE_PHN and
--- C_S_ECI_PTY_RLE_EADDR (both truncated first):
+-- C_S_ECI_PTY_RLE_EADDR (both insert only, never truncated):
 --   -> fil_deactivated_status: party not in STG_ECI_PTY_INACTIVE_STS
 --   -> rtr_Phone_Email
 --        Email_Group (PHONE_EMAIL_TYPE = 'EADDRESS') -> rule_email_validation_v01 -> rtr_Valid_EAddr_Records
@@ -27,8 +27,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- SYSTIMESTAMP()
 BEGIN
-    sp_ors_helper01_common('C_S_ECI_PTY_RLE_PHN');
-    sp_ors_helper01_common('C_S_ECI_PTY_RLE_EADDR');
+    -- Not performed: IDQ "truncate target table" of C_S_ECI_PTY_RLE_PHN, C_S_ECI_PTY_RLE_EADDR. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Default -> RTR_Valid_PhoneNumbers.Good_Records -> exp_Stage_Target_PhoneNumbers -> Write_C_S_ECI_PTY_RLE_PHN

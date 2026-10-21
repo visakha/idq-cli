@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Rle_Alt_Id (workflow wf_ECI_Stage_Load).
 --
--- Alternate ids of the ECI parties into C_S_ECI_PTY_RLE_ALT_ID (truncated first):
+-- Alternate ids of the ECI parties into C_S_ECI_PTY_RLE_ALT_ID (insert only, never truncated):
 --   Read_STG_ECI_D_CHILD (custom SQL: child ECI id 018, child SSN 004, Medicaid number 002 via STG_ECI_SN_CASE,
 --                         family ECI id 019)
 --     -> Filter: party (first 11 characters of the role key, '|' trimmed) not in STG_ECI_PTY_INACTIVE_STS
@@ -29,7 +29,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_ECI_Pty_Rle_Alt_Id';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- SYSTIMESTAMP()
 BEGIN
-    sp_ors_helper01_common('C_S_ECI_PTY_RLE_ALT_ID');
+    -- Not performed: IDQ "truncate target table" of C_S_ECI_PTY_RLE_ALT_ID. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Union_Valid_ALT_ID_Type (SSN valid, ECI ids, Medicaid valid) -> Exp_STG_ALT_ID_Type_Load -> target

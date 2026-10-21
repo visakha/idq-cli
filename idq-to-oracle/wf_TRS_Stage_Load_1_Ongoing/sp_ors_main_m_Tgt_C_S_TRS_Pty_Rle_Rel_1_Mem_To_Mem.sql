@@ -4,7 +4,7 @@
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem (workflow wf_TRS_Stage_Load_1_Ongoing).
 --
 -- Member-to-member relationships (STG_TRS_D_DC_RELATIONSHIPS; both sides valid members, one source key per
--- individual, MCI preferred) into C_S_TRS_PTY_RLE_REL (truncated first):
+-- individual, MCI preferred) into C_S_TRS_PTY_RLE_REL (insert only, never truncated):
 --   -> Lookup_V_LOOKUP_CODE_VALUE (code type PTY_REL, 'TRS') + exp_Build_FK -> rtr_AltId_Exp
 --        Invalid_Main_Alt_Id (no main party key)  -> EXC_STG_BAD_REC_MEMB ('Invalid_Member')
 --        Invalid_Ref_Alt_Id  (no related key)     -> EXC_STG_BAD_REC_MEMB ('Invalid_Ref_Member')
@@ -40,7 +40,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime / systimestamp()
 BEGIN
-    sp_ors_helper01_common('C_S_TRS_PTY_RLE_REL');
+    -- Not performed: IDQ "truncate target table" of C_S_TRS_PTY_RLE_REL. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- rtr_AltId_Exp.Invalid_Main_Alt_Id

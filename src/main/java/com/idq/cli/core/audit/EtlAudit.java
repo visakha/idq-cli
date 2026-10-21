@@ -7,7 +7,6 @@ import com.idq.cli.core.MappingResult;
 import com.idq.cli.core.audit.EtlEvent.RowSample;
 import com.idq.cli.core.audit.EtlEvent.RunId;
 import com.idq.cli.core.exception.BadRecord;
-import com.idq.cli.core.target.LoadMode;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.MemberMapping;
@@ -126,9 +125,8 @@ public class EtlAudit {
     private <T> RowSample readBack(TargetBatch<T> batch) {
         var entity = batch.entity();
         var persistent = aggregates.getConverter().getMappingContext().getRequiredPersistentEntity(entity);
-        if (batch.mode() instanceof LoadMode.DeleteByKey<T> || entity == BadRecord.class) {
-            var note = batch.mode() instanceof LoadMode.DeleteByKey<T> ? "rows deleted by key"
-                    : "rows appended (the table has no key to read them back by)";
+        if (entity == BadRecord.class) {
+            var note = "rows appended (the table has no key to read them back by)";
             return new RowSample(batch.table(), entity, batch.rows().size(), head(batch.rows()), note);
         }
         var ids = head(batch.rows()).stream()

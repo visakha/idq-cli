@@ -6,8 +6,6 @@ import com.idq.cli.config.EtlProcess;
 import com.idq.cli.config.EtlSettings;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 /// `mock-data-pre-fix` handling and the SQL recorded for the audit reports.
@@ -15,7 +13,7 @@ class MockTablesTest {
 
     static MockTables tables(String prefix) {
         return new MockTables(null, null, new EtlSettings(EtlProcess.JAVA, true, true, true, 20, prefix, true,
-                Set.of(), null, null));
+                null, null));
     }
 
     @Test
@@ -38,10 +36,7 @@ class MockTablesTest {
         params.put("NAME", "O'Hara");
         params.put("DOB", LocalDateTime.of(2020, 5, 1, 8, 30));
         params.put("MID", null);
-        assertThat(MockTables.sql("INSERT INTO T (ID, NAME, DOB, MID) VALUES (:ID, :NAME, :DOB, :MID)", params))
-                .isEqualTo("INSERT INTO T (ID, NAME, DOB, MID) VALUES (9100000001, 'O''Hara', "
-                        + "TIMESTAMP '2020-05-01 08:30:00', NULL);");
-        assertThat(MockTables.sql("DELETE FROM T WHERE ID LIKE '9100000___'", Map.of()))
-                .isEqualTo("DELETE FROM T WHERE ID LIKE '9100000___';");
+        assertThat(params.values().stream().map(MockTables::literal).toList())
+                .containsExactly("9100000001", "'O''Hara'", "TIMESTAMP '2020-05-01 08:30:00'", "NULL");
     }
 }

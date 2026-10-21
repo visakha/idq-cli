@@ -114,23 +114,21 @@ public class FssRelationshipService {
                     relationships.add(new FssTargets.Relationship(key, audit, new Columns.Relationship(fromRole(r),
                             toRole(r), "Member Relationship", "Member", type)));
                 });
-        return MappingOutput.empty().load(TargetBatch.replaceAll(FssTargets.Relationship.class,
+        return MappingOutput.empty().load(TargetBatch.append(FssTargets.Relationship.class,
                 Rows.lastPerKey(relationships, FssTargets.Relationship::pkeySrcObject))).reject(bad);
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(FssRelationshipRepository.TABLE, replaceRelationships(output.rows(FssTargets.Relationship.class)));
+        loaded.put(FssRelationshipRepository.TABLE, insertRelationships(output.rows(FssTargets.Relationship.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceRelationships(List<FssTargets.Relationship> rows) {
-        settings.requireClearable(FssRelationshipRepository.TABLE);
-        relationships.deleteAll();
+    int insertRelationships(List<FssTargets.Relationship> rows) {
         return relationships.insertAll(rows).size();
     }
 }

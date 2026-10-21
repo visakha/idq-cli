@@ -56,6 +56,7 @@ command). The prompt shows the latched context, e.g. `TRS+C_S_TRS_PTY+m_Tgt_C_S_
 | `fill-sample-mock-data` | Faker rows via `fill_sample_mock_data_<mapping>` |
 | `fill-sample-real-data` | Placeholder (`RealSampleData`) |
 | `run-etl` | Whole workflow of the latched source (mock rows first when `mock_data=true`), then audit reports |
+| `compare-etl-process` | Prompts for a source system, runs ORA_SP then IDQ on the same (unchanged) source data and writes `compare_runs_<SOURCE>/<SOURCE>_ORA_SP_vs_IDQ_<time>.md` |
 | `run-unit-tests` | PKEY unit test of the latched mapping |
 
 ## Entity models and audit reports
@@ -90,10 +91,10 @@ belong to MDM and live apart, in `com.idq.cli.mdmdc.etldb` (`models.<Src>Targets
 | `etldb.models` | `EciSources` (source tables / views, plus the workflow tables `STG_ECI_PTY_INACTIVE_*`), `EciQueryRows` (`IdqMapInitQuery` and lookup rows) |
 | `etldb.repo` | One repository per source or workflow table, bound to that table's entity. Source repositories own the `@Query` that reads them (`EciChildDeltaRepository#fetchPartyDemographics`); the `C_S_*` repositories in `mdmdc.etldb.repo` expose only `deleteAll` and `insertAll` |
 | `etldb.svc` | Reserved for pure database services that combine several repositories into one business function (no IDQ logic) |
-| `etlmap.svc` | One plain `@Service` per mapping (`EciPartyService` = `m_Tgt_C_S_ECI_Pty`), registered by `EciMappings`: fetch the init-query rows and lookups, `transform` (the IDQ logic, unchanged), then `load` through named steps such as `replaceParties` / `replacePartyRoles` |
+| `etlmap.svc` | One plain `@Service` per mapping (`EciPartyService` = `m_Tgt_C_S_ECI_Pty`), registered by `EciMappings`: fetch the init-query rows and lookups, `transform` (the IDQ logic, unchanged), then `load` through named steps such as `insertParties` / `insertPartyRoles` |
 
 Rows are inserted with `insertAll` (fragment `core.repo.InsertRepository`), never `save`: the keys are assigned, so
-`save` would issue an `UPDATE`. Emptying a target still requires it to be on the clearable-tables whitelist.
+`save` would issue an `UPDATE`. Nothing is ever deleted: repositories expose no delete method.
 
 Three tables have a composite key, modelled as a nested `Key` record annotated `@Id` (see
 `instructions-for-rewrite.md`, "Primary Keys for few tables"):
@@ -140,16 +141,17 @@ Port `8085`, base path `/api/etl`; every CLI command has an endpoint (table in `
 | `idq.mock.rows-per-table` | `20` | Mock rows per source table |
 | `mock-data-pre-fix` | (empty) | Prefix for free-text mock values: `Test_001` gives `Test_001-JaneDoe@gmail.com` |
 | `idq.bootstrap-missing-objects` | `true` | Create (never drop) tables of `db/missing-objects.sql` that do not exist |
-| `idq.clearable-tables-file` | `classpath:db/clearable-tables.txt` | Whitelist of tables a mapping may empty |
 | `idq.report.enabled` | `true` | Write the `adhoc_runs_<SOURCE>` audit reports |
 | `idq.report.base-dir` | `.` | Directory that holds the `adhoc_runs_<SOURCE>` folders |
 | `idq.report.max-rows` | `200` | Rows shown per table in a report (max 1000; totals are always shown) |
+| `idq.compare.ignore-columns` | `ROWID_OBJECT,CREATE_DATE,...` | `compare-etl-process`: columns left out of the target comparison |
 | `idq.wallet-dir`, `IDQ_DB_USER`, `IDQ_DB_PASSWORD` | `docs/wallet`, ADMIN | OCI wallet and credentials |
 
 ## Notes
 
-* No table is ever dropped. A full-table delete is only allowed for tables in `db/clearable-tables.txt`; other
-  targets are refused by the services (`EtlSettings.requireClearable`). Never run `docs/*_EXPORT_OCT_16.sql`: they contain `DROP TABLE`.
+* Nothing is ever deleted, truncated or dropped, in Java or in the `idq-to-oracle` procedures: loads and mock fills
+  only insert (safe for production data). The IDQ *Truncate target table* option and `DD_DELETE` are therefore not
+  reproduced; empty the targets yourself before a reload. Never run `docs/*_EXPORT_OCT_16.sql`: they contain `DROP TABLE`.
 * `db/missing-objects.sql` holds `CREATE TABLE` statements (generated from the workflow XML) for objects missing in
   the OCI schema, e.g. the `V_*` source views, which are created as tables and filled with mock data.
 * The `C_S_*` timeline columns (VERSION_SEQ, PERIOD_REFERENCE_TIME, TIMELINE_ACTION) and the version loops are

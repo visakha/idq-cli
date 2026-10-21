@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_FSS_Pty_Rle_Alt_Id (workflow wf_FSS_Stage_Load).
 --
--- One alternate id per active FSS client into C_S_FSS_PTY_RLE_ALT_ID (truncated first): the FSS client id,
+-- One alternate id per active FSS client into C_S_FSS_PTY_RLE_ALT_ID (insert only, never truncated): the FSS client id,
 -- type '022' for SOURCE_TYPE 'CLIENT' and '023' otherwise.
 --   Read_V_FSS_ETL_SRC (last active registration) -> Filter: party not in STG_FSS_PTY_INACTIVE_STS -> target
 --
@@ -14,7 +14,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_FSS_Pty_Rle_Alt_Id';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime
 BEGIN
-    sp_ors_helper01_common('C_S_FSS_PTY_RLE_ALT_ID');
+    -- Not performed: IDQ "truncate target table" of C_S_FSS_PTY_RLE_ALT_ID. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT INTO C_S_FSS_PTY_RLE_ALT_ID
            (PKEY_SRC_OBJECT, PTY_RLE_FK, ALT_ID_TP, ALT_ID_VAL, SRC_LAST_UPD_DT, HUB_STATE_IND, STS_CD, SRC_ROWID,

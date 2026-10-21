@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
@@ -22,7 +20,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /// Test-fixture writer for mock source rows: entity records (`<Src>Sources`, `ReferenceTables`, ...) inserted through
-/// Spring Data JDBC. Only rows inside the mock id ranges (or carrying the mock marker) are ever deleted.
+/// Spring Data JDBC. Nothing is ever deleted: when the mock rows of a table already exist (mock id range or mock
+/// marker), they are kept and that table is not filled again.
 ///
 /// Free-text values go through [#text] to get the `mock-data-pre-fix`; every statement can be [#record]ed as
 /// replayable SQL for the audit reports.
@@ -32,7 +31,6 @@ public class MockTables {
     public static final String MARKER = "IDQ_CLI_MOCK";
 
     private static final DateTimeFormatter TIMESTAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final Pattern PARAMETER = Pattern.compile(":(\\w+)");
     private static final EntityInstantiators INSTANTIATORS = new EntityInstantiators();
 
     private final JdbcAggregateTemplate aggregates;
@@ -40,6 +38,7 @@ public class MockTables {
     private final EtlSettings settings;
     private final Map<String, Map<String, Integer>> columns = new ConcurrentHashMap<>();
     private final ThreadLocal<List<String>> recorder = new ThreadLocal<>();
+    private final ThreadLocal<java.util.Set<String>> skippedTables = new ThreadLocal<>();
 
     public MockTables(JdbcAggregateTemplate aggregates, NamedParameterJdbcTemplate jdbc, EtlSettings settings) {
         this.aggregates = aggregates;
@@ -57,16 +56,22 @@ public class MockTables {
     public List<String> record(Runnable work) {
         var statements = new ArrayList<String>();
         recorder.set(statements);
+        skippedTables.set(new java.util.HashSet<>());
         try {
             work.run();
         } finally {
             recorder.remove();
+            skippedTables.remove();
         }
         return List.copyOf(statements);
     }
 
-    /// Inserts one entity. Prefixed free text longer than its column is cut at the end, so the prefix survives.
+    /// Inserts one entity. Prefixed free text longer than its column is cut at the end, so the prefix survives. Rows
+    /// of a table whose earlier mock rows are kept ([#skipIfPresent]) are not inserted.
     public <R extends Record> R insert(R row) {
+        if (skipped().contains(entityOf(row).getTableName().getReference().toUpperCase())) {
+            return row;
+        }
         var fitted = fitted(row);
         var statements = recorder.get();
         if (statements != null) {
@@ -79,29 +84,46 @@ public class MockTables {
         return rows.stream().map(this::insert).toList();
     }
 
-    /// Deletes previously generated rows: `column BETWEEN from AND to`.
-    public int deleteRange(String table, String column, long from, long to) {
+    /// Keeps mock rows from an earlier fill instead of generating new ones: when `table` already has rows with
+    /// `column BETWEEN from AND to`, every later [#insert] into that table in the current fill is skipped. Nothing is
+    /// ever deleted.
+    public boolean skipIfPresent(String table, String column, long from, long to) {
         if (!columnsOf(table).containsKey(column)) {
-            return 0;
+            return false;
         }
-        return execute("DELETE FROM " + table + " WHERE " + column + " BETWEEN :f AND :t", Map.of("f", from, "t", to));
+        return skipIf(table, column + " BETWEEN :f AND :t", Map.of("f", from, "t", to));
     }
 
-    /// Deletes previously generated rows: `column = 'IDQ_CLI_MOCK'`.
-    public int deleteMarked(String table, String markerColumn) {
+    /// As [#skipIfPresent] for rows marked `column = 'IDQ_CLI_MOCK'`.
+    public boolean skipIfMarked(String table, String markerColumn) {
         if (!columnsOf(table).containsKey(markerColumn)) {
-            return 0;
+            return false;
         }
-        return execute("DELETE FROM " + table + " WHERE " + markerColumn + " = :m", Map.of("m", MARKER));
+        return skipIf(table, markerColumn + " = :m", Map.of("m", MARKER));
     }
 
-    /// A `DELETE` that the range and marker helpers cannot express.
-    public int execute(String sql, Map<String, ?> params) {
-        var statements = recorder.get();
-        if (statements != null) {
-            statements.add(sql(sql, params));
+    /// As [#skipIfPresent] for rows matching any `condition` (named parameters).
+    public boolean skipIf(String table, String condition, Map<String, ?> params) {
+        var present = exists(table, condition, params);
+        if (present) {
+            skipped().add(table.toUpperCase());
         }
-        return jdbc.update(sql, params);
+        return present;
+    }
+
+    /// `SELECT COUNT(*) FROM <table> WHERE <condition>` is not zero.
+    public boolean exists(String table, String condition, Map<String, ?> params) {
+        var count = jdbc.queryForObject("SELECT COUNT(*) FROM " + table + " WHERE " + condition, params, Long.class);
+        return count != null && count > 0;
+    }
+
+    private java.util.Set<String> skipped() {
+        var tables = skippedTables.get();
+        if (tables == null) {
+            tables = new java.util.HashSet<>();
+            skippedTables.set(tables);
+        }
+        return tables;
     }
 
     /// Column name to maximum character length (`DATA_LENGTH`).
@@ -170,13 +192,6 @@ public class MockTables {
                 out.put((prefix + property.getColumnName().getReference()).toUpperCase(), value);
             }
         });
-    }
-
-    /// The statement with its named parameters replaced by SQL literals, terminated by `;`.
-    static String sql(String sql, Map<String, ?> params) {
-        var replaced = PARAMETER.matcher(sql.strip()).replaceAll(m -> params.containsKey(m.group(1))
-                ? Matcher.quoteReplacement(literal(params.get(m.group(1)))) : Matcher.quoteReplacement(m.group()));
-        return replaced + ";";
     }
 
     static String literal(Object value) {

@@ -4,7 +4,7 @@
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_TOA (workflow wf_TRS_Stage_Load_1_Ongoing).
 --
 -- Type of assistance of valid TIERS members (STG_TRS_D_CV_MCI_EDG_INDV_TOA, latest create per individual / EDG /
--- program / MCI sequence) into C_S_TRS_PTY_RLE_TOA (truncated first):
+-- program / MCI sequence) into C_S_TRS_PTY_RLE_TOA (insert only, never truncated):
 --   -> lkp_LOOKUP_CODE_VALUE (code type TOA, source 'TRS') -> rtr_Valid_Records
 --        Bad_Value (TOA code does not translate)            -> EXC_STG_BAD_REC_MEMB ('Invalid_TOA')
 --        Period_Begin_Date_GT_Period_End_Date (BEGIN > END) -> EXC_STG_BAD_REC_MEMB
@@ -25,7 +25,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TRS_Pty_Rle_TOA';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime / systimestamp()
 BEGIN
-    sp_ors_helper01_common('C_S_TRS_PTY_RLE_TOA');
+    -- Not performed: IDQ "truncate target table" of C_S_TRS_PTY_RLE_TOA. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- rtr_Valid_Records.Bad_Value -> exp_Stage_Exceptions -> Write_Exc_Stg_Bad_Rec_Memb

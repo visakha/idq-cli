@@ -79,23 +79,21 @@ public class FssAlternateIdService {
             return new FssTargets.AlternateId(pkey(r), audit, new Columns.AlternateId(memberRole(r.ptySrcKey()), type,
                     lpad(r.idClient(), 10, '0'), "Issued", type, null));
         }).toList();
-        return MappingOutput.empty().load(TargetBatch.replaceAll(FssTargets.AlternateId.class,
+        return MappingOutput.empty().load(TargetBatch.append(FssTargets.AlternateId.class,
                 Rows.lastPerKey(ids, FssTargets.AlternateId::pkeySrcObject)));
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(FssAlternateIdRepository.TABLE, replaceAlternateIds(output.rows(FssTargets.AlternateId.class)));
+        loaded.put(FssAlternateIdRepository.TABLE, insertAlternateIds(output.rows(FssTargets.AlternateId.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceAlternateIds(List<FssTargets.AlternateId> rows) {
-        settings.requireClearable(FssAlternateIdRepository.TABLE);
-        alternateIds.deleteAll();
+    int insertAlternateIds(List<FssTargets.AlternateId> rows) {
         return alternateIds.insertAll(rows).size();
     }
 }

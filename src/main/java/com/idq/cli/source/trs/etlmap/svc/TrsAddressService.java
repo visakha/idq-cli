@@ -110,7 +110,7 @@ public class TrsAddressService {
                 .thenComparing(Rows.desc(r -> r.columns().effStrtDt())));
         return MappingOutput.empty()
                 .load(TargetBatch.append(DqmAddress.class, dqm))
-                .load(TargetBatch.replaceAll(TrsTargets.Address.class,
+                .load(TargetBatch.append(TrsTargets.Address.class,
                         Rows.firstPerKey(latestFirst, TrsTargets.Address::pkeySrcObject)))
                 .reject(bad);
     }
@@ -130,7 +130,7 @@ public class TrsAddressService {
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(DqmAddressRepository.TABLE, auditValidatedAddresses(output.rows(DqmAddress.class)));
-        loaded.put(TrsAddressRepository.TABLE, replaceAddresses(output.rows(TrsTargets.Address.class)));
+        loaded.put(TrsAddressRepository.TABLE, insertAddresses(output.rows(TrsTargets.Address.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
@@ -141,9 +141,7 @@ public class TrsAddressService {
         return dqmAddresses.insertAll(rows).size();
     }
 
-    int replaceAddresses(List<TrsTargets.Address> rows) {
-        settings.requireClearable(TrsAddressRepository.TABLE);
-        addresses.deleteAll();
+    int insertAddresses(List<TrsTargets.Address> rows) {
         return addresses.insertAll(rows).size();
     }
 }

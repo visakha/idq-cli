@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Rle_Rel (workflow wf_ECI_Stage_Load).
 --
--- Family <-> child relationships into C_S_ECI_PTY_RLE_REL (truncated first). Every STG_ECI_D_FAMILY row is read
+-- Family <-> child relationships into C_S_ECI_PTY_RLE_REL (insert only, never truncated). Every STG_ECI_D_FAMILY row is read
 -- twice (custom SQL, 'To Child' and 'From Child'):
 --   * To Child  : family -> child, relationship code = FAMILY_CD
 --   * From Child: child -> family, relationship code = FAMILY_CD || '|' || child gender (STG_ECI_SN_CHILD.GENDER)
@@ -22,7 +22,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_ECI_Pty_Rle_Rel';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- SYSTIMESTAMP()
 BEGIN
-    sp_ors_helper01_common('C_S_ECI_PTY_RLE_REL');
+    -- Not performed: IDQ "truncate target table" of C_S_ECI_PTY_RLE_REL. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Route_Good_vs_Exceptions.Valid_Relations -> Exp_Build_Reln -> Write_C_S_ECI_PTY_RLE_REL

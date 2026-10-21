@@ -87,8 +87,7 @@ class FssPkeyTest {
 
         assertThat(out.rows(FssSources.InactiveStatus.class))
                 .extracting(FssSources.InactiveStatus::srcKey, FssSources.InactiveStatus::deactivationSts)
-                .containsExactly(org.assertj.core.groups.Tuple.tuple("0000000012", null),
-                        org.assertj.core.groups.Tuple.tuple("0000000011", "H"),
+                .containsExactly(org.assertj.core.groups.Tuple.tuple("0000000011", "H"),
                         org.assertj.core.groups.Tuple.tuple("0000000012", "Reactivation"));
     }
 

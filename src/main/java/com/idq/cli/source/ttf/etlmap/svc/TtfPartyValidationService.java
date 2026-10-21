@@ -15,7 +15,6 @@ import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.reference.LookupRows;
 import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.rules.NameStandardization;
-import com.idq.cli.core.target.LoadMode;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.source.ttf.etldb.models.TtfQueryRows.ClientName;
@@ -130,8 +129,7 @@ public class TtfPartyValidationService {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(TtfInactiveLogRepository.TABLE, logActivationChanges(output.rows(TtfSources.InactiveLog.class)));
         for (var batch : output.batches(TtfSources.InactiveStatus.class)) {
-            loaded.merge(TtfInactiveStatusRepository.TABLE, batch.mode() instanceof LoadMode.DeleteByKey<?>
-                    ? removeReactivatedStatuses(batch.rows()) : recordNewDeactivations(batch.rows()), Integer::sum);
+            loaded.merge(TtfInactiveStatusRepository.TABLE, recordNewDeactivations(batch.rows()), Integer::sum);
         }
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
@@ -141,11 +139,6 @@ public class TtfPartyValidationService {
 
     int logActivationChanges(List<TtfSources.InactiveLog> logs) {
         return inactiveLog.insertAll(logs).size();
-    }
-
-    int removeReactivatedStatuses(List<TtfSources.InactiveStatus> reactivated) {
-        return reactivated.stream()
-                .mapToInt(s -> inactiveStatuses.deleteBySrcKeyAndRowidSystem(s.srcKey(), s.rowidSystem())).sum();
     }
 
     int recordNewDeactivations(List<TtfSources.InactiveStatus> deactivated) {

@@ -11,7 +11,7 @@
 --           Bad_Phone_Records (any code)                 -> EXC_STG_BAD_REC_MEMB
 --   e-mail: Filt_null_email -> rule_email_validation_v01 -> rtr_Valid_EAddr_Records
 --           Valid_Records -> C_S_WIC_PTY_RLE_EADDR ; Bad_Records -> EXC_STG_BAD_REC_MEMB
--- Both C_S targets are truncated first.
+-- Both C_S targets are only inserted into; nothing is truncated.
 --
 -- TIMELINE: VERSION_SEQ = '1' on both targets; PERIOD_START_DATE = DATEKEY.
 -- The e-mail key uses the e-mail as read (no trim), unlike ECI.
@@ -21,8 +21,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- SYSTIMESTAMP()
 BEGIN
-    sp_ors_helper01_common('C_S_WIC_PTY_RLE_PHN');
-    sp_ors_helper01_common('C_S_WIC_PTY_RLE_EADDR');
+    -- Not performed: IDQ "truncate target table" of C_S_WIC_PTY_RLE_PHN, C_S_WIC_PTY_RLE_EADDR. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- RTR_Valid_PhoneNumbers.Good_Records -> Write_C_S_WIC_PTY_RLE_PHN

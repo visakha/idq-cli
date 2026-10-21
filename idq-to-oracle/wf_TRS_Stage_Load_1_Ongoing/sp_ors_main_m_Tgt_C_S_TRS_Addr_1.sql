@@ -5,7 +5,7 @@
 --
 -- Part 1 of the TIERS address load: every UNIQUE address of the daily extract (STG_TRS_D_INDV_ADDR, distinct on the
 -- address parts) goes through the address validator once (about a tenth of the volume), and every result, good or
--- bad, is written to the intermediate table STG_TRS_D_UNQ_ADDR (truncated first). m_Tgt_C_S_TRS_Addr_2 joins it back
+-- bad, is written to the intermediate table STG_TRS_D_UNQ_ADDR (insert only, never truncated). m_Tgt_C_S_TRS_Addr_2 joins it back
 -- to the individuals.
 --   -> lkp_Addr_Street_Type (STG_TRS_CD_REF) + exp_TRS_Addr_Derivation:
 --        line 1 = street number, fraction, direction (EA/NO/SO/WE abbreviated to the first letter, any case), street
@@ -20,7 +20,7 @@ CREATE OR REPLACE PROCEDURE sp_ors_main_m_Tgt_C_S_TRS_Addr_1
 IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TRS_Addr_1';
 BEGIN
-    sp_ors_helper01_common('STG_TRS_D_UNQ_ADDR');
+    -- Not performed: IDQ "truncate target table" of STG_TRS_D_UNQ_ADDR. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT INTO STG_TRS_D_UNQ_ADDR
            (ADDR_ID, ADDR_LN_1, ADDR_LN_2, BLDNG_NM, FLR_NUM, CITY, COUNTY, STATE, CNTRY_CD, PSTL_CD, PSTL_CD_EXT, LATTD,

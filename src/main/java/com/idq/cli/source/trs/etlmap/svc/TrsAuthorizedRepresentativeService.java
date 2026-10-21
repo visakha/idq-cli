@@ -73,23 +73,21 @@ public class TrsAuthorizedRepresentativeService {
             return new TrsTargets.ManagedAttribute(key, audit,
                     new Columns.ManagedAttribute(toChar(r.indvId()), ATTR_TP_AUTH_REP, r.arFlag()));
         }).toList();
-        return MappingOutput.empty().load(TargetBatch.replaceWhere(TrsTargets.ManagedAttribute.class, "MNG_ATTR_TP",
-                ATTR_TP_AUTH_REP, flags));
+        return MappingOutput.empty().load(TargetBatch.append(TrsTargets.ManagedAttribute.class, flags));
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(TrsManagedAttributeRepository.TABLE,
-                replaceAuthorizedRepresentativeFlags(output.rows(TrsTargets.ManagedAttribute.class)));
+                insertAuthorizedRepresentativeFlags(output.rows(TrsTargets.ManagedAttribute.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceAuthorizedRepresentativeFlags(List<TrsTargets.ManagedAttribute> rows) {
-        managedAttributes.deleteByMngAttrTp(ATTR_TP_AUTH_REP);
+    int insertAuthorizedRepresentativeFlags(List<TrsTargets.ManagedAttribute> rows) {
         return managedAttributes.insertAll(rows).size();
     }
 }

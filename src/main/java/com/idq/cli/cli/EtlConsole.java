@@ -7,6 +7,7 @@ import com.idq.cli.domain.MemberMapping;
 import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.domain.SubDomain;
 import com.idq.cli.mock.SampleData;
+import com.idq.cli.workflow.EtlCompareRunner;
 import com.idq.cli.workflow.MappingCatalog;
 import com.idq.cli.workflow.WorkflowRunner;
 import java.io.File;
@@ -49,6 +50,9 @@ public class EtlConsole {
             new CommandHelp("fill-sample-real-data", "Copy real sample rows (fill_sample_real_data_<mapping>)",
                     "latch-mapping"),
             new CommandHelp("run-etl", "Run the workflow of the latched source system", "latch-source-system"),
+            new CommandHelp("compare-etl-process",
+                    "Run ORA_SP then IDQ on the same source data and compare the target tables (prompts for the source)",
+                    ""),
             new CommandHelp("run-unit-tests", "Run the PKEY unit test of the latched mapping", "latch-mapping"),
             new CommandHelp("help", "Built-in help of the shell", ""),
             new CommandHelp("exit", "Exit the CLI", ""));
@@ -58,14 +62,16 @@ public class EtlConsole {
     private final WorkflowRunner runner;
     private final SampleData sampleData;
     private final EtlSettings settings;
+    private final EtlCompareRunner comparer;
 
     public EtlConsole(LatchState latch, MappingCatalog catalog, WorkflowRunner runner, SampleData sampleData,
-            EtlSettings settings) {
+            EtlSettings settings, EtlCompareRunner comparer) {
         this.latch = latch;
         this.catalog = catalog;
         this.runner = runner;
         this.sampleData = sampleData;
         this.settings = settings;
+        this.comparer = comparer;
     }
 
     public LatchState latch() {
@@ -171,6 +177,26 @@ public class EtlConsole {
         var run = runner.run(source);
         return new WorkflowRunner.WorkflowRun(run.source(), run.engine(), run.results(),
                 Stream.concat(Stream.of(mock), run.output().stream()).toList());
+    }
+
+    /// Runs ORA_SP, then IDQ, on the source tables as they are (no mock data) and compares the target tables; the
+    /// Markdown report is written to `compare_runs_<SOURCE>`. `name` is a source system name or its 1-based position in
+    /// [SourceSystem#values()].
+    public EtlCompareRunner.Comparison compareEtlProcesses(String name) {
+        return comparer.compare(sourceSystem(name));
+    }
+
+    /// `TRS` or `1` (position in the `compare-etl-process` prompt) → [SourceSystem#TRS].
+    public static SourceSystem sourceSystem(String name) {
+        var value = name.trim();
+        if (value.matches("\\d+")) {
+            int index = Integer.parseInt(value) - 1;
+            if (index < 0 || index >= SourceSystem.values().length) {
+                throw new IllegalArgumentException(value + " is not between 1 and " + SourceSystem.values().length);
+            }
+            return SourceSystem.values()[index];
+        }
+        return SourceSystem.valueOf(value.toUpperCase());
     }
 
     public MappingResult runLatchedMapping() {

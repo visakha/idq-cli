@@ -22,6 +22,11 @@ for f in docs/wf_*.xml; do python -I ext-tools/idmc_spec.py "$f" "idmc/$(basenam
 > **Not compiled.** No Oracle database was available while these were written. Compile them in a scratch schema
 > (with the contract stubs) before use, and compare the results with an IDQ run on the same input.
 
+> **Insert only.** The procedures never `TRUNCATE`, `DELETE` or `DROP`, so they are safe to call against production
+> data. The IDQ *Truncate target table* option and the `DD_DELETE` update strategies are deliberately not carried
+> over: every such place is marked `-- Not performed: ...`. A second run on the same data therefore adds the rows
+> again (or fails on a unique key) unless the targets are emptied beforehand, outside this code base.
+
 ## Naming
 
 | Object | Name | Where |
@@ -81,7 +86,6 @@ SQL and say so: `mplt_Member_Pty_Rle_Phn_Consolidation`, `mplt_Member_Pty_Rle_EA
 | `fn_ors_helper10_common` | address issue text (`Addr_Issue_Desc`) |
 | `fn_ors_helper11_common` | `exp_Address_Hold` line 1 |
 | `fn_ors_helper12_common` | `exp_Address_Hold` line 2 |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target option *Truncate target table*) |
 | `sp_ors_helper02_common` | log line per step: mapping, step, row count (`DBMS_OUTPUT`; swap for an audit table if needed) |
 
 ## Install
@@ -130,7 +134,7 @@ only lines in that form.
 | User parameter `$Name` | procedure parameter `p_name` with the IDQ default |
 | `$sys.MappingRunStartTime`, `SYSTIMESTAMP()`, `RUN_DATE` | `l_run_ts`, taken once at the start of the procedure |
 | `$sys.MappingName` | constant `c_mapping` |
-| Target option *Truncate target table* | `sp_ors_helper01_common('<table>')` first. TRUNCATE is DDL and commits, as in IDQ, so a failed run leaves the table empty, as IDQ does |
+| Target option *Truncate target table* | **Not performed.** The procedures never truncate, delete or drop; they only insert. A comment `-- Not performed: IDQ "truncate target table" of ...` marks the place. Empty the targets yourself (outside this code base) before a run if you want IDQ's result |
 | Source with custom SQL | the SQL copied verbatim into a CTE. A source filter or *select distinct* stored next to custom SQL is ignored, because IDQ ignores it too |
 | Expression, Filter, Joiner | SQL expressions, `WHERE`, joins |
 | Lookup on reference data | helper function (`fn_ors_helper03/04/05/08_common`) |
@@ -140,7 +144,7 @@ only lines in that form.
 | Sorter (distinct) | `DISTINCT` |
 | Aggregator without aggregate functions | `ROW_NUMBER()` picking the last row of the group in IDQ sort order (IDQ sorts NULL high) |
 | Normalizer | `UNPIVOT` or a pipelined `fn_dq_norm_*` with `CROSS APPLY TABLE(...)` |
-| Update strategy `DD_DELETE` | `DELETE` |
+| Update strategy `DD_DELETE` | **Not performed** (marked `-- Not performed: the IDQ DD_DELETE of ...`): `STG_<SRC>_PTY_INACTIVE_STS` keeps the status rows of reactivated parties and `STG_TRS_VALID_MEMBERS` keeps deactivated members |
 | IDQ blank test `LENGTH(RTRIM(x)) = 0 OR ISNULL(x)` | `RTRIM(x) IS NULL` (in Oracle, `''` is NULL) |
 | Target port with no link | written as explicit `NULL`, listed in the header |
 
@@ -166,8 +170,8 @@ These are reproduced as IDQ runs them and explained in the procedure headers:
 - **`m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid`**: the IDQ filter tests the source key instead of the lookup result,
   so IDQ writes no rows. The default `p_test_lookup_result => 'N'` reproduces that. Pass `'Y'` for the intended
   behaviour.
-- **`m_Tgt_C_S_FSS_Pty_Validation`**: writes the *Reactivation* row into the STS table, not the LOG table, then
-  deletes the older STS rows of those keys.
+- **`m_Tgt_C_S_FSS_Pty_Validation`**: writes the *Reactivation* row into the STS table, not the LOG table. (IDQ then
+  deletes the older STS rows of those keys; that delete is not performed here.)
 - Exception rows write the **looked-up** exception code where the mapping does (NULL when the code is not in
   `EXC_LOOKUP_CODE_VALUE`), and the computed code elsewhere.
 - Unlinked router or sorter ports (for example `FLR_NUM`, `LCTN_CRDNT_DESC`) are written as NULL.

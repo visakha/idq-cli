@@ -70,8 +70,9 @@ public class EciPkeyTest {
                 new EciPartyValidationService.Lookups(new InactiveStatus.Lookup(Map.of("0000000042", "P")), Map.of(),
                         Set.of(), Set.of()), ctx(EciPartyValidationService.INFO));
 
+        // The reactivated party (0000000042) is only logged: its status row is never deleted, so no row for it here.
         assertThat(out.rows(EciSources.InactiveStatus.class)).extracting(EciSources.InactiveStatus::srcKey)
-                .containsExactly("0000000042", "0000000007F");
+                .containsExactly("0000000007F");
         assertThat(out.rows(EciSources.InactiveLog.class)).extracting(EciSources.InactiveLog::action)
                 .containsExactly("Reactivation", "Deactivation");
     }

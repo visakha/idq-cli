@@ -84,23 +84,21 @@ public class TtfPhoneService {
                     phone.value(), "Primary", MdmAudit.srcRowid(key).periodStart(r.submitdate())
                             .lastUpdated(ctx.runStart()).hubState(1).sourceUpdated(r.submitdate())));
         }
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TtfTargets.Phone.class,
+        return MappingOutput.empty().load(TargetBatch.append(TtfTargets.Phone.class,
                 Rows.lastPerKey(phones, TtfTargets.Phone::pkeySrcObject))).reject(bad);
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TtfPhoneRepository.TABLE, replacePhones(output.rows(TtfTargets.Phone.class)));
+        loaded.put(TtfPhoneRepository.TABLE, insertPhones(output.rows(TtfTargets.Phone.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replacePhones(List<TtfTargets.Phone> rows) {
-        settings.requireClearable(TtfPhoneRepository.TABLE);
-        phones.deleteAll();
+    int insertPhones(List<TtfTargets.Phone> rows) {
         return phones.insertAll(rows).size();
     }
 }

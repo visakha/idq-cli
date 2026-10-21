@@ -103,9 +103,9 @@ public class WicPartyService {
                     new Columns.PartyRole(key, EtlPatterns.MEMBER)));
         }
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(WicTargets.Party.class,
+                .load(TargetBatch.append(WicTargets.Party.class,
                         Rows.lastPerKey(parties, WicTargets.Party::pkeySrcObject)))
-                .load(TargetBatch.replaceAll(WicTargets.PartyRole.class,
+                .load(TargetBatch.append(WicTargets.PartyRole.class,
                         Rows.lastPerKey(roles, WicTargets.PartyRole::pkeySrcObject)))
                 .reject(bad);
     }
@@ -113,23 +113,19 @@ public class WicPartyService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(WicPartyRepository.TABLE, replaceParties(output.rows(WicTargets.Party.class)));
-        loaded.put(WicPartyRoleRepository.TABLE, replacePartyRoles(output.rows(WicTargets.PartyRole.class)));
+        loaded.put(WicPartyRepository.TABLE, insertParties(output.rows(WicTargets.Party.class)));
+        loaded.put(WicPartyRoleRepository.TABLE, insertPartyRoles(output.rows(WicTargets.PartyRole.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceParties(List<WicTargets.Party> rows) {
-        settings.requireClearable(WicPartyRepository.TABLE);
-        parties.deleteAll();
+    int insertParties(List<WicTargets.Party> rows) {
         return parties.insertAll(rows).size();
     }
 
-    int replacePartyRoles(List<WicTargets.PartyRole> rows) {
-        settings.requireClearable(WicPartyRoleRepository.TABLE);
-        partyRoles.deleteAll();
+    int insertPartyRoles(List<WicTargets.PartyRole> rows) {
         return partyRoles.insertAll(rows).size();
     }
 }

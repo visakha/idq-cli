@@ -4,7 +4,7 @@
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Addr (workflow wf_ECI_Stage_Load).
 --
 -- Validates the ECI child and family addresses (V_ECI_ETL_SRC_FAMILY_ADDRESS) with the global address mapplet and
--- loads the good ones into C_S_ECI_PTY_RLE_ADDR (truncated first):
+-- loads the good ones into C_S_ECI_PTY_RLE_ADDR (insert only, never truncated):
 --   Read_V_ECI_ETL_SRC_FAMILY_ADDRESS -> lkp_Address_Type (V_LOOKUP_CODE_VALUE ADDR_TP)
 --     -> Fil_Inactive_recs: party not in STG_ECI_PTY_INACTIVE_STS
 --     -> mplt_Global_Addr_Validation (fn_dq_valid_global_addr)
@@ -33,7 +33,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_ECI_Pty_Addr';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- SYSTIMESTAMP() / $sys.MappingRunStartTime
 BEGIN
-    sp_ors_helper01_common('C_S_ECI_PTY_RLE_ADDR');
+    -- Not performed: IDQ "truncate target table" of C_S_ECI_PTY_RLE_ADDR. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Write_DQM_ADDRESS (all rows that pass Fil_Inactive_recs)

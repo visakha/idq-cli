@@ -78,23 +78,21 @@ public class WicAlternateIdService {
             return new WicTargets.AlternateId(pkey(r), audit, new Columns.AlternateId(memberRole(r.ptySrcKey()), type,
                     lpad(r.id(), 12, '0'), "Issued", type, null));
         }).toList();
-        return MappingOutput.empty().load(TargetBatch.replaceAll(WicTargets.AlternateId.class,
+        return MappingOutput.empty().load(TargetBatch.append(WicTargets.AlternateId.class,
                 Rows.lastPerKey(ids, WicTargets.AlternateId::pkeySrcObject)));
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(WicAlternateIdRepository.TABLE, replaceAlternateIds(output.rows(WicTargets.AlternateId.class)));
+        loaded.put(WicAlternateIdRepository.TABLE, insertAlternateIds(output.rows(WicTargets.AlternateId.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceAlternateIds(List<WicTargets.AlternateId> rows) {
-        settings.requireClearable(WicAlternateIdRepository.TABLE);
-        alternateIds.deleteAll();
+    int insertAlternateIds(List<WicTargets.AlternateId> rows) {
         return alternateIds.insertAll(rows).size();
     }
 }

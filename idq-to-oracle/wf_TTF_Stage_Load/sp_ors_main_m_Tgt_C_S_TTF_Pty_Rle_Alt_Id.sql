@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_TTF_Pty_Rle_Alt_Id (workflow wf_TTF_Stage_Load).
 --
--- One alternate id per active TTF client into C_S_TTF_PTY_RLE_ALT_ID (truncated first): the party key itself,
+-- One alternate id per active TTF client into C_S_TTF_PTY_RLE_ALT_ID (insert only, never truncated): the party key itself,
 -- type '024'.
 --   Read_V_TTF_ETL_SRC -> Filter: party not in STG_TTF_PTY_INACTIVE_STS -> target
 -- The source read stores a SQL text that is only a WHERE fragment (test client ids) and is not in custom-query mode:
@@ -16,7 +16,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TTF_Pty_Rle_Alt_Id';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime
 BEGIN
-    sp_ors_helper01_common('C_S_TTF_PTY_RLE_ALT_ID');
+    -- Not performed: IDQ "truncate target table" of C_S_TTF_PTY_RLE_ALT_ID. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT INTO C_S_TTF_PTY_RLE_ALT_ID
            (PKEY_SRC_OBJECT, HUB_STATE_IND, SRC_ROWID, LAST_UPDATE_DATE, VERSION_SEQ, CREATE_DATE, PTY_RLE_FK,

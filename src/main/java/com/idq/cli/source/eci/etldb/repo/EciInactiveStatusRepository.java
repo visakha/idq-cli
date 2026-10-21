@@ -4,10 +4,8 @@ import com.idq.cli.core.reference.LookupRows.KeyValue;
 import com.idq.cli.core.repo.InsertRepository;
 import com.idq.cli.source.eci.etldb.models.EciSources;
 import java.util.List;
-import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
-import org.springframework.data.repository.query.Param;
 
 /// `STG_ECI_PTY_INACTIVE_STS` - the parties currently deactivated. Written by `m_Tgt_C_S_ECI_Pty_Validation`, read
 /// by every later ECI mapping to drop deactivated parties.
@@ -23,8 +21,4 @@ public interface EciInactiveStatusRepository extends Repository<EciSources.Inact
             """)
     List<KeyValue> fetchInactiveStatuses();
 
-    /// Reactivation: the party's status row is removed (IDQ update strategy `DD_DELETE`).
-    @Modifying
-    @Query("DELETE FROM STG_ECI_PTY_INACTIVE_STS WHERE SRC_KEY = :srcKey AND ROWID_SYSTEM = :rowidSystem")
-    int deleteBySrcKeyAndRowidSystem(@Param("srcKey") String srcKey, @Param("rowidSystem") String rowidSystem);
 }
