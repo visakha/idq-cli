@@ -125,6 +125,44 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Filt_null_email` | `NOT ISNULL(EMAIL)` | **discarded** (not written anywhere) |
 | `rtr_Valid_EAddr_Records` | group `Valid_Records`: `ISNULL(DQ_Exception_Code)` | if `NOT ISNULL(DQ_Exception_Code)`: group `Bad_Records` &rarr; `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr`](../../../idq-to-oracle/wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr (workflow wf_WIC_Stage_Load).
+
+Each WIC row (V_WIC_ETL_SRC) gives one phone and possibly one e-mail:
+  -> fil_deactivated_status: party not in STG_WIC_PTY_INACTIVE_STS, then two branches
+  phone : rule_Phone_Std (usage 001 'Telephone', 'Primary') on EVERY active row (there is no null-phone filter,
+          so a missing phone is validated and, when the rule flags it, logged) -> RTR_Valid_PhoneNumbers
+          Good_Records (no code, or 'Missing_AreaCode') -> C_S_WIC_PTY_RLE_PHN
+          Bad_Phone_Records (any code)                 -> EXC_STG_BAD_REC_MEMB
+  e-mail: Filt_null_email -> rule_email_validation_v01 -> rtr_Valid_EAddr_Records
+          Valid_Records -> C_S_WIC_PTY_RLE_EADDR ; Bad_Records -> EXC_STG_BAD_REC_MEMB
+Both C_S targets are truncated first.
+
+TIMELINE: VERSION_SEQ = '1' on both targets; PERIOD_START_DATE = DATEKEY.
+The e-mail key uses the e-mail as read (no trim), unlike ECI.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_WIC_PTY_RLE_PHN` | truncate, insert |
+| `C_S_WIC_PTY_RLE_EADDR` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_phone` | replaces `rule_Phone_Std`, returns `t_dq_phone` |
+| `fn_dq_valid_email` | replaces `rule_email_validation_v01 (+ local part / domain)`, returns `t_dq_email` |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

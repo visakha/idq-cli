@@ -117,6 +117,69 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `read_Staging_Delta_Tables` | custom SQL query (see the step): only the rows it returns | never read |
 | `rtr_Good_vs_Exception_Pty_Records` | group `Good`: `Score = '100'` | if `Score = '40'`: group `Exception` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if no group matches: **discarded** (default group not linked) |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Addr_2`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Addr_2.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Addr_2 (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Part 2 of the TIERS address load: the individual addresses of the extract (latest create per individual / address
+type / case / EDG) joined to the pre-validated unique addresses of m_Tgt_C_S_TRS_Addr_1 (STG_TRS_D_UNQ_ADDR) and to
+the valid members:
+  -> Write_DQM_ADDRESS (every row)
+  -> lkp_Address_Type (V_LOOKUP_CODE_VALUE ADDR_TP, 'TRS') -> exp_Score_and_Exception_details
+  -> rtr_Good_vs_Exception_Pty_Records
+       Good ('100')     -> exp_Address_Hold -> srt_Party_Role_Addr_By_PKey_Beg_Date
+                           -> exp_Party_Role_Address_Attribute_Hold (VERSION_SEQ) -> C_S_TRS_PTY_RLE_ADDR (truncated)
+       Exception ('40') -> EXC_STG_BAD_REC_MEMB ('Invalid_Address', looked-up code)
+       Default          -> not linked (the score is always '40' or '100')
+
+TIMELINE (stale MDM timeline, ported as IDQ does it):
+  * VERSION_SEQ is a running number per role-address key in (key, SRC_LAST_UPDATE_DATE desc, EFF_END_DT desc,
+    EFF_BEGIN_DT desc; NULL high) order - every row is written, numbered 1, 2, 3, ... within the key.
+  * SRC_ROWID = key || '|' || VERSION_SEQ.
+  * PERIOD_REFERENCE_TIME = run start when EFF_END_DT is set.
+  * PERIOD_END_DATE / EFF_END_DT = mplt_Date_Greater_Than_Fifty_Years(EFF_END_DT): NULL (open) when more than 50
+    years away.
+  * PERIOD_START_DATE / EFF_STRT_DT = EFF_BEGIN_DT.
+The source's "select distinct" flag is ignored by IDQ when custom SQL is used, so it is not applied here either.
+Unfed ports written as NULL: ROWID_OBJECT, DELETED_*, UPDATED_BY, HUB_STATE_IND, USG_TP, CRDNT_SYS, PSTL_BRCD,
+RGN_CD, CREATOR, CREATE_DATE, LCTN_CRDNT_DESC (sorter port without input).
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_member_role_type` | VARCHAR2 | `'Member'` | $Member_Role_Type |
+| `p_member_hierarchy_code` | VARCHAR2 | `'Member'` | $Member_Hierarchy_Code |
+| `p_member_hm_rel_tp_cd` | VARCHAR2 | `'Member Addr'` | $Member_HM_REL_TP_CD |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY_RLE_ADDR` | truncate, insert |
+| `DQM_ADDRESS` | insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_date_within_50y` | replaces `mplt_Date_Greater_Than_Fifty_Years`, returns `t_dq_date_50y` |
+| `fn_ors_helper03_common` | V_LOOKUP_CODE_VALUE lookup: source code -> MSTR_CODE_VALUE (any row) |
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
+| `fn_ors_helper09_common` | address score of exp_Score_and_Exception_details: '40' exception / '100' |
+| `fn_ors_helper10_common` | address issue text of exp_Score_and_Exception_details (Addr_Issue_Desc) |
+| `fn_ors_helper11_common` | exp_Address_Hold line 1: empty line 1 replaced by line 2 |
+| `fn_ors_helper12_common` | exp_Address_Hold line 2: cleared when it repeats the held line 1 |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

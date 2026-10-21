@@ -87,6 +87,46 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Read_STG_TRS_D_DC_Primary_Payee` | custom SQL query (see the step): only the rows it returns | never read |
 | `agg_Dedup_TRS_Pty_Mng_Attr` | one row per `PKEY_SRC_OBJECT` | merged into the one row written for its key |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing (workflow
+wf_TRS_Stage_Load_1_Ongoing). Runs after m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw and APPENDS to C_S_TRS_PTY_MNG_ATTR (no
+truncate).
+
+Authorized-representative flag ('Auth_Rep_Flag' = 'Y') of valid TIERS members whose case has a verified,
+sent authorized representative (custom SQL: six union branches over the payee / case / EDG delta tables):
+  -> srtr_Indv_Id (INDV_ID, EFF_BEGIN_DT) -> exp_Rank -> srtr_Rank (distinct) -> exp_Pkey_Generation
+  -> agg_Dedup_TRS_Pty_Mng_Attr: one row per key (INDV_ID || '|Auth_Rep_Flag'), PERIOD_END_DATE = MAX(EFF_END_DT),
+     every other port from the last row of the group
+
+TIMELINE (stale MDM timeline, ported as IDQ does it):
+  * exp_Rank.VERSION_SEQ_NUM is hard-coded to 1 and written to VERSION_SEQ.
+  * srtr_Rank is a distinct re-sort on INDV_ID around exp_Rank (kept: the DISTINCT below).
+  * PERIOD_START_DATE = EFF_BEGIN_DT of the last row, PERIOD_END_DATE = MAX(EFF_END_DT) per key.
+Last row per key = latest EFF_BEGIN_DT (srtr_Indv_Id order, NULL high), assuming the key-only re-sort keeps it.
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_attr_tp_auth_rep` | VARCHAR2 | `'Auth_Rep_Flag'` | $ATTR_TP_AUTH_REP |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY_MNG_ATTR` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

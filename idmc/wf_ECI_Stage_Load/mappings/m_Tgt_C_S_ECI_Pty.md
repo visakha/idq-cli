@@ -166,6 +166,63 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Flt_Remove_Inactive` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
 | `Rtr_Exception` | group `Valid_Party`: `TRUE`<br>(a row that also matches `Invalid_Birth_Date`, `Invalid_Gender_Code`, `Invalid_Ethnicity`, `Invalid_Race`, `Invalid_Language` is written there as well) | never (condition is always TRUE) |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty`](../../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty (workflow wf_ECI_Stage_Load).
+
+Loads the ECI child and family parties of the delta into C_S_ECI_PTY and C_S_ECI_PTY_RLE (both truncated first)
+and logs demographic exceptions:
+  Read_STG_ECI_D_CHILD_AND_FAMILY (custom SQL)
+    -> Flt_Remove_Inactive: IsNull(DEACTIVATION_STS) on STG_ECI_PTY_INACTIVE_STS (the stored condition is
+       "--not IsNull(...)"; "--not" is an IDQ comment, so ACTIVE parties are kept)
+    -> name standardization, gender, birth date, ethnicity, race indicators, language (fn_dq_* functions)
+    -> Rtr_Exception: Valid_Party is TRUE, so every active party is loaded; each failed rule additionally writes
+       one EXC_STG_BAD_REC_MEMB row (ethnicity, race and language only for child rows).
+The source read also stores a filter on five child ids; it is not part of the custom query and is ignored, as in
+IDQ (custom query mode).
+
+TIMELINE (stale MDM timeline, ported here as IDQ does it):
+  * VERSION_SEQ is hard-coded to 1 (exp_Party_Consolidation.v_VERS_SEQ_NUM = 1) on both targets.
+  * exp_Party_Consolidation also computes DUP_RANK and an MD5 of the demographics for the timeline; neither is
+    written by IDQ, so they are not computed here.
+  * PERIOD_START_DATE: party = source DATE_MODIFIED (DATE_MODIFIED, else DATE_CREATED); role = DATE_CREATED.
+
+Exception rows carry MAPPING_NAME 'm_Tgt_C_S_ECI_Pty_OnGoing' (literal in the IDQ expressions).
+Target load order (IDQ): Write_Invalid_Party_Ethnicity before Write_Invalid_Party_Race; the INTO clauses keep that
+order.
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_pty_bo_class_cd_member` | VARCHAR2 | `'Indv'` | $PTY_BO_CLASS_CD_Member |
+| `p_rle_bo_class_cd_member` | VARCHAR2 | `'Member'` | $RLE_BO_CLASS_CD_Member |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_ECI_PTY` | truncate, insert |
+| `C_S_ECI_PTY_RLE` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_name_indv_member` | replaces `mplt_Name_Standardization_Indv_Member (+ TTF CopyOf)`, returns `t_dq_name_std` |
+| `fn_dq_valid_birth_date` | replaces `mplt_BirthDate_Validation`, returns `t_dq_birth_date` |
+| `fn_dq_valid_ethnicity` | replaces `mplt_Ethnicity_Validation`, returns `t_dq_code_check` |
+| `fn_dq_valid_gender` | replaces `mplt_Gender_Validation`, returns `t_dq_gender` |
+| `fn_dq_valid_language` | replaces `mplt_Language_Validation`, returns `t_dq_code_check` |
+| `fn_dq_valid_race_ind` | replaces `mplt_Race_Ind_Validation`, returns `t_dq_race_ind` |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

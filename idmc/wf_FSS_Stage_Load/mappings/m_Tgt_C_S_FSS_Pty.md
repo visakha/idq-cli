@@ -172,6 +172,55 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Flt_Remove_Inactive` | `isnull(DEACTIVATION_STS)`<br>= no matching row in `STG_FSS_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
 | `Rtr_Exception` | group `Valid_Party`: `TRUE`<br>(a row that also matches `Invalid_Birth_Date`, `Invalid_Gender_Code`, `Invalid_Ethnicity`, `Invalid_Race`, `Invalid_Language`, `Invalid_Suffix` is written there as well) | never (condition is always TRUE) |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_FSS_Pty`](../../../idq-to-oracle/wf_FSS_Stage_Load/sp_ors_main_m_Tgt_C_S_FSS_Pty.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_FSS_Pty (workflow wf_FSS_Stage_Load).
+
+Loads the FSS clients (V_FSS_ETL_SRC, last active registration) into C_S_FSS_PTY and C_S_FSS_PTY_RLE (both
+truncated first) and logs demographic exceptions:
+  -> Flt_Remove_Inactive: party not in STG_FSS_PTY_INACTIVE_STS
+  -> name standardization (with the source suffix), gender, birth date, ethnicity (CD_HISPANIC), race
+     indicators, language, rule_Suffix_Std
+  -> Rtr_Exception: Valid_Party is TRUE (every active client loaded); each failed rule writes an
+     EXC_STG_BAD_REC_MEMB row - gender, ethnicity and race only for SOURCE_TYPE = 'CLIENT', birth date, language
+     and suffix for every row.
+
+TIMELINE: VERSION_SEQ hard-coded to 1 (exp_Party_Consolidation.v_VERS_SEQ_NUM); PERIOD_START_DATE =
+DT_LAST_UPDATE on both targets.
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_pty_bo_class_cd_member` | VARCHAR2 | `'Indv'` | $PTY_BO_CLASS_CD_Member |
+| `p_rle_bo_class_cd_member` | VARCHAR2 | `'Member'` | $RLE_BO_CLASS_CD_Member |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_FSS_PTY` | truncate, insert |
+| `C_S_FSS_PTY_RLE` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_name_indv_member` | replaces `mplt_Name_Standardization_Indv_Member (+ TTF CopyOf)`, returns `t_dq_name_std` |
+| `fn_dq_std_suffix` | replaces `rule_Suffix_Std`, returns `t_dq_suffix` |
+| `fn_dq_valid_birth_date` | replaces `mplt_BirthDate_Validation`, returns `t_dq_birth_date` |
+| `fn_dq_valid_ethnicity` | replaces `mplt_Ethnicity_Validation`, returns `t_dq_code_check` |
+| `fn_dq_valid_gender` | replaces `mplt_Gender_Validation`, returns `t_dq_gender` |
+| `fn_dq_valid_language` | replaces `mplt_Language_Validation`, returns `t_dq_code_check` |
+| `fn_dq_valid_race_ind` | replaces `mplt_Race_Ind_Validation`, returns `t_dq_race_ind` |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

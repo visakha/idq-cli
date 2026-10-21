@@ -96,6 +96,48 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `read_Staging_Delta_Tables` | custom SQL query (see the step): only the rows it returns | never read |
 | `rtr_Valid_Records` | matches none of the other groups (default `Default`) | if `isnull(TOA_CD)`: group `Bad_Value` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `BEGIN_DT > END_DT`: group `Period_Begin_Date_GT_Period_End_Date` &rarr; `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_TOA`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_TOA.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_TOA (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Type of assistance of valid TIERS members (STG_TRS_D_CV_MCI_EDG_INDV_TOA, latest create per individual / EDG /
+program / MCI sequence) into C_S_TRS_PTY_RLE_TOA (truncated first):
+  -> lkp_LOOKUP_CODE_VALUE (code type TOA, source 'TRS') -> rtr_Valid_Records
+       Bad_Value (TOA code does not translate)            -> EXC_STG_BAD_REC_MEMB ('Invalid_TOA')
+       Period_Begin_Date_GT_Period_End_Date (BEGIN > END) -> EXC_STG_BAD_REC_MEMB
+                                                             ('Period_Start_Date_>_Period_End_Date')
+       Default (neither)                                  -> C_S_TRS_PTY_RLE_TOA
+  A row with an untranslated code AND begin > end writes both exception rows.
+  Key = INDV_ID|Member|<TOA master code>|TIERS|<EDG_NUM>|<PROGRAM_CD>|<MCI_CREATE_SEQ>.
+
+TIMELINE: VERSION_SEQ is the source ROW_NUMBER() kept only where it equals 1, i.e. always 1; PERIOD_START_DATE /
+EFF_STRT_DT = BEGIN_DT, PERIOD_END_DATE / EFF_END_DT = END_DT; PERIOD_REFERENCE_TIME is linked to an unfed port.
+IDQ quirks kept: the Bad_Value row writes the looked-up EXCEPTION_CODE (NULL when 'Invalid_TOA' is not
+configured); the date row writes the computed code.
+Unfed ports written as NULL: ROWID_OBJECT, DELETED_*, UPDATED_BY, CREATOR, HUB_STATE_IND, and the name / address /
+phone columns of the Bad_Value exception row.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY_RLE_TOA` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

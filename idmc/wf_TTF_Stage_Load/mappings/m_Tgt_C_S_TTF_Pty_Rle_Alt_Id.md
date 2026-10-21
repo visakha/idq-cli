@@ -70,6 +70,35 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Read_V_TTF_ETL_SRC` | rows the view `V_TTF_ETL_SRC` returns (view logic is outside the export)<br>Note: stored SQL text `"V_TTF_ETL_SRC"."CLIENTS_ID" in ('199933','174065','173853','208422','173896','173851','208486','199906','190234','20854 …` is a WHERE fragment, not a query, and the read has no custom-query mode: it looks unused, confirm | never read |
 | `Filter` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_TTF_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Alt_Id`](../../../idq-to-oracle/wf_TTF_Stage_Load/sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Alt_Id.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TTF_Pty_Rle_Alt_Id (workflow wf_TTF_Stage_Load).
+
+One alternate id per active TTF client into C_S_TTF_PTY_RLE_ALT_ID (truncated first): the party key itself,
+type '024'.
+  Read_V_TTF_ETL_SRC -> Filter: party not in STG_TTF_PTY_INACTIVE_STS -> target
+The source read stores a SQL text that is only a WHERE fragment (test client ids) and is not in custom-query mode:
+it is not applied.
+
+TIMELINE: VERSION_SEQ = 1; PERIOD_START_DATE = run start ($sys.MappingRunStartTime).
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TTF_PTY_RLE_ALT_ID` | truncate, insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

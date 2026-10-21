@@ -225,6 +225,86 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `srtr_Dedup_Rec` | not an exact duplicate of an earlier row | collapsed into the identical row |
 | `Aggregator1` | one row per `PKEY_SRC_OBJECT` | merged into the one row written for its key |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_OnGoing`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_OnGoing.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_OnGoing (workflow wf_TRS_Stage_Load_1_Ongoing, first step).
+
+TIERS individuals (STG_TRS_D_DC_INDV and STG_TRS_D_CV_DC_MCI_INDV) that are valid today (custom SQL: new valid
+individuals plus the existing valid members, minus today's inactivations and earlier deactivations):
+  -> exp_interface: party key = INDV_ID || '|DC_INDV' for DC_INDV rows, INDV_ID for MCI rows
+  -> name standardization, gender, birth date, race (code), ethnicity (code); death date after SYSDATE ->
+     'Invalid_Death_Date' (looked up in EXC_LOOKUP_CODE_VALUE)
+  -> rtr_Invalid_Party (a row goes to every matching group):
+       Invalid_Party_Name  (standardized first or last name blank) -> EXC_STG_BAD_REC_MEMB
+       Invalid_Gender_Code                                         -> EXC_STG_BAD_REC_MEMB
+       Invalid_Death_Date  (configured exception found)            -> EXC_STG_BAD_REC_MEMB
+       Invalid_BirthDate                                           -> EXC_STG_BAD_REC_MEMB
+       Valid_Party (first OR last name present)
+         -> srtr_Dedup_Rec (distinct) -> fltr_Dups (TIMELINE, see below)
+            -> Sorter1 + Aggregator1 (one row per party key)      -> C_S_TRS_PTY        (truncated first)
+            -> Sorter  + Aggregator  (one row per role key)       -> C_S_TRS_PTY_RLE    (truncated first)
+            -> lkp_Stg_TRS_Valid_Members + fltr_New_Valid_Members (key not yet valid)
+               -> srtr_Pkey + agg_Valid_Members (one row per key)  -> STG_TRS_VALID_MEMBERS
+            -> Fil_Race_Exceptions      (race code does not translate, configured) -> EXC_STG_BAD_REC_MEMB
+            -> Fil_Ethnicity_Exceptions (ethnicity code does not translate, configured) -> EXC_STG_BAD_REC_MEMB
+
+An IDQ aggregator without aggregate functions returns the LAST row of each group in arrival order. The rows arrive
+in srtr_Dedup_Rec order (party key, update date, INDV_ID, SRC_TBL, gender, suffix, first, prefix, last, middle,
+birth date, full name; ascending, NULL high), which the downstream sorters on the key alone are taken to preserve;
+ROW_NUMBER() over the reverse of that order picks the same row.
+
+TIMELINE (stale MDM timeline, ported as IDQ does it):
+  * exp_Party_Consolidation: VERSION_SEQ_NUM is hard-coded to 1 (the MD5 / version comparison is commented out in
+    IDQ); DUP_RANK is computed by IDQ but not written - not computed here.
+  * fltr_Dups keeps VERSION_SEQ_NUM = 1, i.e. every row: kept as a no-op condition below.
+  * PERIOD_END_DATE = MAX(PERIOD_END_DATE) of a port that is not fed (NULL); PERIOD_REFERENCE_TIME and
+    TIMELINE_ACTION are linked to unfed ports (NULL); PERIOD_START_DATE = CREATE_DT.
+
+IDQ quirks kept:
+  * The race / ethnicity exception rows write the MASTER code as ATTRIBUTE_VALUE (fltr_Dups.Race_Cd is linked from
+    MDM_Race_Cd), which is NULL exactly when the exception fires. These two targets are fed by a dynamic port group
+    (FieldMapPort), resolved field by field.
+  * C_S_TRS_PTY.HUB_STATE_IND, UPDATED_BY, CREATE_DATE, CREATOR, FLAG_SRC and ROWID_OBJECT / DELETED_* are linked
+    to unfed ports (NULL); the same holds for the role table.
+  * The stored source filter INDV_ID = 504937068 is not part of the custom query and is not applied.
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_pty_bo_class_cd_member` | VARCHAR2 | `'Indv'` | $PTY_BO_CLASS_CD_Member |
+| `p_rle_bo_class_cd_member` | VARCHAR2 | `'Member'` | $RLE_BO_CLASS_CD_Member |
+| `p_dc_indv_tbl_src` | VARCHAR2 | `'DC_INDV'` | $DC_INDV_TBL_SRC |
+| `p_mci_tbl_src` | VARCHAR2 | `'MCI'` | $MCI_TBL_SRC |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY` | truncate, insert |
+| `C_S_TRS_PTY_RLE` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+| `STG_TRS_VALID_MEMBERS` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_name_indv_member` | replaces `mplt_Name_Standardization_Indv_Member (+ TTF CopyOf)`, returns `t_dq_name_std` |
+| `fn_dq_valid_birth_date` | replaces `mplt_BirthDate_Validation`, returns `t_dq_birth_date` |
+| `fn_dq_valid_ethnicity` | replaces `mplt_Ethnicity_Validation`, returns `t_dq_code_check` |
+| `fn_dq_valid_gender` | replaces `mplt_Gender_Validation`, returns `t_dq_gender` |
+| `fn_dq_valid_race` | replaces `mplt_Race_Validation`, returns `t_dq_code_check` |
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

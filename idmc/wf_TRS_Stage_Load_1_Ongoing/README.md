@@ -140,6 +140,27 @@ Which steps can keep a source row out of each `C_S_*` table, and where the diver
 | [`m_Tgt_C_S_TRS_Addr_1`](mappings/m_Tgt_C_S_TRS_Addr_1.md#filtered-data) | (no `C_S_*` target) |  |  |
 | [`m_Tgt_C_S_TRS_Addr_2`](mappings/m_Tgt_C_S_TRS_Addr_2.md#filtered-data) | `C_S_TRS_PTY_RLE_ADDR` | `read_Staging_Delta_Tables`, `rtr_Good_vs_Exception_Pty_Records` | `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedures
+
+Each mapping also has a drop-in Oracle replacement under [idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/) (conventions, install order and the shared `fn_dq_*` / helper objects: [idq-to-oracle/README.md](../../idq-to-oracle/README.md)). Run them in taskflow order (paths of a *Parallel Paths* step may run in parallel sessions); [run_wf_TRS_Stage_Load_1_Ongoing.sql](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/run_wf_TRS_Stage_Load_1_Ongoing.sql) runs them one after another. Each mapping spec has an *Oracle stored procedure* section.
+
+| Mapping | Procedure |
+|---|---|
+| [`m_Tgt_C_S_TRS_Pty_OnGoing`](mappings/m_Tgt_C_S_TRS_Pty_OnGoing.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_OnGoing`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_OnGoing.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Deactivation_1`](mappings/m_Tgt_C_S_TRS_Pty_Deactivation_1.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Deactivation_1`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Deactivation_1.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Rle_TOA`](mappings/m_Tgt_C_S_TRS_Pty_Rle_TOA.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_TOA`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_TOA.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Rel_DeActivation_1`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Rel_DeActivation_1.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_DeActivation_1`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_DeActivation_1.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw`](mappings/m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing`](mappings/m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Nm`](mappings/m_Tgt_C_S_TRS_Pty_Nm.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Nm`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Nm.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Alt_Id`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Alt_Id.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Alt_Id`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Alt_Id.sql) |
+| [`m_Tgt_C_S_TRS_Pty_Rle_Pln`](mappings/m_Tgt_C_S_TRS_Pty_Rle_Pln.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Pln`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Pln.sql) |
+| [`m_Tgt_C_S_TRS_Addr_1`](mappings/m_Tgt_C_S_TRS_Addr_1.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Addr_1`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Addr_1.sql) |
+| [`m_Tgt_C_S_TRS_Addr_2`](mappings/m_Tgt_C_S_TRS_Addr_2.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TRS_Addr_2`](../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Addr_2.sql) |
+
 ## Translation rules applied
 
 | IDQ | CDI | Where |

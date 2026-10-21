@@ -76,6 +76,41 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `fltr_Null_Values` | `NOT ISNULL(ATTR_VALUE) AND LENGTH(RTRIM(ATTR_VALUE)) > 0` | **discarded** (not written anywhere) |
 | `srtr_Pkey` | not an exact duplicate of an earlier row | collapsed into the identical row |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Managed attributes ("switches") of the valid TIERS members into C_S_TRS_PTY_MNG_ATTR (truncated first):
+  Read_Stg_TRS_D_DC_Indv (custom SQL: latest DC_INDV / MCI row per individual joined to STG_TRS_VALID_MEMBERS)
+  -> exp_Attr_Type + nrm_Attribute_Types: one row per attribute (UNPIVOT here)
+       File_Clearance_SW = FILE_CLEARANCE_SW, SSA_Validation_SW = SSA_VALIDATION_SW, TW_Convert_Ind,
+       LTC_Convert_Ind, Source_Table = SRC_TBL
+  -> fltr_Null_Values: value present and not blank
+  -> exp_Pkey_Src_Object: key = PTY_PK || '|' || attribute type
+  -> srtr_Pkey (distinct) -> exp_Version_Seq_No -> target
+
+TIMELINE: exp_Version_Seq_No.VERSION_SEQ_NUM is hard-coded to 1 (the running version counter is commented out in
+IDQ); PERIOD_START_DATE = EFF_BEGIN_DT; PERIOD_END_DATE, PERIOD_REFERENCE_TIME, TIMELINE_ACTION are linked to
+unfed ports (NULL).
+Unfed ports written as NULL: ROWID_OBJECT, DELETED_*, UPDATED_BY, CREATOR, HUB_STATE_IND.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY_MNG_ATTR` | truncate, insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

@@ -126,6 +126,46 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 
 This mapping writes no `C_S_*` table (it loads `EXC_STG_BAD_REC_MEMB`, `STG_WIC_PTY_INACTIVE_STS`, `STG_WIC_PTY_INACTIVE_LOG`); the steps above decide which rows it writes.
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_WIC_Pty_Validation`](../../../idq-to-oracle/wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty_Validation.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_WIC_Pty_Validation (workflow wf_WIC_Stage_Load, first step).
+
+Checks the WIC parties (V_WIC_ETL_SRC) and maintains the deactivation list used by every later WIC mapping:
+  * Rtr_Valid_Party.Invalid_Party_Name : standardized first or last name blank      -> EXC_STG_BAD_REC_MEMB
+  * Rtr_Valid_Party.Deactivation       : the same condition
+                                         -> STG_WIC_PTY_INACTIVE_LOG ('Deactivation')
+                                         -> STG_WIC_PTY_INACTIVE_STS (new row H / D / P, only when no status yet)
+  * Rtr_Valid_Party.Reactivation       : has a status and both names present
+                                         -> STG_WIC_PTY_INACTIVE_LOG ('Reactivation')
+                                         -> STG_WIC_PTY_INACTIVE_STS row deleted (Upd_Delete_Inactive DD_DELETE)
+  * Default group: not linked.
+
+Timeline: none.
+Snapshot: all routing happens in one multi-table INSERT (read-consistent, lookups see the pre-run status); the
+DELETE then removes exactly the keys logged as 'Reactivation' in this run.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `STG_WIC_PTY_INACTIVE_STS` | delete, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+| `STG_WIC_PTY_INACTIVE_LOG` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_name_indv_member` | replaces `mplt_Name_Standardization_Indv_Member (+ TTF CopyOf)`, returns `t_dq_name_std` |
+| `fn_ors_helper02_common` | new deactivation status from the hub state: H history / D deactivated / P |
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

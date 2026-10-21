@@ -90,6 +90,17 @@ Which steps can keep a source row out of each `C_S_*` table, and where the diver
 | [`m_Tgt_C_S_TTF_Pty_Rle_Alt_Id`](mappings/m_Tgt_C_S_TTF_Pty_Rle_Alt_Id.md#filtered-data) | `C_S_TTF_PTY_RLE_ALT_ID` | `Read_V_TTF_ETL_SRC`, `Filter` |  |
 | [`m_Tgt_C_S_TTF_Pty_Rle_Phn`](mappings/m_Tgt_C_S_TTF_Pty_Rle_Phn.md#filtered-data) | `C_S_TTF_PTY_RLE_PHN` | `Read_V_TTF_ETL_SRC`, `fil_deactivated_status`, `Filt_null_phone`, `RTR_Valid_PhoneNumbers` | `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedures
+
+Each mapping also has a drop-in Oracle replacement under [idq-to-oracle/wf_TTF_Stage_Load](../../idq-to-oracle/wf_TTF_Stage_Load/) (conventions, install order and the shared `fn_dq_*` / helper objects: [idq-to-oracle/README.md](../../idq-to-oracle/README.md)). Run them in taskflow order (paths of a *Parallel Paths* step may run in parallel sessions); [run_wf_TTF_Stage_Load.sql](../../idq-to-oracle/wf_TTF_Stage_Load/run_wf_TTF_Stage_Load.sql) runs them one after another. Each mapping spec has an *Oracle stored procedure* section.
+
+| Mapping | Procedure |
+|---|---|
+| [`m_Tgt_C_S_TTF_Pty_Validation`](mappings/m_Tgt_C_S_TTF_Pty_Validation.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TTF_Pty_Validation`](../../idq-to-oracle/wf_TTF_Stage_Load/sp_ors_main_m_Tgt_C_S_TTF_Pty_Validation.sql) |
+| [`m_Tgt_C_S_TTF_Pty`](mappings/m_Tgt_C_S_TTF_Pty.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TTF_Pty`](../../idq-to-oracle/wf_TTF_Stage_Load/sp_ors_main_m_Tgt_C_S_TTF_Pty.sql) |
+| [`m_Tgt_C_S_TTF_Pty_Rle_Alt_Id`](mappings/m_Tgt_C_S_TTF_Pty_Rle_Alt_Id.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Alt_Id`](../../idq-to-oracle/wf_TTF_Stage_Load/sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Alt_Id.sql) |
+| [`m_Tgt_C_S_TTF_Pty_Rle_Phn`](mappings/m_Tgt_C_S_TTF_Pty_Rle_Phn.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Phn`](../../idq-to-oracle/wf_TTF_Stage_Load/sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Phn.sql) |
+
 ## Translation rules applied
 
 | IDQ | CDI | Where |

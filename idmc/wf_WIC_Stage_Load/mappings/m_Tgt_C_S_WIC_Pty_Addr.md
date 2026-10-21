@@ -122,6 +122,57 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Fil_Inactive_recs` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_WIC_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
 | `rtr_Good_vs_Exception_Pty_Records` | group `Good`: `Score = '100'` | if `Score = '40'`: group `Exception` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if no group matches: **discarded** (default group not linked) |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_WIC_Pty_Addr`](../../../idq-to-oracle/wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty_Addr.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_WIC_Pty_Addr (workflow wf_WIC_Stage_Load; copied from the ECI address
+mapping).
+
+Validates the WIC addresses (V_WIC_ETL_SRC) and loads the good ones into C_S_WIC_PTY_RLE_ADDR (truncated first):
+  -> Fil_Inactive_recs: party (PTY_SRC_KEY) not in STG_WIC_PTY_INACTIVE_STS
+  -> mplt_Global_Addr_Validation (fn_dq_valid_global_addr) with state 'TX', country 'US', zip only
+  -> Write_DQM_ADDRESS (every active address)
+  -> rtr_Good_vs_Exception_Pty_Records: Good ('100') -> C_S_WIC_PTY_RLE_ADDR; Exception ('40') -> EXC row
+The address type is the constant '002'.
+
+TIMELINE: VERSION_SEQ = 1; PERIOD_START_DATE / EFF_STRT_DT = DATE_ADDRESS_VALID_FROM; EFF_END_DT and
+PERIOD_REFERENCE_TIME are linked to an unfed port (NULL).
+Unfed ports written as NULL: ROWID_OBJECT, DELETED_*, CREATOR, USG_TP, LCTN_CRDNT_DESC, PSTL_BRCD, RGN_CD,
+SRC_STATE (the source state port is unfed even though 'TX' goes to the validator), SRC_PSTL_CD_EXT,
+ADDRESS_STATE, ADDRESS_ZIP_EXT, PERIOD_END_DATE, FLR_NUM (router port without input link).
+DQM_ADDRESS.PTY_SRC_KEY tests SOURCE_TABLE = 'ECI_FAMILY' (copied from ECI), so it never gets the 'F' suffix.
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_member_hierarchy_code` | VARCHAR2 | `'Member'` | $Member_Hierarchy_Code |
+| `p_member_hm_rel_tp_cd` | VARCHAR2 | `'Member Addr'` | $Member_HM_REL_TP_CD |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_WIC_PTY_RLE_ADDR` | truncate, insert |
+| `DQM_ADDRESS` | insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_valid_global_addr` | replaces `mplt_Global_Addr_Validation (+ rule_Addr_Line_*)`, returns `t_dq_address` |
+| `fn_ors_helper07_common` | IDQ TO_DECIMAL(value, scale): non-numeric -> 0, NULL -> NULL |
+| `fn_ors_helper09_common` | address score of exp_Score_and_Exception_details: '40' exception / '100' |
+| `fn_ors_helper10_common` | address issue text of exp_Score_and_Exception_details (Addr_Issue_Desc) |
+| `fn_ors_helper11_common` | exp_Address_Hold line 1: empty line 1 replaced by line 2 |
+| `fn_ors_helper12_common` | exp_Address_Hold line 2: cleared when it repeats the held line 1 |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

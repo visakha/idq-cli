@@ -127,6 +127,65 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Fil_Inactive_recs` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
 | `rtr_Good_vs_Exception_Pty_Records` | group `Good`: `Score = '100'` | if `Score = '40'`: group `Exception` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if no group matches: **discarded** (default group not linked) |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Addr`](../../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Addr.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Addr (workflow wf_ECI_Stage_Load).
+
+Validates the ECI child and family addresses (V_ECI_ETL_SRC_FAMILY_ADDRESS) with the global address mapplet and
+loads the good ones into C_S_ECI_PTY_RLE_ADDR (truncated first):
+  Read_V_ECI_ETL_SRC_FAMILY_ADDRESS -> lkp_Address_Type (V_LOOKUP_CODE_VALUE ADDR_TP)
+    -> Fil_Inactive_recs: party not in STG_ECI_PTY_INACTIVE_STS
+    -> mplt_Global_Addr_Validation (fn_dq_valid_global_addr)
+    -> exp_Score_and_Exception_details -> Write_DQM_ADDRESS        (every active address, before routing)
+    -> rtr_Good_vs_Exception_Pty_Records
+         Good      (Score = '100') -> exp_Address_Hold -> Write_C_S_ECI_PTY_RLE_ADDR
+         Exception (Score = '40')  -> write_ECI_Exc_Member_Rec (EXC_STG_BAD_REC_MEMB, 'Invalid_Address')
+         Default                   -> not linked (Score is always '40' or '100', so no row reaches it)
+Score '40': address type not physical mail (002) and mailability <= '3'; physical mail with mailability < '3'
+and a match code starting I/N; or an address type that does not translate. Comparisons are on strings, as in IDQ.
+
+TIMELINE (stale MDM timeline, ported as IDQ does it):
+  * VERSION_SEQ = 1 (exp_Stage_Target_Party_Role_Addr_Attributes.VERSION_SEQ_NUM).
+  * PERIOD_REFERENCE_TIME = run start when EFF_END_DT is set; EFF_END_DT is not linked in IDQ, so it is NULL.
+  * PERIOD_START_DATE / EFF_STRT_DT = source LAST_UPDATE_DATE; EFF_END_DT NULL.
+
+Ports linked to targets but fed by nothing in IDQ are written as NULL (ROWID_OBJECT, DELETED_*, CREATOR,
+PSTL_BRCD, RGN_CD, LCTN_CRDNT_DESC, EFF_END_DT, PERIOD_END_DATE of the exception row, and FLR_NUM: the router port
+Sub_buildingNumber has no input link in IDQ).
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_member_hierarchy_code` | VARCHAR2 | `'Member'` | $Member_Hierarchy_Code |
+| `p_member_hm_rel_tp_cd` | VARCHAR2 | `'Member Addr'` | $Member_HM_REL_TP_CD |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_ECI_PTY_RLE_ADDR` | truncate, insert |
+| `DQM_ADDRESS` | insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_valid_global_addr` | replaces `mplt_Global_Addr_Validation (+ rule_Addr_Line_*)`, returns `t_dq_address` |
+| `fn_ors_helper03_common` | V_LOOKUP_CODE_VALUE lookup: source code -> MSTR_CODE_VALUE (any row) |
+| `fn_ors_helper07_common` | IDQ TO_DECIMAL(value, scale): non-numeric -> 0, NULL -> NULL |
+| `fn_ors_helper09_common` | address score of exp_Score_and_Exception_details: '40' exception / '100' |
+| `fn_ors_helper10_common` | address issue text of exp_Score_and_Exception_details (Addr_Issue_Desc) |
+| `fn_ors_helper11_common` | exp_Address_Hold line 1: empty line 1 replaced by line 2 |
+| `fn_ors_helper12_common` | exp_Address_Hold line 2: cleared when it repeats the held line 1 |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

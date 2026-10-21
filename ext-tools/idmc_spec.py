@@ -1120,7 +1120,85 @@ def mapping_filtered(m, mapping, kind='mapping', h='##', title='Filtered data', 
     return doc.lines, summary
 
 
-def build_mapping(m, mapping, kind):
+ORACLE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, 'idq-to-oracle')
+
+
+def oracle_registry():
+    """Purpose of every shared Oracle object, from the tables in the idq-to-oracle/common headers."""
+    reg, last = {}, None
+    for fname in ('02_dq_functions_contract.sql', '03_ors_common_helpers.sql'):
+        path = os.path.join(ORACLE_DIR, 'common', fname)
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding='utf-8') as fh:
+            for line in fh:
+                cells = [c.strip() for c in line.rstrip('\n').lstrip('- ').strip('|').split('|')]
+                if len(cells) == 2 and re.fullmatch(r'(fn|sp)_ors_\w+', cells[0]):
+                    reg[cells[0]], last = cells[1], cells[0]
+                elif len(cells) == 2 and not cells[0] and last:
+                    reg[last] += ' ' + cells[1]
+                elif len(cells) == 3 and re.fullmatch(r'fn_dq_\w+', cells[1]):
+                    reg[cells[1]], last = f'replaces `{cells[0]}`, returns `{cells[2]}`', None
+                else:
+                    last = None
+    return reg
+
+
+def oracle_section(doc, wf, name):
+    """'Oracle stored procedure' section: the sp_ors_main_<mapping> drop-in replacement in idq-to-oracle/<wf>/."""
+    proc = f'sp_ors_main_{name}'
+    path = os.path.join(ORACLE_DIR, wf or '', proc + '.sql')
+    if not wf or not os.path.exists(path):
+        return
+    with open(path, encoding='utf-8') as fh:
+        text = fh.read()
+    lines = text.splitlines()
+    header = []
+    for line in lines[1:]:
+        if line.startswith('-----'):
+            break
+        header.append(line[3:] if line.startswith('-- ') else line[2:])
+    while header and (not header[0].strip() or header[0].strip() == proc):
+        header.pop(0)
+    code = re.sub(r'/\*.*?\*/', ' ', re.sub(r'--[^\n]*', '', text), flags=re.S)
+    doc('## Oracle stored procedure', '',
+        f'Drop-in replacement in Oracle: [`{proc}`](../../../idq-to-oracle/{wf}/{proc}.sql) (set-based SQL; one '
+        f'transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules '
+        f'become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). '
+        f'Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the '
+        f'comments.', '')
+    doc('```text', *header, '```', '')
+    sig = re.search(r'CREATE OR REPLACE PROCEDURE\s+\w+\s*\((.*?)\)\s*IS', text, re.S)
+    if sig:
+        rows = []
+        for line in sig.group(1).splitlines():
+            p = re.match(r"\s*(\w+)\s+IN\s+(\w+)(?:\s+DEFAULT\s+(.*?))?\s*,?\s*(?:--\s*(.*))?$", line)
+            if p:
+                rows.append([f'`{p.group(1)}`', p.group(2), f'`{p.group(3)}`' if p.group(3) else '',
+                             md_cell(p.group(4) or '')])
+        if rows:
+            doc('Parameters:', '')
+            doc.table(['Parameter', 'Type', 'Default', 'Replaces / meaning'], rows)
+    writes = {}
+    for t in re.findall(r"sp_ors_helper01_common\s*\(\s*'(\w+)'", code):
+        writes.setdefault(t.upper(), []).append('truncate')
+    for t in re.findall(r'\bDELETE\s+FROM\s+(\w+)', code, re.I):
+        writes.setdefault(t.upper(), []).append('delete')
+    for t in re.findall(r'\bINTO\s+(\w+)', code, re.I):
+        if not t.lower().startswith('l_'):   # SELECT ... INTO l_<variable>
+            writes.setdefault(t.upper(), []).append('insert')
+    if writes:
+        doc('Tables written:', '')
+        doc.table(['Table', 'Operation'],
+                  [[f'`{t}`', ', '.join(dict.fromkeys(ops))] for t, ops in writes.items()])
+    reg = oracle_registry()
+    used = sorted(set(re.findall(r'\b((?:fn|sp)_ors_helper\d+_\w+|fn_dq_\w+)\b', code)), key=lambda s: (s[:2], s))
+    if used:
+        doc('Shared functions and procedures called:', '')
+        doc.table(['Object', 'Does'], [[f'`{u}`', md_cell(reg.get(u, ''))] for u in used])
+
+
+def build_mapping(m, mapping, kind, wf=None):
     doc = Doc()
     name = mapping.get('name')
     params = [p['name'] for p in mapping_params(m, mapping)]
@@ -1217,6 +1295,8 @@ def build_mapping(m, mapping, kind):
     summary = []
     if name not in RETIRED_MAPPLETS:
         summary = filtered_section(doc, m, mapping, kind, params, order, retired)
+    if kind == 'mapping':
+        oracle_section(doc, wf, name)
 
     doc('## Transformations', '', 'In data-flow order.', '')
     used = set()
@@ -1538,6 +1618,18 @@ def readme(m, wfm, tf, mappings, mapplets, counts, steps, project, folder, retir
                              ', '.join(f'`{x}`' for x in steps_) or ('none' if table else ''),
                              ', '.join(f'`{x}`' for x in diverted)])
         doc.table(['Mapping', '`C_S_*` table', 'Steps that can keep a row out', 'Failed rows diverted to'], rows)
+    procs = [n for n in mappings if os.path.exists(os.path.join(ORACLE_DIR, wfm['name'], f'sp_ors_main_{n}.sql'))]
+    if procs:
+        doc('## Oracle stored procedures', '',
+            'Each mapping also has a drop-in Oracle replacement under '
+            f'[idq-to-oracle/{wfm["name"]}](../../idq-to-oracle/{wfm["name"]}/) (conventions, install order and the '
+            'shared `fn_dq_*` / helper objects: [idq-to-oracle/README.md](../../idq-to-oracle/README.md)). Run them '
+            'in taskflow order (paths of a *Parallel Paths* step may run in parallel sessions); '
+            f'[run_{wfm["name"]}.sql](../../idq-to-oracle/{wfm["name"]}/run_{wfm["name"]}.sql) runs them one after '
+            'another. Each mapping spec has an *Oracle stored procedure* section.', '')
+        doc.table(['Mapping', 'Procedure'],
+                  [[f'[`{n}`](mappings/{n}.md#oracle-stored-procedure)',
+                    f'[`sp_ors_main_{n}`](../../idq-to-oracle/{wfm["name"]}/sp_ors_main_{n}.sql)'] for n in procs])
     doc('## Translation rules applied', '')
     doc.table(['IDQ', 'CDI', 'Where'], [
         ['`$<Param>` (user parameter)', '`$$<Param>` input parameter', 'expressions, conditions, SQL'],
@@ -1589,7 +1681,7 @@ def main(path, out):
     for mp in m.mappings:
         name = mp.get('name')
         kind = 'mapping' if name in mapping_set else 'mapplet'
-        text, used, c, r, fsum = build_mapping(m, mp, kind)
+        text, used, c, r, fsum = build_mapping(m, mp, kind, wfm['name'])
         if kind == 'mapping':
             filtered[name] = fsum
         if kind == 'mapplet' and name not in RETIRED_MAPPLETS:

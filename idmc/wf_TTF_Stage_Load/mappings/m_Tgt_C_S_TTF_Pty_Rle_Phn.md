@@ -106,6 +106,42 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Filt_null_phone` | `not isnull(SRC_PHONE)` | **discarded** (not written anywhere) |
 | `RTR_Valid_PhoneNumbers` | group `Good_Records`: `ISNULL(Phone_Exception_Code)`<br>(a row that also matches `Bad_Phone_Ext__Records` is written there as well) | if `NOT ISNULL(Phone_Exception_Code)`: group `Bad_Phone_Records` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `NOT ISNULL(Phone_Nbr_Ext_Exception_Code)`: group `Bad_Phone_Ext__Records` &rarr; `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Phn`](../../../idq-to-oracle/wf_TTF_Stage_Load/sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Phn.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TTF_Pty_Rle_Phn (workflow wf_TTF_Stage_Load).
+
+One phone per active TTF client (V_TTF_ETL_SRC) into C_S_TTF_PTY_RLE_PHN (truncated first):
+  -> fil_deactivated_status: party not in STG_TTF_PTY_INACTIVE_STS
+  -> Filt_null_phone: PHONE not NULL
+  -> rule_Phone_Std (usage 001 'Telephone', 'Primary') -> RTR_Valid_PhoneNumbers
+       Good_Records (no code)      -> C_S_TTF_PTY_RLE_PHN
+       Bad_Phone_Records (a code)  -> EXC_STG_BAD_REC_MEMB ('Rejected Record')
+       Bad_Phone_Ext__Records      -> never: the extension port feeding rule_Phone_Extension_Std is not fed in IDQ,
+                                      so the extension is NULL and the rule returns no code. Not generated.
+The source read stores an invalid SQL fragment ("PHONE" in ()) that is not in custom-query mode: not applied.
+
+TIMELINE: VERSION_SEQ = '1'; PERIOD_START_DATE = SUBMITDATE.
+SRC_SYS_ID_2 of the exception row is linked to a router port without input (ID_PHONE): NULL.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TTF_PTY_RLE_PHN` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_phone` | replaces `rule_Phone_Std`, returns `t_dq_phone` |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

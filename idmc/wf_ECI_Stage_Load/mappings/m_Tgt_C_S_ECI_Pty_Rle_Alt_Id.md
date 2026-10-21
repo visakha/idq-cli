@@ -149,6 +149,54 @@ Path 3:
 | `Rtr_ALT_ID_Type` | group `MEDICAID_NBR`: `ALT_ID_TP='002'` | if `ALT_ID_TP='004'`: group `CHILD_SSN` &rarr; `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB`<br>if `ALT_ID_TP='018' or ALT_ID_TP='019'`: group `ECI_IDs` &rarr; `C_S_ECI_PTY_RLE_ALT_ID`<br>if no group matches: **discarded** (default group not linked) |
 | `RTR_Valid_Medicaid_ID` | group `VALID_Medicaid_Id`: `ISNULL(Medicaid_Id_Exception_Code)` | if `NOT ISNULL(Medicaid_Id_Exception_Code)`: group `INVALID_Medicaid_Id` &rarr; `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Alt_Id`](../../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Alt_Id.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Rle_Alt_Id (workflow wf_ECI_Stage_Load).
+
+Alternate ids of the ECI parties into C_S_ECI_PTY_RLE_ALT_ID (truncated first):
+  Read_STG_ECI_D_CHILD (custom SQL: child ECI id 018, child SSN 004, Medicaid number 002 via STG_ECI_SN_CASE,
+                        family ECI id 019)
+    -> Filter: party (first 11 characters of the role key, '|' trimmed) not in STG_ECI_PTY_INACTIVE_STS
+    -> Rtr_ALT_ID_Type
+         CHILD_SSN    (004) -> rule_USA_SSN_Validation_post_June2011 -> RTR_Valid_SSN
+                                Valid   -> Union -> target
+                                Invalid -> Exp_SSN_Exceptions -> EXC_STG_BAD_REC_MEMB
+         ECI_IDs  (018/019) -> Union -> target
+         MEDICAID_NBR (002) -> rule_MEDICAID_ID_Std -> RTR_Valid_Medicaid_ID
+                                Valid   -> Union -> target
+                                Invalid -> Exp_Invalid_MedicaidId -> EXC_STG_BAD_REC_MEMB
+         Default            -> not linked (no other type is read)
+The id written is the SOURCE value (the standardized SSN / Medicaid id is only used for validation).
+
+TIMELINE: VERSION_SEQ = 1; PERIOD_START_DATE = source DATE_CREATED.
+
+IDQ quirks kept: the SSN exception row has no RUN_DATE linked (NULL) and writes the EXCEPTION_CODE returned by the
+EXC_LOOKUP_CODE_VALUE lookup (NULL when Invalid_SSN is not configured); the Medicaid exception row writes the
+computed code.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_ECI_PTY_RLE_ALT_ID` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_medicaid_id` | replaces `rule_MEDICAID_ID_Std`, returns `t_dq_ident` |
+| `fn_dq_valid_ssn` | replaces `rule_USA_SSN_Validation_post_June2011`, returns `t_dq_ssn` |
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

@@ -142,6 +142,54 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 
 This mapping writes no `C_S_*` table (it loads `EXC_STG_BAD_REC_MEMB`, `STG_ECI_PTY_INACTIVE_STS`, `STG_ECI_PTY_INACTIVE_LOG`); the steps above decide which rows it writes.
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Validation`](../../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Validation.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Validation (workflow wf_ECI_Stage_Load, first step).
+
+Checks every ECI child and family party of the delta (STG_ECI_D_CHILD + STG_ECI_D_FAMILY) and maintains the
+deactivation list that every later ECI mapping uses as a filter:
+  * Rtr_Valid_Party.Invalid_Party_Name : standardized first or last name blank (and the family is not already
+                                         inactive)                     -> EXC_STG_BAD_REC_MEMB
+  * Rtr_Valid_Party.Deactivation       : name blank, or a duplicate case (V_ECI_ETL_LU_DUP_CASES), or the family is
+                                         inactive (V_ECI_ETL_LU_FAMILY_VALIDATION)
+                                         -> STG_ECI_PTY_INACTIVE_LOG ('Deactivation')
+                                         -> STG_ECI_PTY_INACTIVE_STS (new row, only when the party has no status yet;
+                                            H / D / P from the C_B_PTY_XREF hub state)
+  * Rtr_Valid_Party.Reactivation       : party has a status, names present, not a duplicate, family active
+                                         -> STG_ECI_PTY_INACTIVE_LOG ('Reactivation')
+                                         -> STG_ECI_PTY_INACTIVE_STS row deleted (Upd_Delete_Inactive DD_DELETE)
+  * Default group                      : not linked, rows dropped.
+A row goes to every group whose condition is true (IDQ router semantics), so Invalid_Party_Name rows are also
+Deactivation rows.
+
+Timeline: this mapping has no MDM timeline logic.
+
+Snapshot: the lookups on STG_ECI_PTY_INACTIVE_STS read the table as it was before the run (IDQ static lookup
+cache): all routing happens in one multi-table INSERT (one read-consistent statement). The DELETE that follows
+removes exactly the keys that INSERT logged as 'Reactivation' in this run, so it does not re-evaluate anything.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `STG_ECI_PTY_INACTIVE_STS` | delete, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+| `STG_ECI_PTY_INACTIVE_LOG` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_name_indv_member` | replaces `mplt_Name_Standardization_Indv_Member (+ TTF CopyOf)`, returns `t_dq_name_std` |
+| `fn_ors_helper02_common` | new deactivation status from the hub state: H history / D deactivated / P |
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

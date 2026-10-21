@@ -60,6 +60,46 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 
 This mapping writes no `C_S_*` table (it loads `STG_ECI_D_MEDICAID`); the steps above decide which rows it writes.
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid`](../../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid (workflow wf_ECI_Stage_Load).
+
+Meant to move the latest history row of each Medicaid record of a reactivated child (V_ECI_ETL_LU_REACTIVATED_ID,
+ID_CHILD, via STG_ECI_SN_CASE) from STG_ECI_H_MEDICAID into the delta table STG_ECI_D_MEDICAID:
+  Read_STG_ECI_H_MEDICAID (source filter: latest LOAD_DATE per ID_MEDICAID of reactivated children)
+    -> Lookup_STG_ECI_D_MEDICAID (returns lkp_ID_MEDICAID)
+    -> Filt_Keep_New_Medicaid: IsNull(ID_MEDICAID)
+    -> Write_STG_ECI_D_MEDICAID (insert, no truncate)
+
+IDQ DEFECT CARRIED OVER: the filter tests the SOURCE port ID_MEDICAID, not the lookup result lkp_ID_MEDICAID (the
+sister mappings test the lookup result). ID_MEDICAID is the history key and never NULL, so IDQ writes no rows.
+This procedure reproduces that. To get the intended behaviour, call it with p_test_lookup_result => 'Y', which
+keeps the records not yet in STG_ECI_D_MEDICAID (as m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Addr / _Phn do).
+
+Timeline: none.
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_test_lookup_result` | VARCHAR2 | `'N'` | 'N' = exactly as IDQ (defect), 'Y' = test lkp_ID_MEDICAID |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `STG_ECI_D_MEDICAID` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

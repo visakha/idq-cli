@@ -100,6 +100,45 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Filter_Fam_Child_Valid` | `isnull(CHILD_DEACTIVATION_STS) and isnull(FAM_DEACTIVATION_STS1)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` (lookup `Lkp_CHILD_STG_ECI_PTY_INACTIVE_STS`) and no matching row in `STG_ECI_PTY_INACTIVE_STS` (lookup `Lkp_FAM_STG_ECI_PTY_INACTIVE_STS`) | **discarded** (not written anywhere) |
 | `Route_Good_vs_Exceptions` | group `Valid_Relations`: `NOT IsNull(MSTR_REF_CODE)`<br>= a matching row exists in `LOOKUP_CODE_VALUE` | if `IsNull(MSTR_REF_CODE)`: group `Relation_Exceptions` &rarr; `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Rel`](../../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Rel.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Rle_Rel (workflow wf_ECI_Stage_Load).
+
+Family <-> child relationships into C_S_ECI_PTY_RLE_REL (truncated first). Every STG_ECI_D_FAMILY row is read
+twice (custom SQL, 'To Child' and 'From Child'):
+  * To Child  : family -> child, relationship code = FAMILY_CD
+  * From Child: child -> family, relationship code = FAMILY_CD || '|' || child gender (STG_ECI_SN_CHILD.GENDER)
+  -> Filter_Fam_Child_Valid: neither the child (LPAD(ID_CHILD,10,'0')) nor the family (LPAD(ID_FAMILY,10,'0')||'F')
+     is in STG_ECI_PTY_INACTIVE_STS
+  -> Lkp_Rel_Tp_Code_Value (LOOKUP_CODE_VALUE, code types REL_TP / INVERSE_REL) -> Route_Good_vs_Exceptions
+       Valid_Relations     (code translates)       -> C_S_ECI_PTY_RLE_REL
+       Relation_Exceptions (code does not translate) -> EXC_STG_BAD_REC_MEMB ('Invalid_Relationship')
+
+TIMELINE: VERSION_SEQ = 1; PERIOD_START_DATE = family DATE_CREATED; CREATE_DATE = DATE_MODIFIED (as IDQ links it).
+The exception row writes the EXCEPTION_CODE returned by the EXC_LOOKUP_CODE_VALUE lookup (NULL when
+'Invalid_Relationship' is not configured).
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_ECI_PTY_RLE_REL` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

@@ -142,6 +142,58 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `mplt_EAddr_Consolidation` | `fltr_Null_Email`: keep `ISNULL(ELEC_ADDR) = 0`<br>`srtr_Pkey_Src_Object`: distinct: exact duplicate rows are collapsed into one | **discarded** inside the mapplet |
 | `agg_Pty_Rle_Eaddr` | one row per `PKEY_SRC_OBJECT` | merged into the one row written for its key |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Phones and e-mail of the TIERS case delta (STG_TRS_D_DC_CASES x STG_TRS_DC_CASE_INDV, valid members only) into
+C_S_TRS_PTY_RLE_PHN and C_S_TRS_PTY_RLE_EADDR (both truncated first):
+  -> fltr_Hold (TRUE)
+  phones: mplt_Phone_Normalization (TABLE(fn_dq_norm_member_phn(...))): main PH_NUM (001), work
+          WORK_PH_NUM || ' ' || WORK_PH_NUM_EXT (002), other OTHER_PH_NUM (003); each through rule_Phone_Std
+          -> rtr_Valid_Phone_Records
+               Valid_Records (no code) -> mplt_Phone_Consolidation -> srtr_Pty_Rle_Phone + agg_Pty_Rle_Phone
+                                          -> C_S_TRS_PTY_RLE_PHN
+               Default (a code)        -> EXC_STG_BAD_REC_MEMB
+  e-mail: fltr_Null_Emails -> rule_email_validation_v01 -> rtr_Valid_EAddr_Records
+               Valid_Records -> mplt_EAddr_Consolidation -> srtr_Pty_Rle_Eaddr + agg_Pty_Rle_Eaddr
+                                -> C_S_TRS_PTY_RLE_EADDR
+               Default       -> EXC_STG_BAD_REC_MEMB
+
+mplt_Member_Pty_Rle_Phn_Consolidation / mplt_Member_Pty_Rle_EAddr_Consolidation are set-level mapplets, inlined
+here: drop NULL numbers / addresses, distinct sort on (FILE_DATE - not fed, NULL -, PKEY_SRC_OBJECT,
+PERIOD_START_DATE), running VERSION_SEQ per key, LAST_UPDATE_DATE = SYSTIMESTAMP, SRC_ROWID = key.
+
+TIMELINE (stale MDM timeline, ported as IDQ does it):
+  * VERSION_SEQ: the consolidation mapplets number the distinct versions of a key 1, 2, 3, ... in
+    PERIOD_START_DATE order; the aggregator keeps the LAST row of the key, so VERSION_SEQ = number of distinct
+    versions of that key.
+  * PERIOD_END_DATE = MAX of a port that is not fed (NULL); PERIOD_REFERENCE_TIME and TIMELINE_ACTION are linked
+    to unfed ports (NULL).
+Unfed ports written as NULL: ROWID_OBJECT, DELETED_*, UPDATED_BY, CREATOR, HUB_STATE_IND, USG_TP (e-mail).
+The stored source filter rownum < 100000 is not part of the custom query and is not applied.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY_RLE_PHN` | truncate, insert |
+| `C_S_TRS_PTY_RLE_EADDR` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_norm_member_phn` | replaces `mplt_Member_Pty_Rle_Phn_Normalization (TRS)`, returns `t_dq_member_phn_tab (pipelined)` |
+| `fn_dq_valid_email` | replaces `rule_email_validation_v01 (+ local part / domain)`, returns `t_dq_email` |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.
