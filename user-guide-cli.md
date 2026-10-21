@@ -31,7 +31,7 @@ Contents
 | Domain / sub-domain | Everything implemented is in the `MEMBER` domain (`PROVIDER` is listed but not implemented). Sub-domains: Demographics, Phone-email, Address, Alternate-ID, Alternate-Name, Party-Managed-Attrib, Role. |
 | Mapping | One IDQ mapping ported to Java, e.g. `m_Tgt_C_S_ECI_Pty_Rle_Rel`. 33 mappings in total; each has a document in `docs/mappings/NNN_<mapping>.md`. |
 | Target table | The `C_S_*` staging table a mapping loads, e.g. `C_S_ECI_PTY_RLE_REL`. |
-| IdqMapInitQuery | The first SQL a mapping runs to read its source rows. In Java it is a `@Query` method in `<Src>Queries` returning a record, e.g. `EciQueries.FamilyRelation`. |
+| IdqMapInitQuery | The first SQL a mapping runs to read its source rows. In Java it is a `@Query` method in `<Src>Queries` returning a record (ECI: on the repository of the table it reads, e.g. `EciFamilyDeltaRepository#fetchFamilyRelations` returning `EciQueryRows.FamilyRelation`). |
 | Latch | The CLI's working context: one source system, optionally one target table and one mapping (plus one or more domains). Commands act on what is latched. |
 | Engine (`etl_process`) | `JAVA` (default) runs the Java mappings; `IDQ` calls the Informatica `infacmd` script instead (simulated when `mock_infacmd=true`). |
 | Mock data | Synthetic source rows generated with Datafaker by `fill_sample_mock_data_<mapping>` functions. Controlled by `mock_data`, `idq.mock.rows-per-table` and `mock-data-pre-fix`. |
@@ -41,7 +41,7 @@ The entity models behind the reports (all Spring Data JDBC records, no JPA):
 
 | Kind | Class | Example |
 |---|---|---|
-| IdqMapInitQuery rows | records in `<Src>Queries` | `EciQueries.FamilyRelation` |
+| IdqMapInitQuery rows | records in `<Src>Queries` (ECI: `EciQueryRows`) | `EciQueryRows.FamilyRelation` |
 | Source tables and views | `<Src>Sources` | `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`) |
 | Target tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
 | MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
@@ -363,7 +363,7 @@ adhoc_runs_ECI\C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_10_58_AM.sql    mock data o
    * **Source tables** - each table or view the mapping reads, as captured just before it ran, through its source
      entity (e.g. `EciSources.FamilyDelta`): total rows and the first `idq.report.max-rows` rows.
    * **IdqMapInitQuery** - the rows the mapping's first SQL returned, through its record (e.g.
-     `EciQueries.FamilyRelation`).
+     `EciQueryRows.FamilyRelation`).
    * **Target** - the rows this run loaded into the table, read back from Oracle by `PKEY_SRC_OBJECT` through the
      target entity (e.g. `EciTargets.Relationship`). With `etl_process=IDQ`: the table content after the workflow.
    * **EXC_STG_BAD_REC_MEMB** - the data-quality exceptions the mapping raised, when there are any.

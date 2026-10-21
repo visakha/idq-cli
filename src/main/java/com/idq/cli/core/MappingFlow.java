@@ -34,15 +34,16 @@ public final class MappingFlow {
         }
 
         public Writer transform(EtlContext ctx) {
-            return new Writer(reader.mapping().info().name(), reader.started(), rows.size(),
+            return new Writer(reader.mapping(), reader.started(), rows.size(),
                     reader.mapping().transform(rows, lookups, ctx));
         }
     }
 
-    public record Writer(String mapping, Instant started, int rowsRead, MappingOutput output) {
+    public record Writer(MemberMapping<?, ?> mapping, Instant started, int rowsRead, MappingOutput output) {
+        /// Mappings with their own repositories ([TargetLoad]) load themselves; the others go through `writer`.
         public MappingResult writeWith(TargetWriter writer) {
-            var written = writer.write(output);
-            return new MappingResult(mapping, MappingResult.Status.SUCCEEDED, rowsRead, written,
+            var written = mapping instanceof TargetLoad own ? own.load(output) : writer.write(output);
+            return new MappingResult(mapping.info().name(), MappingResult.Status.SUCCEEDED, rowsRead, written,
                     output.badRecords().size(), Duration.between(started, Instant.now()), null);
         }
     }

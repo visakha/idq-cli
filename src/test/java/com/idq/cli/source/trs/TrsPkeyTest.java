@@ -2,7 +2,7 @@ package com.idq.cli.source.trs;
 
 import static com.idq.cli.Fixtures.DAY;
 import static com.idq.cli.Fixtures.ctx;
-import static com.idq.cli.Fixtures.queries;
+import static com.idq.cli.Fixtures.stub;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.idq.cli.core.rules.PassThroughAddressValidator;
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 /// `PKEY_SRC_OBJECT` formulation of every TRS mapping, verified on the rows each mapping writes to its target.
 class TrsPkeyTest {
 
-    final TrsQueries q = queries(TrsQueries.class);
+    final TrsQueries q = stub(TrsQueries.class);
 
     static List<String> keys(List<? extends StagingRow<?>> rows) {
         return rows.stream().map(StagingRow::pkeySrcObject).toList();

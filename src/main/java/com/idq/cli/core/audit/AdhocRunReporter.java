@@ -217,7 +217,7 @@ public class AdhocRunReporter {
                 .append(MarkdownTable.of(sample.entity(), sample.rows())).append("\n");
     }
 
-    /// `EciQueries.FamilyRelation` rather than `com.idq.cli.source.eci.EciQueries$FamilyRelation`
+    /// `EciQueryRows.FamilyRelation` rather than `com.idq.cli.source.eci.etldb.models.EciQueryRows$FamilyRelation`
     static String entityName(Class<?> type) {
         return type.getName().substring(type.getPackageName().length() + 1).replace('$', '.');
     }

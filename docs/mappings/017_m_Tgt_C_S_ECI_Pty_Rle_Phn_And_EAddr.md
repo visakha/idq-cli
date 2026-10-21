@@ -6,7 +6,7 @@
 | Sub-domain | Phone-email |
 | Sources | `V_ECI_ETL_SRC_FAMILY_PHONE`, `STG_ECI_PTY_INACTIVE_STS` |
 | Targets | `C_S_ECI_PTY_RLE_PHN`, `C_S_ECI_PTY_RLE_EADDR`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.eci.EciPhoneEmail` |
+| Java | `com.idq.cli.source.eci.etlmap.svc.EciPhoneEmailService` |
 
 ## Business purpose
 
@@ -33,7 +33,7 @@ flowchart LR
 
 All rows of the source view (phones and e-mail in one column, `PHONE_EMAIL_TYPE` tells them apart). No filter.
 
-Entity: `EciQueries.FamilyContact` - named query: `EciQueries#fetchFamilyContacts`.
+Entity: `EciQueryRows.FamilyContact` - named query: `EciFamilyPhoneViewRepository#fetchFamilyContacts`.
 
 ```sql
 SELECT source_table, id_family_phone, id_case, id, period_start_date, phone_email_type, phone_email,
@@ -62,7 +62,7 @@ FROM v_eci_etl_src_family_phone
 
 ## Java implementation
 
-* `EciPhoneEmail.partyKey`, `pkey`, `srcRowid`, `transform`; `ContactRules`; entities `EciTargets.Phone`
+* `EciPhoneEmailService.partyKey`, `pkey`, `srcRowid`, `transform`; `ContactRules`; entities `EciTargets.Phone`
   (`PHN_NUM_EXT`), `EciTargets.Email`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.EtlSrcFamilyPhone`
   (`V_ECI_ETL_SRC_FAMILY_PHONE`), `EciTargets.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`).

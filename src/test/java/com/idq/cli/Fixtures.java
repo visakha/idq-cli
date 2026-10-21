@@ -54,9 +54,9 @@ public final class Fixtures {
         return new InactiveStatus.Lookup(Map.of(srcKey, "P"));
     }
 
-    /// A named-query interface whose methods all return empty lists; the PKEY tests never read the database.
+    /// A repository whose methods all return empty lists; the PKEY tests never read the database.
     @SuppressWarnings("unchecked")
-    public static <T> T queries(Class<T> type) {
+    public static <T> T stub(Class<T> type) {
         return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] {type},
                 (proxy, method, args) -> List.of());
     }

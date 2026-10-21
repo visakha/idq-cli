@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Table;
 /// @param name           IDQ mapping name, e.g. `m_Tgt_C_S_TRS_Pty_OnGoing`
 /// @param targets        `C_S_*` (and side) tables written, primary target first
 /// @param sourceEntities `@Table` entities of the tables and views the mapping reads (its `IdqMapInitQuery` and
-///                       lookups), e.g. [com.idq.cli.source.eci.EciSources.FamilyDelta]
+///                       lookups), e.g. [com.idq.cli.source.eci.etldb.models.EciSources.FamilyDelta]
 public record MappingInfo(String seq, String name, SourceSystem source, List<String> targets,
         List<Class<?>> sourceEntities) {
 

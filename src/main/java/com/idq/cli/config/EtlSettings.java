@@ -33,4 +33,11 @@ public record EtlSettings(
     public boolean mayClear(String table) {
         return clearableTables.contains(table.toUpperCase());
     }
+
+    /// Refuses to empty a table that is not on the clearable-tables whitelist.
+    public void requireClearable(String table) {
+        if (!mayClear(table)) {
+            throw new IllegalStateException(table + " is not on the clearable-tables whitelist; refusing to empty it");
+        }
+    }
 }

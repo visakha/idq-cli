@@ -6,7 +6,7 @@
 | Sub-domain | Alternate-ID |
 | Sources | `STG_ECI_D_CHILD`, `STG_ECI_D_FAMILY`, `STG_ECI_D_MEDICAID`, `STG_ECI_SN_CASE`, `STG_ECI_PTY_INACTIVE_STS` |
 | Targets | `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.eci.EciAlternateId` |
+| Java | `com.idq.cli.source.eci.etlmap.svc.EciAlternateIdService` |
 
 ## Business purpose
 
@@ -36,7 +36,7 @@ Four branches, each producing the role key, the type, the value and the complete
 child id (`018`), child SSN (`004`, only when present), Medicaid number (`002`, from the Medicaid records of the
 child's cases) and family id (`019`, role key suffixed `F`). No stale filter found.
 
-Entity: `EciQueries.PartyIdentifier` - named query: `EciQueries#fetchPartyIdentifiers`.
+Entity: `EciQueryRows.PartyIdentifier` - named query: `EciChildDeltaRepository#fetchPartyIdentifiers`.
 
 ```sql
 SELECT id_child AS id, LPAD(id_child, 10, '0') || '|Member' AS pty_rel_fk,
@@ -84,7 +84,7 @@ Note the SSN key ends with the child id, not the SSN. Unit test: `EciPkeyTest#m_
 
 ## Java implementation
 
-* `EciAlternateId.transform` switches on the type (`IdentifierRules.ssn` / `medicaidId`); `partyKey`; entity
+* `EciAlternateIdService.transform` switches on the type (`IdentifierRules.ssn` / `medicaidId`); `partyKey`; entity
   `EciTargets.AlternateId`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.ChildDelta`
   (`STG_ECI_D_CHILD`), `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`), `EciSources.MedicaidDelta` (`STG_ECI_D_MEDICAID`),

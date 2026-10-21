@@ -3,6 +3,7 @@ package com.idq.cli.domain;
 import com.idq.cli.core.EtlContext;
 import com.idq.cli.core.MappingOutput;
 import java.util.List;
+import org.springframework.core.ResolvableType;
 
 /// Contract of one Member-domain mapping: read the rows of its `IdqMapInitQuery`, transform them exactly as the IDQ
 /// mapping does, and describe what to load. Transformation is a pure function so it can be unit tested without a
@@ -25,6 +26,11 @@ public interface MemberMapping<I, L> {
     L fetchLookups();
 
     MappingOutput transform(List<I> rows, L lookups, EtlContext ctx);
+
+    /// Record type of the `IdqMapInitQuery` rows, for the audit reports.
+    default Class<?> rowType() {
+        return ResolvableType.forClass(getClass()).as(MemberMapping.class).resolveGeneric(0);
+    }
 
     default Domain domain() {
         return Domain.MEMBER;

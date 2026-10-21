@@ -1,4 +1,4 @@
-package com.idq.cli.source.eci;
+package com.idq.cli.source.eci.etldb.models;
 
 import com.idq.cli.core.target.Columns;
 import com.idq.cli.core.target.MdmAudit;

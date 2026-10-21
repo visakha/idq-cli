@@ -64,7 +64,7 @@ Every table has a Spring Data JDBC `@Table` record (no JPA):
 
 | Kind | Where | Example |
 |---|---|---|
-| `IdqMapInitQuery` rows | records next to their `@Query` in `<Src>Queries` | `EciQueries.FamilyRelation` |
+| `IdqMapInitQuery` rows | records next to their `@Query` in `<Src>Queries` (ECI: `EciQueryRows`) | `TrsQueries.ManagedCarePlan`, `EciQueryRows.FamilyRelation` |
 | Source tables / views | `<Src>Sources` | `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`) |
 | Target `C_S_*` tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
 | MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
@@ -78,6 +78,21 @@ Staging-table infixes become record suffixes: `_D_` (delta detection) gives `Del
 so `STG_ECI_D_CHILD` is `EciSources.ChildDelta` and `STG_TRS_H_DC_INDV` is `TrsSources.DcIndvHist`. The plain table of
 the same name keeps the bare record name (`STG_TRS_DC_CASES` is `TrsSources.DcCases`, `STG_TRS_D_DC_CASES` is
 `TrsSources.DcCasesDelta`).
+
+### ECI data layer (`source.eci.etldb`) and mappings (`source.eci.etlmap`)
+
+ECI is the first source moved off the generic `TargetWriter` onto plain Spring Data JDBC repositories; TRS, FSS, TTF
+and WIC still use `<Src>Queries` + `TargetWriter` until they are migrated the same way.
+
+| Package | Contents |
+|---|---|
+| `etldb.models` | `EciSources` (source tables / views), `EciTargets` (`C_S_ECI_*`, `STG_ECI_PTY_INACTIVE_*`), `EciQueryRows` (`IdqMapInitQuery` and lookup rows) |
+| `etldb.repo` | One repository per table, bound to that table's entity. Source repositories own the `@Query` that reads them (`EciChildDeltaRepository#fetchPartyDemographics`); target repositories expose only `deleteAll` and `insertAll` |
+| `etldb.svc` | Reserved for pure database services that combine several repositories into one business function (no IDQ logic) |
+| `etlmap.svc` | One `@Service` per mapping (`EciPartyService` = `m_Tgt_C_S_ECI_Pty`): fetch the init-query rows and lookups, `transform` (the IDQ logic, unchanged), then `load` through named steps such as `replaceParties` / `replacePartyRoles` |
+
+Rows are inserted with `insertAll` (fragment `core.repo.InsertRepository`), never `save`: the keys are assigned, so
+`save` would issue an `UPDATE`. Emptying a target still requires it to be on the clearable-tables whitelist.
 
 Three tables have a composite key, modelled as a nested `Key` record annotated `@Id` (see
 `instructions-for-rewrite.md`, "Primary Keys for few tables"):

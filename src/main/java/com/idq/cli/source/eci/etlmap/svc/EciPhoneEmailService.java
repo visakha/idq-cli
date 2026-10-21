@@ -1,4 +1,4 @@
-package com.idq.cli.source.eci;
+package com.idq.cli.source.eci.etlmap.svc;
 
 import static com.idq.cli.core.EtlPatterns.badData4Email;
 import static com.idq.cli.core.EtlPatterns.badData4Phone;
@@ -7,38 +7,69 @@ import static com.idq.cli.core.Infa.concat;
 import static com.idq.cli.core.Infa.pipe;
 import static com.idq.cli.core.Infa.trim;
 
+import com.idq.cli.config.EtlSettings;
 import com.idq.cli.core.EtlContext;
 import com.idq.cli.core.InactiveStatus;
 import com.idq.cli.core.MappingOutput;
 import com.idq.cli.core.Rows;
 import com.idq.cli.core.exception.BadRecord;
+import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.reference.LookupRows;
 import com.idq.cli.core.rules.ContactRules;
 import com.idq.cli.core.target.Columns;
 import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
-import com.idq.cli.domain.MemberMapping;
-import com.idq.cli.domain.SourceMapping;
 import com.idq.cli.domain.SourceSystem;
-import com.idq.cli.source.eci.EciQueries.FamilyContact;
+import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyContact;
+import com.idq.cli.source.eci.etldb.models.EciSources;
+import com.idq.cli.source.eci.etldb.models.EciTargets;
+import com.idq.cli.source.eci.etldb.repo.EciEmailRepository;
+import com.idq.cli.source.eci.etldb.repo.EciFamilyPhoneViewRepository;
+import com.idq.cli.source.eci.etldb.repo.EciInactiveStatusRepository;
+import com.idq.cli.source.eci.etldb.repo.EciPhoneRepository;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import org.springframework.stereotype.Component;
+import java.util.Map;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /// `m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr` - family phones and e-mail addresses.
 /// See [docs/mappings/017_m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr.md].
-@Component
-public class EciPhoneEmail extends SourceMapping<FamilyContact, InactiveStatus.Lookup>
-        implements MemberMapping.PhoneEmail<FamilyContact, InactiveStatus.Lookup> {
+@Service
+public class EciPhoneEmailService {
 
     public static final MappingInfo INFO = MappingInfo.of("017", "m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr",
             SourceSystem.ECI, List.of("C_S_ECI_PTY_RLE_PHN", "C_S_ECI_PTY_RLE_EADDR"),
             List.of(EciSources.EtlSrcFamilyPhone.class, EciTargets.InactiveStatus.class));
 
-    public EciPhoneEmail(EciQueries queries) {
-        super(INFO, queries::fetchFamilyContacts,
-                () -> new InactiveStatus.Lookup(LookupRows.toMap(queries.fetchInactiveStatuses())));
+    private final EciFamilyPhoneViewRepository familyPhones;
+    private final EciInactiveStatusRepository inactiveStatuses;
+    private final EciPhoneRepository phones;
+    private final EciEmailRepository emails;
+    private final BadRecordRepository badRecords;
+    private final EtlSettings settings;
+
+    public EciPhoneEmailService(EciFamilyPhoneViewRepository familyPhones,
+            EciInactiveStatusRepository inactiveStatuses, EciPhoneRepository phones, EciEmailRepository emails,
+            BadRecordRepository badRecords, EtlSettings settings) {
+        this.familyPhones = familyPhones;
+        this.inactiveStatuses = inactiveStatuses;
+        this.phones = phones;
+        this.emails = emails;
+        this.badRecords = badRecords;
+        this.settings = settings;
+    }
+
+    /// Child and family phones and e-mail addresses.
+    public List<FamilyContact> fetchFamilyContacts() {
+        return familyPhones.fetchFamilyContacts();
+    }
+
+    /// Parties deactivated by the validation mapping.
+    public InactiveStatus.Lookup fetchDeactivatedParties() {
+        return new InactiveStatus.Lookup(LookupRows.toMap(inactiveStatuses.fetchInactiveStatuses()));
     }
 
     /// The view id as-is plus `F` for family members (no padding in this mapping).
@@ -54,7 +85,6 @@ public class EciPhoneEmail extends SourceMapping<FamilyContact, InactiveStatus.L
                 : pipe(partyKey(c), "Member", c.phoneTp(), c.usgTp(), c.idFamilyPhone(), trim(c.phoneEmail()));
     }
 
-    @Override
     public MappingOutput transform(List<FamilyContact> rows, InactiveStatus.Lookup inactive, EtlContext ctx) {
         var phones = new ArrayList<EciTargets.Phone>();
         var emails = new ArrayList<EciTargets.Email>();
@@ -102,5 +132,28 @@ public class EciPhoneEmail extends SourceMapping<FamilyContact, InactiveStatus.L
         return "EADDRESS".equals(c.phoneEmailType())
                 ? pipe(partyKey(c), "Member", "001", c.idFamilyPhone(), c.phoneEmail())
                 : pipe(partyKey(c), "Member", c.phoneTp(), c.usgTp(), c.idFamilyPhone(), c.phoneEmail());
+    }
+
+    @Transactional
+    public Map<String, Integer> load(MappingOutput output) {
+        var loaded = new LinkedHashMap<String, Integer>();
+        loaded.put(EciPhoneRepository.TABLE, replacePhones(output.rows(EciTargets.Phone.class)));
+        loaded.put(EciEmailRepository.TABLE, replaceEmails(output.rows(EciTargets.Email.class)));
+        if (!output.badRecords().isEmpty()) {
+            loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
+        }
+        return loaded;
+    }
+
+    int replacePhones(List<EciTargets.Phone> rows) {
+        settings.requireClearable(EciPhoneRepository.TABLE);
+        phones.deleteAll();
+        return phones.insertAll(rows).size();
+    }
+
+    int replaceEmails(List<EciTargets.Email> rows) {
+        settings.requireClearable(EciEmailRepository.TABLE);
+        emails.deleteAll();
+        return emails.insertAll(rows).size();
     }
 }

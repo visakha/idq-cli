@@ -3,8 +3,8 @@ package com.idq.cli.core;
 import static com.idq.cli.core.EntityBuilder.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.idq.cli.source.eci.EciSources.ChildDelta;
-import com.idq.cli.source.eci.EciSources.SnCase;
+import com.idq.cli.source.eci.etldb.models.EciSources.ChildDelta;
+import com.idq.cli.source.eci.etldb.models.EciSources.SnCase;
 import org.junit.jupiter.api.Test;
 
 class EntityBuilderTest {

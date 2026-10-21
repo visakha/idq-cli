@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.idq.cli.core.EntityBuilder;
 import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.reference.ReferenceTables;
-import com.idq.cli.source.eci.EciSources;
+import com.idq.cli.source.eci.etldb.models.EciSources;
 import com.idq.cli.source.fss.FssSources;
 import com.idq.cli.source.trs.TrsSources;
 import com.idq.cli.source.ttf.TtfSources;

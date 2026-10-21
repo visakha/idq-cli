@@ -1,34 +1,41 @@
-package com.idq.cli.source.eci;
+package com.idq.cli.source.eci.etlmap.svc;
 
 import static com.idq.cli.core.Infa.lpad;
 import static com.idq.cli.core.Infa.pipe;
 
+import com.idq.cli.config.EtlSettings;
 import com.idq.cli.core.EtlContext;
 import com.idq.cli.core.InactiveStatus;
 import com.idq.cli.core.Infa;
 import com.idq.cli.core.MappingOutput;
 import com.idq.cli.core.Rows;
 import com.idq.cli.core.exception.BadRecord;
+import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.reference.LookupRows;
 import com.idq.cli.core.reference.ReferenceData;
 import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
-import com.idq.cli.domain.MemberMapping;
-import com.idq.cli.domain.SourceMapping;
 import com.idq.cli.domain.SourceSystem;
-import com.idq.cli.source.eci.EciQueries.FamilyRelation;
+import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyRelation;
+import com.idq.cli.source.eci.etldb.models.EciSources;
+import com.idq.cli.source.eci.etldb.models.EciTargets;
+import com.idq.cli.source.eci.etldb.repo.EciFamilyDeltaRepository;
+import com.idq.cli.source.eci.etldb.repo.EciInactiveStatusRepository;
+import com.idq.cli.source.eci.etldb.repo.EciRelationshipRepository;
+import com.idq.cli.source.eci.etldb.repo.EciSnChildRepository;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /// `m_Tgt_C_S_ECI_Pty_Rle_Rel` - child / family member relationships in both directions.
 /// See [docs/mappings/018_m_Tgt_C_S_ECI_Pty_Rle_Rel.md].
-@Component
-public class EciRelationship extends SourceMapping<FamilyRelation, EciRelationship.Lookups>
-        implements MemberMapping.Role<FamilyRelation, EciRelationship.Lookups> {
+@Service
+public class EciRelationshipService {
 
     public static final MappingInfo INFO = MappingInfo.of("018", "m_Tgt_C_S_ECI_Pty_Rle_Rel", SourceSystem.ECI,
             List.of("C_S_ECI_PTY_RLE_REL"), List.of(EciSources.FamilyDelta.class, EciSources.SnChild.class,
@@ -36,10 +43,33 @@ public class EciRelationship extends SourceMapping<FamilyRelation, EciRelationsh
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, String> childGender) {}
 
-    public EciRelationship(EciQueries queries) {
-        super(INFO, queries::fetchFamilyRelations, () -> new Lookups(
-                new InactiveStatus.Lookup(LookupRows.toMap(queries.fetchInactiveStatuses())),
-                LookupRows.toMap(queries.fetchChildGenders())));
+    private final EciFamilyDeltaRepository familyDelta;
+    private final EciInactiveStatusRepository inactiveStatuses;
+    private final EciSnChildRepository snChildren;
+    private final EciRelationshipRepository relationships;
+    private final BadRecordRepository badRecords;
+    private final EtlSettings settings;
+
+    public EciRelationshipService(EciFamilyDeltaRepository familyDelta, EciInactiveStatusRepository inactiveStatuses,
+            EciSnChildRepository snChildren, EciRelationshipRepository relationships, BadRecordRepository badRecords,
+            EtlSettings settings) {
+        this.familyDelta = familyDelta;
+        this.inactiveStatuses = inactiveStatuses;
+        this.snChildren = snChildren;
+        this.relationships = relationships;
+        this.badRecords = badRecords;
+        this.settings = settings;
+    }
+
+    /// Every family member / child pair, once per direction.
+    public List<FamilyRelation> fetchFamilyRelations() {
+        return familyDelta.fetchFamilyRelations();
+    }
+
+    /// Parties deactivated by the validation mapping, and the gender of every child.
+    public Lookups fetchRelationshipLookups() {
+        return new Lookups(new InactiveStatus.Lookup(LookupRows.toMap(inactiveStatuses.fetchInactiveStatuses())),
+                LookupRows.toMap(snChildren.fetchChildGenders()));
     }
 
     public static String childKey(Long idChild) {
@@ -77,7 +107,6 @@ public class EciRelationship extends SourceMapping<FamilyRelation, EciRelationsh
                 .or(() -> ctx.reference().codeValue("INVERSE_REL", "ECI", code));
     }
 
-    @Override
     public MappingOutput transform(List<FamilyRelation> rows, Lookups lookups, EtlContext ctx) {
         var relationships = new ArrayList<EciTargets.Relationship>();
         var bad = new ArrayList<BadRecord>();
@@ -109,5 +138,22 @@ public class EciRelationship extends SourceMapping<FamilyRelation, EciRelationsh
                 });
         return MappingOutput.empty().load(TargetBatch.replaceAll(EciTargets.Relationship.class,
                 Rows.lastPerKey(relationships, EciTargets.Relationship::pkeySrcObject))).reject(bad);
+    }
+
+    @Transactional
+    public Map<String, Integer> load(MappingOutput output) {
+        var loaded = new LinkedHashMap<String, Integer>();
+        loaded.put(EciRelationshipRepository.TABLE,
+                replaceRelationships(output.rows(EciTargets.Relationship.class)));
+        if (!output.badRecords().isEmpty()) {
+            loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
+        }
+        return loaded;
+    }
+
+    int replaceRelationships(List<EciTargets.Relationship> rows) {
+        settings.requireClearable(EciRelationshipRepository.TABLE);
+        relationships.deleteAll();
+        return relationships.insertAll(rows).size();
     }
 }

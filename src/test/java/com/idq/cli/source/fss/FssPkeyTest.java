@@ -3,7 +3,7 @@ package com.idq.cli.source.fss;
 import static com.idq.cli.Fixtures.DAY;
 import static com.idq.cli.Fixtures.ctx;
 import static com.idq.cli.Fixtures.noInactive;
-import static com.idq.cli.Fixtures.queries;
+import static com.idq.cli.Fixtures.stub;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.idq.cli.core.InactiveStatus;
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /// `PKEY_SRC_OBJECT` formulation of every FSS mapping.
 class FssPkeyTest {
 
-    final FssQueries q = queries(FssQueries.class);
+    final FssQueries q = stub(FssQueries.class);
 
     static List<String> keys(List<? extends StagingRow<?>> rows) {
         return rows.stream().map(StagingRow::pkeySrcObject).toList();

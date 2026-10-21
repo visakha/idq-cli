@@ -52,9 +52,7 @@ public class TargetWriter {
     }
 
     private void clear(String table) {
-        if (!settings.mayClear(table)) {
-            throw new IllegalStateException(table + " is not on the clearable-tables whitelist; refusing to empty it");
-        }
+        settings.requireClearable(table);
         jdbc.update("DELETE FROM " + table, Map.of());
     }
 

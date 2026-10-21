@@ -29,7 +29,13 @@ public record MappingOutput(List<TargetBatch<?>> targets, List<BadRecord> badRec
                 : Stream.concat(targets.stream(), Stream.of(TargetBatch.append(BadRecord.class, badRecords))).toList();
     }
 
-    /// Rows bound for one table, for assertions in tests.
+    /// Batches bound for one table, in load order.
+    @SuppressWarnings("unchecked")
+    public <T> List<TargetBatch<T>> batches(Class<T> entity) {
+        return targets.stream().filter(b -> b.entity() == entity).map(b -> (TargetBatch<T>) b).toList();
+    }
+
+    /// Rows bound for one table.
     @SuppressWarnings("unchecked")
     public <T> List<T> rows(Class<T> entity) {
         return targets.stream().filter(b -> b.entity() == entity).flatMap(b -> ((List<T>) b.rows()).stream())

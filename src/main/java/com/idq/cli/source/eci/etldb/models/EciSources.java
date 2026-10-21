@@ -1,4 +1,4 @@
-package com.idq.cli.source.eci;
+package com.idq.cli.source.eci.etldb.models;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 /// Spring Data JDBC entities that mirror, column for column, the ECI source tables and views read by
 /// `wf_ECI_Stage_Load`.
 ///
-/// The mappings read through their `IdqMapInitQuery` records in [EciQueries]; these entities
+/// The mappings read through their `IdqMapInitQuery` records in [EciQueryRows]; these entities
 /// are the raw-table view used by the audit reports (`adhoc_runs_ECI`) and the rows the mock data inserts. Source
 /// tables have no primary key; each record carries a provisional `@Id` because Spring Data JDBC needs one to insert.
 ///

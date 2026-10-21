@@ -6,7 +6,7 @@
 | Sub-domain | Demographics (party activation status) |
 | Sources | `STG_ECI_D_CHILD`, `STG_ECI_D_FAMILY`, `C_B_PTY_XREF`, `STG_ECI_PTY_INACTIVE_STS`, `V_ECI_ETL_LU_DUP_CASES`, `V_ECI_ETL_LU_FAMILY_VALIDATION` |
 | Targets | `STG_ECI_PTY_INACTIVE_STS`, `STG_ECI_PTY_INACTIVE_LOG`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.eci.EciPartyValidation` |
+| Java | `com.idq.cli.source.eci.etlmap.svc.EciPartyValidationService` |
 
 ## Business purpose
 
@@ -38,7 +38,7 @@ flowchart LR
 
 Children and family members with names, birth date and audit dates. No stale filter found.
 
-Entity: `EciQueries.PartyName` - named query: `EciQueries#fetchPartyNames`.
+Entity: `EciQueryRows.PartyName` - named query: `EciChildDeltaRepository#fetchPartyNames`.
 
 ```sql
 SELECT 'ECI_CHILD' AS source_table, id_child AS id, first_name, last_name, middle_initial, dob,
@@ -52,27 +52,27 @@ FROM stg_eci_d_family
 
 ### Lookups
 
-`Lookup_STG_ECI_PTY_INACTIVE_STS` - `EciQueries#fetchInactiveStatuses`:
+`Lookup_STG_ECI_PTY_INACTIVE_STS` - `EciInactiveStatusRepository#fetchInactiveStatuses`:
 
 ```sql
 SELECT src_key AS lookup_key, deactivation_sts AS lookup_value FROM stg_eci_pty_inactive_sts
 WHERE rowid_system = 'ECI' AND deactivation_sts IS NOT NULL
 ```
 
-`Lookup_C_B_PTY_XREF` (hub state of the party in MDM) - `EciQueries#fetchHubStates`:
+`Lookup_C_B_PTY_XREF` (hub state of the party in MDM) - `EciPartyXrefRepository#fetchHubStates`:
 
 ```sql
 SELECT pkey_src_object AS lookup_key, hub_state_ind AS lookup_value FROM c_b_pty_xref
 WHERE rowid_system = 'ECI'
 ```
 
-`Lookup_V_ECI_ETL_LU_DUP_CASES` - `EciQueries#fetchDuplicateCases`:
+`Lookup_V_ECI_ETL_LU_DUP_CASES` - `EciDupCasesViewRepository#fetchDuplicateCases`:
 
 ```sql
 SELECT source_table || '|' || id AS lookup_key, TO_CHAR(id) AS lookup_value FROM v_eci_etl_lu_dup_cases
 ```
 
-`Lookup_V_ECI_ETL_LU_FAMILY_VALIDATION` - `EciQueries#fetchFamilyValidations`:
+`Lookup_V_ECI_ETL_LU_FAMILY_VALIDATION` - `EciFamilyValidationViewRepository#fetchFamilyValidations`:
 
 ```sql
 SELECT source_table, id_family, fam_name_status, fam_phone_and_address_sts, fam_inactive_sts
@@ -100,7 +100,7 @@ No `C_S_*` target. Status / log key `SRC_KEY` = party key, `ROWID_SYSTEM` = `ECI
 
 ## Java implementation
 
-* `EciPartyValidation.transform` + `InactiveStatus.Changes` (deactivate / reactivate) + `InactiveStatus.output`
+* `EciPartyValidationService.transform` + `InactiveStatus.Changes` (deactivate / reactivate) + `InactiveStatus.output`
   (log append, status delete by key, status append). Entities `EciTargets.InactiveStatus`,
   `EciTargets.InactiveLog`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.ChildDelta`

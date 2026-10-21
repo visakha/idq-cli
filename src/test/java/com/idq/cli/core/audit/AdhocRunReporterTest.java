@@ -2,7 +2,6 @@ package com.idq.cli.core.audit;
 
 import static com.idq.cli.Fixtures.DAY;
 import static com.idq.cli.Fixtures.ctx;
-import static com.idq.cli.Fixtures.queries;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.idq.cli.config.EtlProcess;
@@ -12,11 +11,11 @@ import com.idq.cli.core.MappingResult;
 import com.idq.cli.core.audit.EtlEvent.RowSample;
 import com.idq.cli.core.audit.EtlEvent.RunId;
 import com.idq.cli.domain.SourceSystem;
-import com.idq.cli.source.eci.EciQueries;
-import com.idq.cli.source.eci.EciQueries.FamilyRelation;
-import com.idq.cli.source.eci.EciRelationship;
-import com.idq.cli.source.eci.EciSources;
-import com.idq.cli.source.eci.EciTargets;
+import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyRelation;
+import com.idq.cli.source.eci.etldb.models.EciSources;
+import com.idq.cli.source.eci.etldb.models.EciTargets;
+import com.idq.cli.source.eci.etlmap.svc.EciPkeyTest;
+import com.idq.cli.source.eci.etlmap.svc.EciRelationshipService;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -37,10 +36,10 @@ class AdhocRunReporterTest {
     @Test
     void writesOneMarkdownReportPerTargetTable() throws Exception {
         var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200));
-        var info = EciRelationship.INFO;
+        var info = EciRelationshipService.INFO;
         var relation = new FamilyRelation("To Child", 7L, "F", 42L, "1", DAY, DAY);
-        var output = new EciRelationship(queries(EciQueries.class)).transform(List.of(relation),
-                new EciRelationship.Lookups(InactiveStatus.Lookup.NONE, Map.of()), ctx(info));
+        var output = EciPkeyTest.relationships().transform(List.of(relation),
+                new EciRelationshipService.Lookups(InactiveStatus.Lookup.NONE, Map.of()), ctx(info));
         var family = EciSources.FamilyDelta.builder().idFamily(7L).idChild(42L).familyCd(1).gender("F")
                 .firstName("Mia").lastName("Lee").dob(DAY).childResidesInd(1).inactiveInd(0).dateCreated(DAY)
                 .modifiedBy("mock").createdBy("mock").loadDate(DAY).build();
@@ -65,7 +64,7 @@ class AdhocRunReporterTest {
                 .contains("| 018 | m_Tgt_C_S_ECI_Pty_Rle_Rel | SUCCEEDED | 1 | C_S_ECI_PTY_RLE_REL=1 | 0 | 5 |  |")
                 .contains("#### STG_ECI_D_FAMILY (`EciSources.FamilyDelta`)", "| ID_FAMILY | ID_CHILD | FAMILY_CD |")
                 .contains("| 7 | 42 | 1 | F |  |  | Mia | Lee |", "#### STG_ECI_SN_CHILD", "_no rows_")
-                .contains("### IdqMapInitQuery (`EciQueries.FamilyRelation`)",
+                .contains("### IdqMapInitQuery (`EciQueryRows.FamilyRelation`)",
                         "| RELATION_DIRECTION | ID_FAMILY | FAMILY_GENDER | ID_CHILD |", "| To Child | 7 | F | 42 |")
                 .contains("#### C_S_ECI_PTY_RLE_REL (`EciTargets.Relationship`)", "| PKEY_SRC_OBJECT |",
                         "PTY_RLE_FK_1", "| 0000000007F\\|Member\\|0000000042\\|Member\\|MTH |")
@@ -76,7 +75,7 @@ class AdhocRunReporterTest {
     @Test
     void mockDataOfTheRunIsWrittenAsSqlNextToTheReport() throws Exception {
         var reporter = new AdhocRunReporter(new ReportSettings(true, dir, 200));
-        var info = EciRelationship.INFO;
+        var info = EciRelationshipService.INFO;
         reporter.on(new MockDataGenerated(MockDataGenerated.REFERENCE_DATA, "Test_001",
                 List.of("INSERT INTO LOOKUP_CODE_VALUE (CODE_TYPE) VALUES ('REL_TP');")));
         reporter.on(new MockDataGenerated(info.name(), "Test_001", List.of(

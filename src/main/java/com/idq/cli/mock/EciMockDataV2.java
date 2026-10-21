@@ -4,13 +4,13 @@ import static com.idq.cli.core.EntityBuilder.entity;
 
 import com.idq.cli.config.EtlSettings;
 import com.idq.cli.core.EntityBuilder;
-import com.idq.cli.source.eci.EciSources.ChildDelta;
-import com.idq.cli.source.eci.EciSources.FamilyDelta;
-import com.idq.cli.source.eci.EciSources.MedicaidDelta;
-import com.idq.cli.source.eci.EciSources.EtlSrcFamilyAddress;
-import com.idq.cli.source.eci.EciSources.EtlSrcFamilyPhone;
-import com.idq.cli.source.eci.EciSources.SnCase;
-import com.idq.cli.source.eci.EciSources.SnChild;
+import com.idq.cli.source.eci.etldb.models.EciSources.ChildDelta;
+import com.idq.cli.source.eci.etldb.models.EciSources.FamilyDelta;
+import com.idq.cli.source.eci.etldb.models.EciSources.MedicaidDelta;
+import com.idq.cli.source.eci.etldb.models.EciSources.EtlSrcFamilyAddress;
+import com.idq.cli.source.eci.etldb.models.EciSources.EtlSrcFamilyPhone;
+import com.idq.cli.source.eci.etldb.models.EciSources.SnCase;
+import com.idq.cli.source.eci.etldb.models.EciSources.SnChild;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,10 +26,12 @@ public class EciMockDataV2 {
 
     static final long ID = 9_100_000_000L;
 
+    private final MockTables tables;
     private final EtlSettings settings;
     private final Faker faker = new Faker(new Random(7));
 
     public EciMockDataV2(MockTables tables, EtlSettings settings) {
+        this.tables = tables;
         this.settings = settings;
     }
 
