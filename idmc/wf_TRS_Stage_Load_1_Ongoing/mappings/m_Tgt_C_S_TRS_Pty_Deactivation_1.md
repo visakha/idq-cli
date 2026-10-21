@@ -76,6 +76,39 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 
 This mapping writes no `C_S_*` table (it loads `STG_TRS_DEACTIVED_MEMBERS`, `STG_TRS_VALID_MEMBERS`); the steps above decide which rows it writes.
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Deactivation_1`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Deactivation_1.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Deactivation_1 (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Processes TIERS members that were deactivated or deleted, as the first part of soft-deleting them in the MDM:
+  Read_STG_TRS_D_DC_INDV_and_CV (custom SQL): valid members (STG_TRS_VALID_MEMBERS) whose individual is inactive or
+    deleted in STG_TRS_D_DC_INDV, or inactive in STG_TRS_D_CV_DC_MCI_INDV
+  -> Delete_Valid_Stage (DD_DELETE)  -> STG_TRS_VALID_MEMBERS rows with that PTY_PK deleted
+  -> Lookup_STG_TRS_DEACTIVED_MEMBERS + Filt_New_Only (not logged yet)
+       -> STG_TRS_DEACTIVED_MEMBERS (PROCESSED_YN 'N', LOAD_DATE = run start)
+A later process sends the unprocessed keys to the MDM.
+
+Timeline: none.
+Order: the insert runs first; the delete removes the same members (its subquery reads STG_TRS_VALID_MEMBERS in its
+own consistent snapshot, which still holds them).
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `STG_TRS_VALID_MEMBERS` | delete |
+| `STG_TRS_DEACTIVED_MEMBERS` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

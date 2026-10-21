@@ -94,6 +94,47 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Read_STG_TRS_D_DC_INDV` | custom SQL query (see the step): only the rows it returns<br>Note: filter `INDV_ID=504937068` is also stored; it is not part of the custom query text and looks like a test filter: confirm it is not applied | never read |
 | `mplt_TRS_Pty_Rle_Alt_Id_Normalization` | `FLTR_Remove_Null_Alt_IDs`: keep `NOT ISNULL(ALT_ID_VAL) AND RTRIM(ALT_ID_VAL) <> ''`<br>`RTR_Invalid_Alt_Ids`: passes only rows of the linked group(s) `Valid_Alt_ID` (`ISNULL(DQ_EXCP_CD) OR LENGTH(RTRIM(DQ_EXCP_CD))=0`), default `Default` | **discarded** inside the mapplet |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Alt_Id`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Alt_Id.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Alt_Id (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Alternate ids of valid TIERS members into C_S_TRS_PTY_RLE_ALT_ID (truncated first):
+  Read_STG_TRS_D_DC_INDV (custom SQL: MCI, DC_INDV and merged-individual keys of valid members, one row per key
+    keeping the longest, latest SSN)
+  -> lkp_Valid_SSN: the SSN is used only when STG_TRS_H_DC_INDV has it SSA-validated for the individual
+  -> mplt_TRS_Pty_Rle_Alt_Id_Normalization (TABLE(fn_dq_norm_trs_alt_id(...))): Medicaid id and member id (both the
+     member id), validated SSN; one row per non-empty id
+       valid rows   -> srtr_Pkey -> exp_Rank / fltr_Rank (TIMELINE) -> target
+       invalid rows -> EXC_STG_BAD_REC_MEMB (written INSIDE the IDQ mapplet; written here by the procedure)
+
+TIMELINE (stale MDM timeline, ported as IDQ does it):
+  * exp_Rank ranks versions per key but VERSION_SEQ is hard-coded to 1 (the rank is commented out), so fltr_Rank
+    (VERSION_SEQ = 1) keeps EVERY row; no de-duplication happens. VERSION_SEQ = 1.
+  * PERIOD_START_DATE / CREATE_DATE / SRC_LAST_UPD_DT = START_DT; PERIOD_END_DATE, PERIOD_REFERENCE_TIME,
+    TIMELINE_ACTION are linked to unfed ports (NULL).
+Unfed ports written as NULL: ROWID_OBJECT, DELETED_*, UPDATED_BY, CREATOR, HUB_STATE_IND.
+The stored source filter INDV_ID = 504937068 is not part of the custom query and is not applied.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY_RLE_ALT_ID` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_norm_trs_alt_id` | replaces `mplt_TRS_Pty_Rle_Alt_Id_Normalization (TRS)`, returns `t_dq_trs_alt_id_tab (pipelined)` |
+| `fn_ors_helper07_common` | IDQ TO_DECIMAL(value, scale): non-numeric -> 0, NULL -> NULL |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

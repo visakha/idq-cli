@@ -128,6 +128,50 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `rtr_Phone_Email` | group `Email_Group`: `PHONE_EMAIL_TYPE='EADDRESS'` | if no group matches: default group `Default` &rarr; `EXC_STG_BAD_REC_MEMB`, `C_S_ECI_PTY_RLE_PHN` |
 | `rtr_Valid_EAddr_Records` | group `Valid_Records`: `ISNULL(DQ_Exception_Code)` | if `NOT ISNULL(DQ_Exception_Code)`: group `Bad_Records` &rarr; `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr`](../../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr (workflow wf_ECI_Stage_Load).
+
+Phones and e-mail addresses of the ECI parties (V_ECI_ETL_SRC_FAMILY_PHONE) into C_S_ECI_PTY_RLE_PHN and
+C_S_ECI_PTY_RLE_EADDR (both truncated first):
+  -> fil_deactivated_status: party not in STG_ECI_PTY_INACTIVE_STS
+  -> rtr_Phone_Email
+       Email_Group (PHONE_EMAIL_TYPE = 'EADDRESS') -> rule_email_validation_v01 -> rtr_Valid_EAddr_Records
+            Valid_Records (no looked-up exception code) -> C_S_ECI_PTY_RLE_EADDR
+            Bad_Records                                 -> EXC_STG_BAD_REC_MEMB
+       Default (every other row, including a NULL type)  -> rule_Phone_Std (7-digit numbers get '000' prefixed)
+            -> RTR_Valid_PhoneNumbers
+            Good_Records      (no code, or 'Missing_AreaCode') -> C_S_ECI_PTY_RLE_PHN
+            Bad_Phone_Records (any code)                       -> EXC_STG_BAD_REC_MEMB
+       A 'Missing_AreaCode' phone matches both groups, so it is loaded AND logged (IDQ router semantics).
+       An e-mail whose 'Invalid_Email' code is not configured in EXC_LOOKUP_CODE_VALUE is treated as valid
+       (the router tests the looked-up code).
+
+TIMELINE: VERSION_SEQ = '1' on both targets; PERIOD_START_DATE = source PERIOD_START_DATE; the e-mail
+PERIOD_REFERENCE_TIME port is not fed in IDQ (NULL).
+The phone exception SRC_SYS_ID_1 is linked to an unfed port (PTY_FK) in IDQ and is written NULL.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_ECI_PTY_RLE_PHN` | truncate, insert |
+| `C_S_ECI_PTY_RLE_EADDR` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_phone` | replaces `rule_Phone_Std`, returns `t_dq_phone` |
+| `fn_dq_valid_email` | replaces `rule_email_validation_v01 (+ local part / domain)`, returns `t_dq_email` |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

@@ -146,6 +146,69 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `rtr_AltId_Exp` | matches none of the other groups (default `Default`) | if `ISNULL(PTY_RLE_FK_1) = true`: group `Invalid_Main_Alt_Id` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `ISNULL(PTY_RLE_FK_2) = true`: group `Invalid_Ref_Alt_Id` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `ISNULL(REL_TYPE_CODE) = true`: group `Invalid_Lookup` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `PERIOD_START_DATE > PERIOD_END_DATE`: group `Period_Start_Dt_GT_Period_End_Date` &rarr; `EXC_STG_BAD_REC_MEMB` |
 | `MPLT_Member_PTY_RLE_REL_Consolidation` | `Filter`: keep `NOT ISNULL(REL_TP)`<br>`Sorter`: distinct: exact duplicate rows are collapsed into one<br>`Aggregator`: one row per `PKEY_SRC_OBJECT`, `PERIOD_END_DATE`, `PERIOD_START_DATE` | **discarded** inside the mapplet |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Member-to-member relationships (STG_TRS_D_DC_RELATIONSHIPS; both sides valid members, one source key per
+individual, MCI preferred) into C_S_TRS_PTY_RLE_REL (truncated first):
+  -> Lookup_V_LOOKUP_CODE_VALUE (code type PTY_REL, 'TRS') + exp_Build_FK -> rtr_AltId_Exp
+       Invalid_Main_Alt_Id (no main party key)  -> EXC_STG_BAD_REC_MEMB ('Invalid_Member')
+       Invalid_Ref_Alt_Id  (no related key)     -> EXC_STG_BAD_REC_MEMB ('Invalid_Ref_Member')
+       Invalid_Lookup      (type untranslated)  -> EXC_STG_BAD_REC_MEMB ('Invalid_Rel_Type', looked-up code)
+       Period_Start_Dt_GT_Period_End_Date       -> EXC_STG_BAD_REC_MEMB ('Period_Start_Date_>_Period_End_Date')
+       Default (none of the above)
+         -> MPLT_Member_PTY_RLE_REL_Consolidation (inlined, set level): type present, distinct on
+            (key, end date, start date), one row per (key, end, start), running VERSION_SEQ per key
+         -> Exp_safe_C_S_TRS_PTY_RLE_REL
+         -> mplt_Pty_Rle_Rel_Timeline_Validation (inlined, TIMELINE, see below) -> C_S_TRS_PTY_RLE_REL
+
+TIMELINE (stale MDM timeline, ported here as IDQ does it; this is the one mapping family where the timeline
+changes the ROW SET, not only column values):
+  mplt_Pty_Rle_Rel_Timeline_Validation
+  1. mplt_DST_Correction (fn_dq_dst_correction): the end date moves forward one hour when start = end, or when
+     end + 2 hours is a daylight-saving change (REF_DYLGHT_SVNGS_TM).
+  2. rtr_Active_Records + union_All_Records: open rows (no end date) pass once; every END-DATED row is emitted
+     TWICE - the closed version (End_Dated_Records) and an open copy with the end date removed
+     (New_Active_Records).
+  3. SRT_PKEY_FOR_RANK + exp_RANK: VERSION_SEQ is re-numbered per key in (start date ascending, end date
+     descending, NULL high) order.
+  4. exp_Stage_Output_Attributes: PERIOD_REFERENCE_TIME = end date and TIMELINE_ACTION = 2 when end dated;
+     LAST_UPDATE_DATE = run start; HUB_STATE_IND forced to 1 on the open row with VERSION_SEQ 1 when it has none
+     (the input HUB_STATE_IND is not fed, so all other rows get NULL).
+  Exp_safe_C_S_TRS_PTY_RLE_REL also computes PERIOD_REFERENCE_TIME / TIMELINE_ACTION, but the mapplet outputs
+  replace them.
+Unfed ports written as NULL: ROWID_OBJECT, DELETED_*, UPDATED_BY, CREATOR.
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_indv_id_alt_id_tp` | VARCHAR2 | `'007'` | $INDV_ID_ALT_ID_TP (substituted into the source SQL) |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY_RLE_REL` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_dst_correction` | replaces `mplt_DST_Correction (TIMELINE)`, returns `DATE` |
+| `fn_ors_helper03_common` | V_LOOKUP_CODE_VALUE lookup: source code -> MSTR_CODE_VALUE (any row) |
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

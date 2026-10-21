@@ -129,6 +129,52 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 
 This mapping writes no `C_S_*` table (it loads `EXC_STG_BAD_REC_MEMB`, `STG_FSS_PTY_INACTIVE_LOG`, `STG_FSS_PTY_INACTIVE_STS`); the steps above decide which rows it writes.
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_FSS_Pty_Validation`](../../../idq-to-oracle/wf_FSS_Stage_Load/sp_ors_main_m_Tgt_C_S_FSS_Pty_Validation.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_FSS_Pty_Validation (workflow wf_FSS_Stage_Load, first step).
+
+Checks the FSS clients (V_FSS_ETL_SRC, rows that are the last active registration of a client or that mark all
+registrations inactive) and maintains the deactivation list used by every later FSS mapping:
+  * Rtr_Valid_Party.Invalid_Party_Name : standardized first or last name blank      -> EXC_STG_BAD_REC_MEMB
+  * Rtr_Valid_Party.Deactivation       : name blank, client deleted (CLIENT_DTL__CAPXACTION = 'D') or all
+                                         registrations inactive (LAST_INACTV_CLIENT_YN = 'Y')
+                                         -> STG_FSS_PTY_INACTIVE_LOG ('Deactivation')
+                                         -> STG_FSS_PTY_INACTIVE_STS (new row H / D / P, only when no status yet)
+  * Rtr_Valid_Party.Reactivation       : has a status, names present, not deleted, not all inactive
+                                         -> STG_FSS_PTY_INACTIVE_STS rows of the key deleted (Upd_Delete_Inactive)
+                                         -> STG_FSS_PTY_INACTIVE_STS row inserted with DEACTIVATION_STS =
+                                            'Reactivation' (IDQ links Exp_Log_Reactv to the STATUS table, not the
+                                            log; ported as observed, see docs/mappings/019). Because later mappings
+                                            skip any key with a non-null status, a reactivated FSS client stays
+                                            excluded - confirm with the business.
+  * Default group: not linked.
+NULL capture action / inactive flag: "x <> 'D'" is not true for NULL in IDQ or Oracle, so such rows are not
+reactivated.
+
+Timeline: none.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `STG_FSS_PTY_INACTIVE_STS` | delete, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+| `STG_FSS_PTY_INACTIVE_LOG` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_name_indv_member` | replaces `mplt_Name_Standardization_Indv_Member (+ TTF CopyOf)`, returns `t_dq_name_std` |
+| `fn_ors_helper02_common` | new deactivation status from the hub state: H history / D deactivated / P |
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

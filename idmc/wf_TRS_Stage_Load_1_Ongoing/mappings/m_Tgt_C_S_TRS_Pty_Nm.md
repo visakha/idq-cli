@@ -93,6 +93,56 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `srtr_Pkey` | not an exact duplicate of an earlier row | collapsed into the identical row |
 | `srtr_TRS_Pty_Nm` | not an exact duplicate of an earlier row | collapsed into the identical row |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Nm`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Nm.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Nm (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Alias names of valid TIERS members (STG_TRS_D_CV_DC_MCI_ALIAS + STG_TRS_D_DC_ALIAS joined to STG_TRS_VALID_MEMBERS)
+into C_S_TRS_PTY_NM (truncated first), name type '002' (Alias):
+  -> fltr_Null_Fn_Ln: source first and last name present
+  -> mplt_Name_Standardization_Trailing_Num_Removal (fn_dq_std_name_trailing_num) on the source names, then
+     mplt_Name_Standardization_Indv_Member (fn_dq_std_name_indv_member) on its output with the source prefix,
+     suffix and full name
+  -> srtr_Pkey (distinct) -> exp_Party_Consolidation -> srtr_TRS_Pty_Nm (distinct) -> exp_Pkey -> target
+     key = PKEY_PTY || '|002|' || SEQUENCE_NUM
+
+TIMELINE (stale MDM timeline, ported as IDQ does it):
+  * exp_Party_Consolidation ranks versions per party (v_VERSION_SEQ_RANK, v_DUP_RANK) but VERSION_SEQ_NUM is
+    hard-coded to 1 (the rank is commented out) and DUP_RANK is not written.
+  * PERIOD_START_DATE_OUT = IIF(v_DUP_RANK = 1, PERIOD_START_DATE, v_LAST_STRT_DATE) is a carry-forward of the
+    version start date. IDQ evaluates input ports, then variable ports in display order, then output ports;
+    v_LAST_STRT_DATE (a variable, set to the current PERIOD_START_DATE) is evaluated BEFORE the output port, so the
+    output is always the current row's PERIOD_START_DATE (the alias CREATE_DT). That is what is written here.
+  * PERIOD_END_DATE, PERIOD_REFERENCE_TIME are linked to unfed ports (NULL).
+  * The second distinct sorter (srtr_TRS_Pty_Nm) adds DUP_RANK to the compared ports, but its input is already
+    distinct on all other ports, so one DISTINCT reproduces both sorters.
+Unfed ports written as NULL: ROWID_OBJECT, DELETED_*, UPDATED_BY, CREATOR, HUB_STATE_IND.
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_member_name_type_code` | VARCHAR2 | `'002'` | $MemberNameTypeCode |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY_NM` | truncate, insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_std_name_indv_member` | replaces `mplt_Name_Standardization_Indv_Member (+ TTF CopyOf)`, returns `t_dq_name_std` |
+| `fn_dq_std_name_trailing_num` | replaces `mplt_Name_Standardization_Trailing_Num_Removal`, returns `t_dq_name_parts` |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

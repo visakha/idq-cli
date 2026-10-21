@@ -78,6 +78,41 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 
 This mapping writes no `C_S_*` table (it loads `STG_TRS_D_UNQ_ADDR`); the steps above decide which rows it writes.
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Addr_1`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Addr_1.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Addr_1 (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Part 1 of the TIERS address load: every UNIQUE address of the daily extract (STG_TRS_D_INDV_ADDR, distinct on the
+address parts) goes through the address validator once (about a tenth of the volume), and every result, good or
+bad, is written to the intermediate table STG_TRS_D_UNQ_ADDR (truncated first). m_Tgt_C_S_TRS_Addr_2 joins it back
+to the individuals.
+  -> lkp_Addr_Street_Type (STG_TRS_CD_REF) + exp_TRS_Addr_Derivation:
+       line 1 = street number, fraction, direction (EA/NO/SO/WE abbreviated to the first letter, any case), street
+                name, street type description
+       line 2 = dwelling type, apartment number, address line
+       zip    = zip5 || '-' || zip4
+  -> mplt_Global_Addr_Validation (fn_dq_valid_global_addr) -> Expression -> Write_STG_TRS_D_UNQ_ADDR
+
+Timeline: none. SRC_COUNTY is linked to an unfed port (NULL).
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `STG_TRS_D_UNQ_ADDR` | truncate, insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_valid_global_addr` | replaces `mplt_Global_Addr_Validation (+ rule_Addr_Line_*)`, returns `t_dq_address` |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

@@ -135,6 +135,59 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Rout_Valid_vs_Exceptions` | group `Valid_Records`: `NOT ISNULL(PTY_RLE_FK_1) AND NOT ISNULL(PTY_RLE_FK_2) AND (PERIOD_START_DATE <= PERIOD_END_DATE OR ISNULL(PERIOD_END_DATE) )`<br>(a row that also matches `Period_Start_Date_GT_Period_End_Date` is written there as well) | if `PERIOD_START_DATE > PERIOD_END_DATE`: group `Period_Start_Date_GT_Period_End_Date` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if no group matches: default group `Default` &rarr; `EXC_STG_BAD_REC_MEMB` |
 | `MPLT_Member_PTY_RLE_REL_Consolidation` | `Filter`: keep `NOT ISNULL(REL_TP)`<br>`Sorter`: distinct: exact duplicate rows are collapsed into one<br>`Aggregator`: one row per `PKEY_SRC_OBJECT`, `PERIOD_END_DATE`, `PERIOD_START_DATE` | **discarded** inside the mapplet |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP`](../../../idq-to-oracle/wf_TRS_Stage_Load_1_Ongoing/sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP (workflow wf_TRS_Stage_Load_1_Ongoing).
+
+Member-to-primary-care-provider relationships (STG_TRS_D_IN_MANAGED_CARE with a provider, one source key per
+individual) into C_S_TRS_PTY_RLE_REL_PROV (truncated first):
+  -> Filt_Numeric_Prov: IS_NUMBER(PROVIDER_NUM)
+  -> Lookup_C_B_PTY_RLE_ALT_ID (custom lookup SQL: the TPI alternate id '006' of C21 in the MDM, latest source key
+     per id) -> Exp_Build_FK: provider key = source key up to its second '|'; type 'Member PCO' when the key holds
+     '|HCO', else 'Member PCP'; relationship key = member|provider|100
+  -> Rout_Valid_vs_Exceptions
+       Period_Start_Date_GT_Period_End_Date -> EXC_STG_BAD_REC_MEMB ('Period_Start_Date_>_Period_End_Date')
+       Valid_Records (both keys, start <= end or open)
+         -> MPLT_Member_PTY_RLE_REL_Consolidation (inlined) -> mplt_Pty_Rle_Rel_Timeline_Validation (inlined,
+            TIMELINE) -> C_S_TRS_PTY_RLE_REL_PROV
+       Default (anything else, e.g. a key missing) -> EXC_STG_BAD_REC_MEMB ('Invalid_Member' / 'Invalid_PCP')
+
+TIMELINE (stale MDM timeline, ported as IDQ does it - same mapplet as m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem):
+  DST-corrected end date; every end-dated row emitted twice (closed version + open copy); VERSION_SEQ re-ranked
+  per key (start ascending, end descending, NULL high); PERIOD_REFERENCE_TIME = end date and TIMELINE_ACTION = 2
+  when end dated; HUB_STATE_IND = 1 on the open row with VERSION_SEQ 1 (input not fed, so NULL elsewhere).
+Unfed ports written as NULL: CREATE_DATE (not fed into the timeline mapplet in this mapping), ROWID_OBJECT,
+DELETED_*, UPDATED_BY, CREATOR. SRC_LAST_UPD_DT = source CREATE_DT.
+The stored source filter PROVIDER_NUM is not null duplicates the custom query's WHERE.
+```
+
+Parameters:
+
+| Parameter | Type | Default | Replaces / meaning |
+|---|---|---|---|
+| `p_pcp_rel_tp` | VARCHAR2 | `'100'` | $PCP_REL_TP |
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_TRS_PTY_RLE_REL_PROV` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_dq_dst_correction` | replaces `mplt_DST_Correction (TIMELINE)`, returns `DATE` |
+| `fn_ors_helper01_common` | IDQ IS_NUMBER(): 1 when the string is a number, else 0 |
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

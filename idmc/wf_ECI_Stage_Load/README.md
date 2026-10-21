@@ -109,6 +109,22 @@ Which steps can keep a source row out of each `C_S_*` table, and where the diver
 | [`m_Tgt_C_S_ECI_Pty_Addr`](mappings/m_Tgt_C_S_ECI_Pty_Addr.md#filtered-data) | `C_S_ECI_PTY_RLE_ADDR` | `Read_V_ECI_ETL_SRC_FAMILY_ADDRESS`, `Fil_Inactive_recs`, `rtr_Good_vs_Exception_Pty_Records` | `EXC_STG_BAD_REC_MEMB` |
 | [`m_Tgt_C_S_ECI_Pty_Rle_Rel`](mappings/m_Tgt_C_S_ECI_Pty_Rle_Rel.md#filtered-data) | `C_S_ECI_PTY_RLE_REL` | `Read_STG_ECI_D_FAMILY`, `Filter_Fam_Child_Valid`, `Route_Good_vs_Exceptions` | `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedures
+
+Each mapping also has a drop-in Oracle replacement under [idq-to-oracle/wf_ECI_Stage_Load](../../idq-to-oracle/wf_ECI_Stage_Load/) (conventions, install order and the shared `fn_dq_*` / helper objects: [idq-to-oracle/README.md](../../idq-to-oracle/README.md)). Run them in taskflow order (paths of a *Parallel Paths* step may run in parallel sessions); [run_wf_ECI_Stage_Load.sql](../../idq-to-oracle/wf_ECI_Stage_Load/run_wf_ECI_Stage_Load.sql) runs them one after another. Each mapping spec has an *Oracle stored procedure* section.
+
+| Mapping | Procedure |
+|---|---|
+| [`m_Tgt_C_S_ECI_Pty_Validation`](mappings/m_Tgt_C_S_ECI_Pty_Validation.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Validation`](../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Validation.sql) |
+| [`m_Tgt_C_S_ECI_Pty`](mappings/m_Tgt_C_S_ECI_Pty.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_ECI_Pty`](../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty.sql) |
+| [`m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Addr`](mappings/m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Addr.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Addr`](../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Addr.sql) |
+| [`m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Phn`](mappings/m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Phn.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Phn`](../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Phn.sql) |
+| [`m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid`](mappings/m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid`](../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid.sql) |
+| [`m_Tgt_C_S_ECI_Pty_Rle_Alt_Id`](mappings/m_Tgt_C_S_ECI_Pty_Rle_Alt_Id.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Alt_Id`](../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Alt_Id.sql) |
+| [`m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr`](mappings/m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr`](../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr.sql) |
+| [`m_Tgt_C_S_ECI_Pty_Addr`](mappings/m_Tgt_C_S_ECI_Pty_Addr.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Addr`](../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Addr.sql) |
+| [`m_Tgt_C_S_ECI_Pty_Rle_Rel`](mappings/m_Tgt_C_S_ECI_Pty_Rle_Rel.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Rel`](../../idq-to-oracle/wf_ECI_Stage_Load/sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Rel.sql) |
+
 ## Translation rules applied
 
 | IDQ | CDI | Where |

@@ -100,6 +100,43 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Filter_Fam_Child_Valid` | `isnull(CHILD_DEACTIVATION_STS) and isnull(FAM_DEACTIVATION_STS1)`<br>= no matching row in `STG_FSS_PTY_INACTIVE_STS` (lookup `Lkp_CHILD_STG_FSS_PTY_INACTIVE_STS`) and no matching row in `STG_FSS_PTY_INACTIVE_STS` (lookup `Lkp_FAM_STG_FSS_PTY_INACTIVE_STS`) | **discarded** (not written anywhere) |
 | `Route_Good_vs_Exceptions` | group `Valid_Relations`: `NOT IsNull(MSTR_REF_CODE)`<br>= a matching row exists in `LOOKUP_CODE_VALUE` | if `IsNull(MSTR_REF_CODE)`: group `Relation_Exceptions` &rarr; `EXC_STG_BAD_REC_MEMB` |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_FSS_Pty_Rle_Rel`](../../../idq-to-oracle/wf_FSS_Stage_Load/sp_ors_main_m_Tgt_C_S_FSS_Pty_Rle_Rel.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_FSS_Pty_Rle_Rel (workflow wf_FSS_Stage_Load).
+
+Relationships between FSS clients (V_FSS_ETL_SRC_RELATIONS, one row per direction) into C_S_FSS_PTY_RLE_REL
+(truncated first):
+  -> Filter_Fam_Child_Valid: neither PTY_SRC_KEY nor RELN_PTY_SRC_KEY is in STG_FSS_PTY_INACTIVE_STS
+  -> Exp_Map_Code_Val_and_Gender: relation code (CAREGIVER when missing) || '|' || gender of the related party
+     ('To Child': RELN_CD_GENDER with code type REL_TP; otherwise CD_GENDER with code type INVERSE_REL)
+  -> Lkp_Rel_Tp_Code_Value (LOOKUP_CODE_VALUE) -> Route_Good_vs_Exceptions
+       Valid_Relations     -> C_S_FSS_PTY_RLE_REL
+       Relation_Exceptions -> EXC_STG_BAD_REC_MEMB ('Invalid_Relationship', attribute 'Relationship|Sex', gender)
+
+TIMELINE: VERSION_SEQ = 1; PERIOD_START_DATE = RELN_DT_CREATED.
+The exception row writes the looked-up EXCEPTION_CODE (NULL when 'Invalid_Relationship' is not configured).
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_FSS_PTY_RLE_REL` | truncate, insert |
+| `EXC_STG_BAD_REC_MEMB` | insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
+| `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
+| `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

@@ -70,6 +70,33 @@ Every step that can stop, divert or collapse rows, and what happens to the rows 
 | `Read_V_FSS_ETL_SRC` | source filter `"V_FSS_ETL_SRC"."LAST_ACTIVE_CLIENT_REGISTRATION_YN"='Y'`; rows the view `V_FSS_ETL_SRC` returns (view logic is outside the export) | never read |
 | `Filter` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_FSS_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
 
+## Oracle stored procedure
+
+Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_FSS_Pty_Rle_Alt_Id`](../../../idq-to-oracle/wf_FSS_Stage_Load/sp_ors_main_m_Tgt_C_S_FSS_Pty_Rle_Alt_Id.sql) (set-based SQL; one transaction that commits at the end and rolls back and re-raises on error). The IDQ mapplets and rules become the shared `fn_dq_*` functions; see [idq-to-oracle/README.md](../../../idq-to-oracle/README.md). Unlike the CDI spec above, the procedure **keeps the MDM timeline logic**; it is marked `TIMELINE` in the comments.
+
+```text
+Drop-in replacement of IDQ mapping m_Tgt_C_S_FSS_Pty_Rle_Alt_Id (workflow wf_FSS_Stage_Load).
+
+One alternate id per active FSS client into C_S_FSS_PTY_RLE_ALT_ID (truncated first): the FSS client id,
+type '022' for SOURCE_TYPE 'CLIENT' and '023' otherwise.
+  Read_V_FSS_ETL_SRC (last active registration) -> Filter: party not in STG_FSS_PTY_INACTIVE_STS -> target
+
+TIMELINE: VERSION_SEQ = 1; PERIOD_START_DATE = DT_CREATED.
+```
+
+Tables written:
+
+| Table | Operation |
+|---|---|
+| `C_S_FSS_PTY_RLE_ALT_ID` | truncate, insert |
+
+Shared functions and procedures called:
+
+| Object | Does |
+|---|---|
+| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
+| `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
+
 ## Transformations
 
 In data-flow order.

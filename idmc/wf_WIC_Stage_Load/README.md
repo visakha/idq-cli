@@ -98,6 +98,18 @@ Which steps can keep a source row out of each `C_S_*` table, and where the diver
 | [`m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr`](mappings/m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr.md#filtered-data) | `C_S_WIC_PTY_RLE_EADDR` | `Read_V_WIC_ETL_SRC`, `fil_deactivated_status`, `Filt_null_email`, `rtr_Valid_EAddr_Records` | `EXC_STG_BAD_REC_MEMB` |
 | [`m_Tgt_C_S_WIC_Pty_Rle_Alt_Id`](mappings/m_Tgt_C_S_WIC_Pty_Rle_Alt_Id.md#filtered-data) | `C_S_WIC_PTY_RLE_ALT_ID` | `Read_V_WIC_ETL_SRC`, `Filter` |  |
 
+## Oracle stored procedures
+
+Each mapping also has a drop-in Oracle replacement under [idq-to-oracle/wf_WIC_Stage_Load](../../idq-to-oracle/wf_WIC_Stage_Load/) (conventions, install order and the shared `fn_dq_*` / helper objects: [idq-to-oracle/README.md](../../idq-to-oracle/README.md)). Run them in taskflow order (paths of a *Parallel Paths* step may run in parallel sessions); [run_wf_WIC_Stage_Load.sql](../../idq-to-oracle/wf_WIC_Stage_Load/run_wf_WIC_Stage_Load.sql) runs them one after another. Each mapping spec has an *Oracle stored procedure* section.
+
+| Mapping | Procedure |
+|---|---|
+| [`m_Tgt_C_S_WIC_Pty_Validation`](mappings/m_Tgt_C_S_WIC_Pty_Validation.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_WIC_Pty_Validation`](../../idq-to-oracle/wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty_Validation.sql) |
+| [`m_Tgt_C_S_WIC_Pty`](mappings/m_Tgt_C_S_WIC_Pty.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_WIC_Pty`](../../idq-to-oracle/wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty.sql) |
+| [`m_Tgt_C_S_WIC_Pty_Addr`](mappings/m_Tgt_C_S_WIC_Pty_Addr.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_WIC_Pty_Addr`](../../idq-to-oracle/wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty_Addr.sql) |
+| [`m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr`](mappings/m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr`](../../idq-to-oracle/wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr.sql) |
+| [`m_Tgt_C_S_WIC_Pty_Rle_Alt_Id`](mappings/m_Tgt_C_S_WIC_Pty_Rle_Alt_Id.md#oracle-stored-procedure) | [`sp_ors_main_m_Tgt_C_S_WIC_Pty_Rle_Alt_Id`](../../idq-to-oracle/wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty_Rle_Alt_Id.sql) |
+
 ## Translation rules applied
 
 | IDQ | CDI | Where |
