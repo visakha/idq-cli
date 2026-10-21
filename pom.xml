@@ -30,6 +30,7 @@
 		<java.version>27</java.version>
 		<spring-shell.version>4.0.3</spring-shell.version>
 		<datafaker.version>2.7.0</datafaker.version>
+		<snowflake-jdbc.version>4.4.0</snowflake-jdbc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -65,6 +66,13 @@
 		<dependency>
 			<groupId>com.oracle.database.security</groupId>
 			<artifactId>oraclepki</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- etl_process=SNOWFLAKE_SP: calls the idq-to-snowflake procedures -->
+		<dependency>
+			<groupId>net.snowflake</groupId>
+			<artifactId>snowflake-jdbc</artifactId>
+			<version>${snowflake-jdbc.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

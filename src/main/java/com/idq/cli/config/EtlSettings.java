@@ -9,28 +9,33 @@ import java.nio.file.Path;
 /// | `etl_process`                    | [#etlProcess]             |
 /// | `mock_infacmd`                   | [#mockInfacmd]            |
 /// | `mock_ora_sp`                    | [#mockOraSp]              |
+/// | `mock_snowflake_sp`              | [#mockSnowflakeSp]        |
 /// | `mock_data`                      | [#mockData]               |
 /// | `idq.mock.rows-per-table`        | [#mockRowsPerTable]       |
 /// | `mock-data-pre-fix`              | [#mockDataPrefix]         |
 /// | `idq.bootstrap-missing-objects`  | [#bootstrapMissingObjects]|
 /// | `idq.ora-sp.dir`                 | [#oraSpDir]               |
+/// | `idq.snowflake-sp.dir`           | [#snowflakeSpDir]         |
 ///
 /// `mockDataPrefix` (e.g. `Test_001`) is put in front of every free-text mock value, `Test_001-JaneDoe@gmail.com`;
 /// codes, keys and reference data are never prefixed. Empty means no prefix.
 ///
-/// `oraSpDir` is the `idq-to-oracle` folder that holds `<workflow>/run_<workflow>.sql` (`etl_process=ORA_SP`).
+/// `oraSpDir` is the `idq-to-oracle` folder that holds `<workflow>/run_<workflow>.sql` (`etl_process=ORA_SP`);
+/// `snowflakeSpDir` is the `idq-to-snowflake` folder with the same layout (`etl_process=SNOWFLAKE_SP`).
 ///
 /// Nothing in this application deletes, truncates or drops: loads only insert.
 public record EtlSettings(
         EtlProcess etlProcess,
         boolean mockInfacmd,
         boolean mockOraSp,
+        boolean mockSnowflakeSp,
         boolean mockData,
         int mockRowsPerTable,
         String mockDataPrefix,
         boolean bootstrapMissingObjects,
         Infacmd infacmd,
-        Path oraSpDir) {
+        Path oraSpDir,
+        Path snowflakeSpDir) {
 
     public record Infacmd(String script, String domain, String service, String application) {}
 }

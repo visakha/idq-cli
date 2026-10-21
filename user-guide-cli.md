@@ -34,7 +34,7 @@ Contents
 | Target table | The `C_S_*` staging table a mapping loads, e.g. `C_S_ECI_PTY_RLE_REL`. |
 | IdqMapInitQuery | The first SQL a mapping runs to read its source rows. In Java it is a `@Query` method on the repository of the table it reads, returning a record, e.g. `EciFamilyDeltaRepository#fetchFamilyRelations` returning `EciQueryRows.FamilyRelation`. |
 | Latch | The CLI's working context: one source system, optionally one target table and one mapping (plus one or more domains). Commands act on what is latched. |
-| Engine (`etl_process`) | `JAVA` (default) runs the Java mappings; `IDQ` calls the Informatica `infacmd` script instead (simulated when `mock_infacmd=true`); `ORA_SP` calls the Oracle stored procedures of `idq-to-oracle/` over JDBC (simulated when `mock_ora_sp=true`). |
+| Engine (`etl_process`) | `JAVA` (default) runs the Java mappings; `IDQ` calls the Informatica `infacmd` script instead (simulated when `mock_infacmd=true`); `ORA_SP` calls the Oracle stored procedures of `idq-to-oracle/` over JDBC (simulated when `mock_ora_sp=true`); `SNOWFLAKE_SP` calls the Snowflake stored procedures of `idq-to-snowflake/` over the Snowflake JDBC driver (simulated when `mock_snowflake_sp=true`). |
 | Mock data | Synthetic source rows generated with Datafaker by `fill_sample_mock_data_<mapping>` functions. Controlled by `mock_data`, `idq.mock.rows-per-table` and `mock-data-pre-fix`. |
 | Audit report | After every run, one Markdown file per target table in `adhoc_runs_<SOURCE>/` showing the source tables, the IdqMapInitQuery rows and the target rows, plus a `.sql` file that replays the mock data. |
 
@@ -51,8 +51,9 @@ The entity models behind the reports (all Spring Data JDBC records, no JPA):
 Safety rules that always apply:
 
 * **Nothing is ever deleted, truncated or dropped**, so the CLI is safe to point at production data. This holds for
-  the whole code base: the Java mappings, the mock-data fills, `compare-etl-process` and the Oracle stored procedures
-  of `idq-to-oracle/` that `etl_process=ORA_SP` calls. Rows are only inserted; the only DDL is `CREATE TABLE` for
+  the whole code base: the Java mappings, the mock-data fills, `compare-etl-process`, the Oracle stored procedures
+  of `idq-to-oracle/` that `etl_process=ORA_SP` calls and the Snowflake stored procedures of `idq-to-snowflake/`
+  that `etl_process=SNOWFLAKE_SP` calls (`InsertOnlySqlTest` checks both folders). Rows are only inserted; the only DDL is `CREATE TABLE` for
   missing objects (`db/missing-objects.sql`, never `DROP` or `ALTER`).
 * Consequence: the IDQ *Truncate target table* option and the `DD_DELETE` update strategies are **not** reproduced.
   A second run on the same source rows inserts the target rows again (or fails on a unique key). Empty the `C_S_*`
@@ -336,7 +337,14 @@ What happens:
    procedures after it are shown as `SKIPPED`, as `WHENEVER SQLERROR EXIT` does in the script. With
    `mock_ora_sp=true` nothing is executed and each result line says `[mock] EXEC sp_ors_main_...`. The procedures
    must be installed first (`@install.sql` in `idq-to-oracle/`).
-6. The audit reports are written (section 8); the last line gives their directory.
+6. With `etl_process=SNOWFLAKE_SP`, the Snowflake stored procedures (`sp_snow_main_<mapping>`, see
+   `idq-to-snowflake/README.md`) are called the same way: one `CALL sp_snow_main_<mapping>()` per procedure, in the
+   order of `<idq.snowflake-sp.dir>/<workflow>/run_<workflow>.sql`, first failure stops the run. Each procedure
+   returns its run log, shown as the result line. The connection comes from `SNOWFLAKE_JDBC_URL`, `SNOWFLAKE_USER`
+   and `SNOWFLAKE_PASSWORD`. The tables live in Snowflake, so the audit reports hold only the procedure results (no
+   table sections). With `mock_snowflake_sp=true` each result line says `[mock] CALL sp_snow_main_...()`. Install
+   the procedures first (`snowsql -f install.sql` in `idq-to-snowflake/`).
+7. The audit reports are written (section 8); the last line gives their directory.
 
 Result line per mapping: status, rows read by the IdqMapInitQuery, rows written per table (including the bad-data
 table `EXC_STG_BAD_REC_MEMB`), number of data-quality exceptions and elapsed time.
@@ -570,10 +578,13 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 
 | Property | Default | Meaning |
 |---|---|---|
-| `etl_process` | `JAVA` | `JAVA` runs the Java mappings, `IDQ` runs the Informatica workflow via `infacmd`, `ORA_SP` calls the Oracle stored procedures |
+| `etl_process` | `JAVA` | `JAVA` runs the Java mappings, `IDQ` runs the Informatica workflow via `infacmd`, `ORA_SP` calls the Oracle stored procedures, `SNOWFLAKE_SP` the Snowflake stored procedures |
 | `mock_infacmd` | `true` | With `IDQ`: print the simulated `infacmd` call instead of running `idq.infacmd.script` |
 | `mock_ora_sp` | `true` | With `ORA_SP`: report each `EXEC sp_ors_main_*` instead of calling it |
 | `idq.ora-sp.dir` | `idq-to-oracle` | Folder with `<workflow>/run_<workflow>.sql`, which gives the procedures and their order (ORA_SP engine) |
+| `mock_snowflake_sp` | `true` | With `SNOWFLAKE_SP`: report each `CALL sp_snow_main_*()` instead of calling it |
+| `idq.snowflake-sp.dir` | `idq-to-snowflake` | Folder with `<workflow>/run_<workflow>.sql`, whose `CALL` lines give the procedures and their order (SNOWFLAKE_SP engine) |
+| `idq.snowflake.url` / `.user` / `.password` | `${SNOWFLAKE_JDBC_URL}` / `${SNOWFLAKE_USER}` / `${SNOWFLAKE_PASSWORD}` | Snowflake connection of the SNOWFLAKE_SP engine, from the environment only |
 | `mock_data` | `true` | Allow mock data; `run-etl` generates it for every mapping before the run |
 | `idq.mock.rows-per-table` | `20` | Mock rows per source table |
 | `mock-data-pre-fix` | (empty) | Prefix for free-text mock values, e.g. `Test_001` gives `Test_001-JaneDoe@gmail.com` |

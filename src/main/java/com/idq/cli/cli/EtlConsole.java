@@ -230,7 +230,8 @@ public class EtlConsole {
 
     public Map<String, Object> settings() {
         return Map.of("etl_process", settings.etlProcess(), "mock_infacmd", settings.mockInfacmd(), "mock_ora_sp",
-                settings.mockOraSp(), "mock_data", settings.mockData());
+                settings.mockOraSp(), "mock_snowflake_sp", settings.mockSnowflakeSp(), "mock_data",
+                settings.mockData());
     }
 
     static MappingView view(MemberMapping<?, ?> m) {

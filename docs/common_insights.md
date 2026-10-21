@@ -1,8 +1,8 @@
 # Common insights: how the IDQ stage loads really behave
 
 These are the surprises found while reading the five IDQ workflow exports (`docs/wf_*.xml`) line by line: once for
-the Java port (`docs/mappings`), once for the IDMC specs (`idmc/`) and once for the Oracle procedures
-(`idq-to-oracle/`). Each one is something a reader of the mapping names, descriptions or diagrams would probably get
+the Java port (`docs/mappings`), once for the IDMC specs (`idmc/`), once for the Oracle procedures
+(`idq-to-oracle/`) and once for the Snowflake procedures (`idq-to-snowflake/`, which also write out the mapplets). Each one is something a reader of the mapping names, descriptions or diagrams would probably get
 wrong.
 
 Unless the entry says otherwise, every port keeps the behaviour as IDQ runs it, and the procedure header in
@@ -43,6 +43,8 @@ Unless the entry says otherwise, every port keeps the behaviour as IDQ runs it, 
 | 1.12 | `m_Tgt_C_S_ECI_Pty_Rle_Rel` | `CREATE_DATE` is linked from `DATE_MODIFIED`. | Create and modify dates are mixed up in the role relationship table. |
 | 1.13 | `m_Tgt_C_S_ECI_Pty_Rle_Alt_Id` | The SSN exception row has no `RUN_DATE` linked. | These exception rows have `RUN_DATE` NULL, so they drop out of any report by run. |
 | 1.14 | `m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr` | Unlike FSS and TTF, there is no null-phone filter before `rule_Phone_Std`. | A WIC party with no phone is validated and, when the rule flags it, logged as a phone exception. |
+| 1.15 | `mplt_Date_Greater_Than_Fifty_Years` (`m_Tgt_C_S_TRS_Addr_2`) | `out_Date_Diff = DATE_DIFF(Input_Date, SYSDATE, 'YY')` is a **string(10)** port, and `out_Date` tests `out_Date_Diff > '50'`, a **text** comparison. | Besides end dates more than 50 years ahead, end dates **6 to 10 years ahead** become NULL (`'6.2' > '50'` as text), and dates 100+ years ahead are kept (`'100' < '50'`). A TRS address ending in 7 years is loaded as open-ended. The Snowflake port reproduces it (`fn_snow_helper21_common`); confirm on IDQ, then decide whether to fix. |
+| 1.16 | `mplt_Member_Pty_Rle_Phn_Normalization` (`m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr`) | The three `rule_Phone_Std` instances get only `Phone`; their `SRC_SYS` and `USG_TP` inputs are not linked. | The rule's own "TRS / CRE / ECI main and other numbers may not be toll-free" check never runs for TRS phones, the one source it was written for. |
 
 ## 2. Rows that are loaded and logged as exceptions
 
@@ -208,6 +210,20 @@ From [000_mapplets.md](mappings/000_mapplets.md):
 - **Fifty years**: an end date more than fifty years ahead becomes NULL (open-ended).
 - **TTF uses `CopyOf_mplt_Name_Standardization_Indv_Member`**, which is identical to the shared mapplet apart from
   its name. It can be replaced by the shared one.
+- **Port precision cuts values** (the engine truncates a string to the precision of the port it enters; to confirm on
+  IDQ with test values, the Snowflake port assumes it):
+  - `mplt_Gender_Validation` reads the gender through `v_Gender_First_Digit` (string(1)): only the first character
+    counts, so `'MALE'` maps to `'1'` and `'Unknown'` passes as `U`.
+  - `rule_Phone_Std` checks and returns the phone through a string(10) port: a longer number is cut to ten digits
+    before the length test, so an 11- or 12-digit number can pass and be stored cut. The TRS work phone is fed as
+    `number extension`; the cleaning removes the space and the cut drops the extension, which is probably why that
+    concatenation works at all.
+  - `rule_MEDICAID_ID_Std` / `rule_Member_Id_Std` hold the cleaned id in a string(10) port.
+- **SSN rule**: the error message strips `-`, space **and `X` / `x`** (`REPLACESTR(0, In_SSN, '-', ' ', 'X', '')`,
+  case-insensitive), and compares the area as text (`> '899'`).
+- **In the TRS alternate-id mapplet** the Medicaid and member ids are normalized from the *source* values; the rules
+  only decide the exception code. TRS feeds the member id as the Medicaid id, so every 10-character member id also
+  raises `Invalid_Medicaid_Id` for its `002` row.
 
 ## 10. Copy-paste traces between sources
 
@@ -253,3 +269,21 @@ WIC and FSS were cloned from ECI, and some ECI-only logic came along:
 5. **Unfed columns** (section 5): a "fixed" port that suddenly fills `FLR_NUM` or `HUB_STATE_IND` changes what the
    MDM receives. Decide deliberately rather than by accident.
 6. **Timeline removal** changes TRS relationship row counts (section 8).
+7. **Unique keys that IDQ relies on.** Every `C_S_*` target is unique on (`PKEY_SRC_OBJECT`, `VERSION_SEQ`), and
+   `STG_TRS_VALID_MEMBERS` (`PTY_PK`), `STG_TRS_DEACTIVED_MEMBERS` (`INDV_ID`), `STG_TRS_D_UNQ_ADDR` (`ADDR_ID`),
+   `STG_ECI_D_MEDICAID` (`ID_MEDICAID`) have keys too. IDQ gets duplicates **rejected row by row** by Oracle and
+   carries on, so the keys silently de-duplicate:
+   - `VERSION_SEQ` is hard-coded to 1 almost everywhere, so a key that arrives twice in one run keeps only its first
+     row. 1.7 ("no de-duplication") is therefore only half true: the filter does nothing, the unique index does it.
+   - In `m_Tgt_C_S_TRS_Pty_Rle_Alt_Id`, when `LKP_ALT_ID_LBL` finds no type, the Medicaid and member rows of a person
+     (same value) get the same key, and the second is rejected.
+   - The ECI SSN exception row has `RUN_DATE` NULL (1.13), so its unique key repeats from run to run: an invalid SSN
+     is logged **once, ever**; every later run's row is rejected.
+   - An individual valid under two party keys (`INDV_ID|DC_INDV` and MCI `INDV_ID`) can be logged once in
+     `STG_TRS_DEACTIVED_MEMBERS` (key `INDV_ID`).
+   **Snowflake does not enforce unique keys** (except on hybrid tables). A Snowflake port must apply them itself,
+   or it loads the duplicates IDQ never wrote; `idq-to-snowflake/` does (`uq_*` flags).
+8. **Snowflake is not Oracle.** `''` is not NULL (as in IDQ), `'a' || NULL` is NULL (unlike IDQ and Oracle), `CHAR`
+   columns are not compared blank-padded (so `ROWID_SYSTEM = 'ECI'` needs `TRIM`), and a value longer than a
+   `VARCHAR(n)` column fails the whole statement instead of one row. The Oracle procedures cannot be translated
+   word for word; see `idq-to-snowflake/README.md`.

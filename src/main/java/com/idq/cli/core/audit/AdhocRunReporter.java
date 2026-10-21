@@ -29,7 +29,7 @@ import org.springframework.data.relational.core.mapping.RelationalMappingContext
 import org.springframework.stereotype.Component;
 
 /// Listens to the [EtlEvent]s of a run and, when it completes, writes one Markdown audit report per target table to
-/// `adhoc_runs_<SOURCE>/<TABLE>_$<Java|IDQ|ORA_SP>$_<dd_MM_yyyy_h_mm_AM>.md`.
+/// `adhoc_runs_<SOURCE>/<TABLE>_$<Java|IDQ|ORA_SP|SNOWFLAKE_SP>$_<dd_MM_yyyy_h_mm_AM>.md`.
 ///
 /// A report shows, for every mapping that loads the table: the run outcome, the source tables, the rows of the
 /// `IdqMapInitQuery`, the target rows and the data-quality exceptions. When the run's mappings had mock data generated
@@ -157,6 +157,7 @@ public class AdhocRunReporter {
             case JAVA -> "Java";
             case IDQ -> "IDQ";
             case ORA_SP -> "ORA_SP";
+            case SNOWFLAKE_SP -> "SNOWFLAKE_SP";
         };
     }
 
