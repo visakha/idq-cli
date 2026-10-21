@@ -8,7 +8,6 @@ import com.idq.cli.core.MappingFlow;
 import com.idq.cli.core.MappingResult;
 import com.idq.cli.core.audit.EtlAudit;
 import com.idq.cli.core.reference.ReferenceLoader;
-import com.idq.cli.core.target.TargetWriter;
 import com.idq.cli.domain.MemberMapping;
 import com.idq.cli.domain.SourceSystem;
 import java.time.Duration;
@@ -36,17 +35,15 @@ public class WorkflowRunner {
 
     private final MappingCatalog catalog;
     private final ReferenceLoader referenceLoader;
-    private final TargetWriter writer;
     private final IdqCommandRunner idq;
     private final EtlSettings settings;
     private final EtlAudit audit;
     private final ReportSettings reports;
 
-    public WorkflowRunner(MappingCatalog catalog, ReferenceLoader referenceLoader, TargetWriter writer,
-            IdqCommandRunner idq, EtlSettings settings, EtlAudit audit, ReportSettings reports) {
+    public WorkflowRunner(MappingCatalog catalog, ReferenceLoader referenceLoader, IdqCommandRunner idq,
+            EtlSettings settings, EtlAudit audit, ReportSettings reports) {
         this.catalog = catalog;
         this.referenceLoader = referenceLoader;
-        this.writer = writer;
         this.idq = idq;
         this.settings = settings;
         this.audit = audit;
@@ -104,7 +101,7 @@ public class WorkflowRunner {
             trail.sources(mapping.info());
             var transformed = MappingFlow.of(mapping).read().peek(rows -> trail.initQuery(mapping, rows))
                     .transform(ctx);
-            result = transformed.writeWith(writer);
+            result = transformed.load();
             trail.written(mapping.info(), transformed.output());
             log.info(result.summary());
         } catch (RuntimeException e) {

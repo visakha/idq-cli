@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 /// ```
 public record ServiceMapping<I, L>(MappingInfo info, SubDomain subDomain, Class<I> rowType,
         Supplier<List<I>> initQuery, Supplier<L> lookups, Transformation<I, L> transformation,
-        Function<MappingOutput, Map<String, Integer>> loader) implements MemberMapping<I, L>, TargetLoad {
+        Function<MappingOutput, Map<String, Integer>> loader) implements MemberMapping<I, L> {
 
     @FunctionalInterface
     public interface Transformation<I, L> {

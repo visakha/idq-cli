@@ -6,7 +6,7 @@
 | Sub-domain | Role |
 | Sources | `STG_TRS_D_DC_RELATIONSHIPS`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_RLE_REL`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.trs.TrsMemberRelationship` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsMemberRelationshipService` |
 
 ## Business purpose
 
@@ -35,7 +35,7 @@ flowchart LR
 * Relationship rows where both individuals have a key, with dates, type, history flag, create / update dates.
 * IDQ parameter `$INDV_ID_ALT_ID_TP` = `007` inlined. No stale filter (commented `ora_hash` sample removed).
 
-Entity: `TrsQueries.MemberRelationship` - named query: `TrsQueries#fetchMemberRelationships`.
+Entity: `TrsQueryRows.MemberRelationship` - named query: `TrsDcRelationshipsDeltaRepository#fetchMemberRelationships`.
 
 ```sql
 WITH min_pk AS (
@@ -78,7 +78,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem_pkey_test`.
 
 ## Java implementation
 
-* `TrsMemberRelationship.transform` with `roleOf`, `pkey`, `sourceLastUpdate`; consolidation
+* `TrsMemberRelationshipService.transform` with `roleOf`, `pkey`, `sourceLastUpdate`; consolidation
   `Rows.currentSegmentPerKey`; entity `TrsTargets.Relationship` (`Columns.Relationship`).
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DcRelationshipsDelta`
   (`STG_TRS_D_DC_RELATIONSHIPS`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`).

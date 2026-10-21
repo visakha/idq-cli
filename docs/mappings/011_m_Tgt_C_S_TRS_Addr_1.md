@@ -6,7 +6,7 @@
 | Sub-domain | Address |
 | Sources | `STG_TRS_D_INDV_ADDR`, `STG_TRS_CD_REF` |
 | Targets | `STG_TRS_D_UNQ_ADDR` (staging, emptied first) |
-| Java | `com.idq.cli.source.trs.TrsUniqueAddress` |
+| Java | `com.idq.cli.source.trs.etlmap.svc.TrsUniqueAddressService` |
 
 ## Business purpose
 
@@ -33,7 +33,7 @@ flowchart LR
   012 joins on.
 * No stale filter found.
 
-Entity: `TrsQueries.DistinctAddress` - named query: `TrsQueries#fetchDistinctAddresses`.
+Entity: `TrsQueryRows.DistinctAddress` - named query: `TrsIndvAddrDeltaRepository#fetchDistinctAddresses`.
 
 ```sql
 SELECT DISTINCT
@@ -65,7 +65,7 @@ FROM stg_trs_d_indv_addr a
 
 ## Java implementation
 
-* `TrsUniqueAddress.direction`, `line1`, `line2`, `transform`; `AddressValidator` (default
+* `TrsUniqueAddressService.direction`, `line1`, `line2`, `transform`; `AddressValidator` (default
   `PassThroughAddressValidator`); entity `TrsTargets.UniqueAddressDelta`; load `replaceAll`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.IndvAddrDelta`
   (`STG_TRS_D_INDV_ADDR`), `TrsSources.CdRef` (`STG_TRS_CD_REF`).

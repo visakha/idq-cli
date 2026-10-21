@@ -1,7 +1,5 @@
 package com.idq.cli.core.target;
 
-import java.util.Map;
-import java.util.function.Function;
 
 /// How a [TargetBatch] is applied to its table.
 public sealed interface LoadMode<T> {
@@ -16,5 +14,5 @@ public sealed interface LoadMode<T> {
     record Append<T>() implements LoadMode<T> {}
 
     /// IDQ update strategy `DD_DELETE`: delete the rows whose key columns match, nothing is inserted.
-    record DeleteByKey<T>(Function<T, Map<String, Object>> key) implements LoadMode<T> {}
+    record DeleteByKey<T>() implements LoadMode<T> {}
 }

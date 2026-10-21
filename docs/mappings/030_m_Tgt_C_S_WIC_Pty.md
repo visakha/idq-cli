@@ -6,7 +6,7 @@
 | Sub-domain | Demographics (plus Role) |
 | Sources | `V_WIC_ETL_SRC`, `STG_WIC_PTY_INACTIVE_STS` |
 | Targets | `C_S_WIC_PTY`, `C_S_WIC_PTY_RLE`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.wic.WicParty` |
+| Java | `com.idq.cli.source.wic.etlmap.svc.WicPartyService` |
 
 ## Business purpose
 
@@ -28,7 +28,7 @@ flowchart LR
 
 All rows of the WIC view. No filter in IDQ.
 
-Entity: `WicQueries.ClientDemographics` - named query: `WicQueries#fetchClientDemographics`.
+Entity: `WicQueryRows.ClientDemographics` - named query: `WicEtlSrcViewRepository#fetchClientDemographics`.
 
 ```sql
 SELECT source_table, datekey, load_date, id, pty_src_key, first_name, last_name, middle_name, dob, gender,
@@ -56,6 +56,6 @@ Unit test: `WicPkeyTest#m_Tgt_C_S_WIC_Pty_pkey_test`.
 
 ## Java implementation
 
-* `WicParty.birthWeightGrams`, `transform`; entities `WicTargets.Party`, `WicTargets.PartyRole`.
+* `WicPartyService.birthWeightGrams`, `transform`; entities `WicTargets.Party`, `WicTargets.PartyRole`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
   (`V_WIC_ETL_SRC`), `WicTargets.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).

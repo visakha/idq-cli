@@ -6,7 +6,7 @@
 | Sub-domain | Demographics (party activation status) |
 | Sources | `V_FSS_ETL_SRC`, `C_B_PTY_XREF`, `STG_FSS_PTY_INACTIVE_STS` |
 | Targets | `STG_FSS_PTY_INACTIVE_STS`, `STG_FSS_PTY_INACTIVE_LOG`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.fss.FssPartyValidation` |
+| Java | `com.idq.cli.source.fss.etlmap.svc.FssPartyValidationService` |
 
 ## Business purpose
 
@@ -35,7 +35,7 @@ Rows of the client view that are the last active registration of a client or mar
 inactive. The view supplies the party source key `PTY_SRC_KEY`. The testing filters were already commented out in
 IDQ.
 
-Entity: `FssQueries.ClientName` - named query: `FssQueries#fetchClientNames`.
+Entity: `FssQueryRows.ClientName` - named query: `FssEtlSrcViewRepository#fetchClientNames`.
 
 ```sql
 SELECT source_type, id_client, pty_src_key, nm_first, nm_last, nm_middle, dt_dob, dt_last_update,
@@ -44,7 +44,7 @@ FROM v_fss_etl_src
 WHERE last_active_client_registration_yn = 'Y' OR last_inactv_client_yn = 'Y'
 ```
 
-Lookups: `FssQueries#fetchInactiveStatuses`, `FssQueries#fetchHubStates`:
+Lookups: `FssInactiveStatusRepository#fetchInactiveStatuses`, `FssPartyXrefRepository#fetchHubStates`:
 
 ```sql
 SELECT src_key AS lookup_key, deactivation_sts AS lookup_value FROM stg_fss_pty_inactive_sts
@@ -76,7 +76,7 @@ No `C_S_*` target; status / log key `SRC_KEY` = `PTY_SRC_KEY`, `ROWID_SYSTEM` = 
 
 ## Java implementation
 
-* `FssPartyValidation.transform` with `InactiveStatus.Changes`; reactivation log rows are converted into status rows
+* `FssPartyValidationService.transform` with `InactiveStatus.Changes`; reactivation log rows are converted into status rows
   to mirror IDQ; `InactiveStatus.output`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `FssSources.EtlSrc`
   (`V_FSS_ETL_SRC`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`), `FssTargets.InactiveStatus`

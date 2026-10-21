@@ -6,7 +6,7 @@
 | Sub-domain | Address |
 | Sources | `V_WIC_ETL_SRC`, `STG_WIC_PTY_INACTIVE_STS` |
 | Targets | `C_S_WIC_PTY_RLE_ADDR`, `DQM_ADDRESS`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.wic.WicAddress` |
+| Java | `com.idq.cli.source.wic.etlmap.svc.WicAddressService` |
 
 ## Business purpose
 
@@ -28,7 +28,7 @@ flowchart LR
 
 All rows of the WIC view. No filter in IDQ.
 
-Entity: `WicQueries.FamilyAddress` - named query: `WicQueries#fetchFamilyAddresses`.
+Entity: `WicQueryRows.FamilyAddress` - named query: `WicEtlSrcViewRepository#fetchFamilyAddresses`.
 
 ```sql
 SELECT source_table, id, fid, pty_src_key, address1, address2, city, county, zip_code,
@@ -53,6 +53,6 @@ The state segment is empty in the IDQ expression (`city || '|' || '|' || zip`) a
 
 ## Java implementation
 
-* `WicAddress.pkey` + `AddressPatterns.route`; entity `WicTargets.Address`.
+* `WicAddressService.pkey` + `AddressPatterns.route`; entity `WicTargets.Address`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
   (`V_WIC_ETL_SRC`), `WicTargets.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).

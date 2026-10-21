@@ -1,5 +1,5 @@
 /// WIC (Women, Infants and Children), IDQ workflow `wf_WIC_Stage_Load`, mappings 029 to 033.
 ///
-/// Every mapping reads the source view through [WicQueries], transforms in its own class and is loaded by the
-/// generic `core.target.TargetWriter`. To be migrated to the ECI `etldb` / `etlmap` layout.
+/// Why it is split in two: `etldb` is the database side (entities, repositories, multi-repository services) and
+/// `etlmap` is the IDQ mapping side (read, transform, load of each mapping).
 package com.idq.cli.source.wic;

@@ -9,6 +9,6 @@
 /// * [EtlPatterns], [PartyPattern], [AddressPatterns], [InactiveStatus] - recurring mapping patterns
 /// * [MappingFlow], [MappingOutput], [MappingResult], [EtlContext] - driving one mapping run and describing its
 ///   result
-/// * [ServiceMapping], [TargetLoad] - plug a plain `source.<src>.etlmap.svc` service into the workflow runner
+/// * [ServiceMapping] - plugs a plain `source.<src>.etlmap.svc` service into the workflow runner
 /// * [EntityBuilder] - typed construction of very wide records (mock data)
 package com.idq.cli.core;

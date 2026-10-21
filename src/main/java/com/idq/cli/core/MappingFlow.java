@@ -1,6 +1,5 @@
 package com.idq.cli.core;
 
-import com.idq.cli.core.target.TargetWriter;
 import com.idq.cli.domain.MemberMapping;
 import java.time.Duration;
 import java.time.Instant;
@@ -10,7 +9,7 @@ import java.util.function.Consumer;
 /// Fluent driver of one mapping run:
 ///
 /// ```java
-/// MappingFlow.of(mapping).read().peek(audit).transform(ctx).writeWith(writer);
+/// MappingFlow.of(mapping).read().peek(audit).transform(ctx).load();
 /// ```
 public final class MappingFlow {
 
@@ -40,9 +39,9 @@ public final class MappingFlow {
     }
 
     public record Writer(MemberMapping<?, ?> mapping, Instant started, int rowsRead, MappingOutput output) {
-        /// Mappings with their own repositories ([TargetLoad]) load themselves; the others go through `writer`.
-        public MappingResult writeWith(TargetWriter writer) {
-            var written = mapping instanceof TargetLoad own ? own.load(output) : writer.write(output);
+        /// Loads the output through the mapping's own repositories.
+        public MappingResult load() {
+            var written = mapping.load(output);
             return new MappingResult(mapping.info().name(), MappingResult.Status.SUCCEEDED, rowsRead, written,
                     output.badRecords().size(), Duration.between(started, Instant.now()), null);
         }

@@ -8,7 +8,7 @@ import com.idq.cli.core.reference.ReferenceTables.CodeValue;
 import com.idq.cli.core.reference.ReferenceTables.ExceptionCode;
 import com.idq.cli.core.reference.ReferenceTables.JunkName;
 import com.idq.cli.core.reference.ReferenceTables.MasterCodeValue;
-import com.idq.cli.source.trs.TrsSources.CdRef;
+import com.idq.cli.source.trs.etldb.models.TrsSources.CdRef;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

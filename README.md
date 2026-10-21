@@ -11,9 +11,9 @@ that mirrors it.
 
 * User guide (CLI and REST, by task): [user-guide-cli.md](user-guide-cli.md).
 * Mapping documentation: [docs/mappings/README.md](docs/mappings/README.md), one `NNN_<mapping>.md` per mapping.
-* Code layout: `domain` (interfaces per sub-domain), `source/<sys>` (one class per mapping, named queries in
-  `<Sys>Queries`, targets in `<Sys>Targets`), `core` (mapplets, rules, target structure, Informatica functions),
-  `workflow`, `cli`, `api`, `mock`.
+* Code layout: `source/<sys>` (`etldb` tables and repositories, `etlmap` one service per mapping), `domain`
+  (mapping identity), `core` (mapplets, rules, target structure, Informatica functions), `workflow`, `cli`, `api`,
+  `mock`.
 
 ## Build and test
 
@@ -64,7 +64,7 @@ Every table has a Spring Data JDBC `@Table` record (no JPA):
 
 | Kind | Where | Example |
 |---|---|---|
-| `IdqMapInitQuery` rows | records next to their `@Query` in `<Src>Queries` (ECI: `EciQueryRows`) | `TrsQueries.ManagedCarePlan`, `EciQueryRows.FamilyRelation` |
+| `IdqMapInitQuery` rows | `<Src>QueryRows`, returned by a `@Query` of the repository of the table they read | `EciQueryRows.FamilyRelation` |
 | Source tables / views | `<Src>Sources` | `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`) |
 | Target `C_S_*` tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
 | MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
@@ -79,17 +79,16 @@ so `STG_ECI_D_CHILD` is `EciSources.ChildDelta` and `STG_TRS_H_DC_INDV` is `TrsS
 the same name keeps the bare record name (`STG_TRS_DC_CASES` is `TrsSources.DcCases`, `STG_TRS_D_DC_CASES` is
 `TrsSources.DcCasesDelta`).
 
-### ECI data layer (`source.eci.etldb`) and mappings (`source.eci.etlmap`)
+### Data layer (`source.<src>.etldb`) and mappings (`source.<src>.etlmap`)
 
-ECI is the first source moved off the generic `TargetWriter` onto plain Spring Data JDBC repositories; TRS, FSS, TTF
-and WIC still use `<Src>Queries` + `TargetWriter` until they are migrated the same way.
+Every source (TRS, ECI, FSS, TTF, WIC) has the same layout, shown here for ECI:
 
 | Package | Contents |
 |---|---|
 | `etldb.models` | `EciSources` (source tables / views), `EciTargets` (`C_S_ECI_*`, `STG_ECI_PTY_INACTIVE_*`), `EciQueryRows` (`IdqMapInitQuery` and lookup rows) |
 | `etldb.repo` | One repository per table, bound to that table's entity. Source repositories own the `@Query` that reads them (`EciChildDeltaRepository#fetchPartyDemographics`); target repositories expose only `deleteAll` and `insertAll` |
 | `etldb.svc` | Reserved for pure database services that combine several repositories into one business function (no IDQ logic) |
-| `etlmap.svc` | One `@Service` per mapping (`EciPartyService` = `m_Tgt_C_S_ECI_Pty`): fetch the init-query rows and lookups, `transform` (the IDQ logic, unchanged), then `load` through named steps such as `replaceParties` / `replacePartyRoles` |
+| `etlmap.svc` | One plain `@Service` per mapping (`EciPartyService` = `m_Tgt_C_S_ECI_Pty`), registered by `EciMappings`: fetch the init-query rows and lookups, `transform` (the IDQ logic, unchanged), then `load` through named steps such as `replaceParties` / `replacePartyRoles` |
 
 Rows are inserted with `insertAll` (fragment `core.repo.InsertRepository`), never `save`: the keys are assigned, so
 `save` would issue an `UPDATE`. Emptying a target still requires it to be on the clearable-tables whitelist.
@@ -144,7 +143,7 @@ Port `8085`, base path `/api/etl`; every CLI command has an endpoint (table in `
 ## Notes
 
 * No table is ever dropped. A full-table delete is only allowed for tables in `db/clearable-tables.txt`; other
-  targets are rejected by `TargetWriter`. Never run `docs/*_EXPORT_OCT_16.sql`: they contain `DROP TABLE`.
+  targets are refused by the services (`EtlSettings.requireClearable`). Never run `docs/*_EXPORT_OCT_16.sql`: they contain `DROP TABLE`.
 * `db/missing-objects.sql` holds `CREATE TABLE` statements (generated from the workflow XML) for objects missing in
   the OCI schema, e.g. the `V_*` source views, which are created as tables and filled with mock data.
 * The `C_S_*` timeline columns (VERSION_SEQ, PERIOD_REFERENCE_TIME, TIMELINE_ACTION) and the version loops are

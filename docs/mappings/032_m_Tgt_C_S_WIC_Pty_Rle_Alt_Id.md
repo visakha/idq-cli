@@ -6,7 +6,7 @@
 | Sub-domain | Alternate-ID |
 | Sources | `V_WIC_ETL_SRC`, `STG_WIC_PTY_INACTIVE_STS` |
 | Targets | `C_S_WIC_PTY_RLE_ALT_ID` |
-| Java | `com.idq.cli.source.wic.WicAlternateId` |
+| Java | `com.idq.cli.source.wic.etlmap.svc.WicAlternateIdService` |
 
 ## Business purpose
 
@@ -25,7 +25,7 @@ flowchart LR
 
 All rows of the WIC view. No filter in IDQ.
 
-Entity: `WicQueries.ClientIdentifier` - named query: `WicQueries#fetchClientIdentifiers`.
+Entity: `WicQueryRows.ClientIdentifier` - named query: `WicEtlSrcViewRepository#fetchClientIdentifiers`.
 
 ```sql
 SELECT id, datekey, pty_src_key, source_table FROM v_wic_etl_src
@@ -46,6 +46,6 @@ Unit test: `WicPkeyTest#m_Tgt_C_S_WIC_Pty_Rle_Alt_Id_pkey_test`.
 
 ## Java implementation
 
-* `WicAlternateId.altIdType`, `pkey`, `transform`; entity `WicTargets.AlternateId`.
+* `WicAlternateIdService.altIdType`, `pkey`, `transform`; entity `WicTargets.AlternateId`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `WicSources.EtlSrc`
   (`V_WIC_ETL_SRC`), `WicTargets.InactiveStatus` (`STG_WIC_PTY_INACTIVE_STS`).

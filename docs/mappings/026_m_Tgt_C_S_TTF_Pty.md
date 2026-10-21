@@ -6,7 +6,7 @@
 | Sub-domain | Demographics (plus Role) |
 | Sources | `V_TTF_ETL_SRC`, `STG_TTF_PTY_INACTIVE_STS` |
 | Targets | `C_S_TTF_PTY`, `C_S_TTF_PTY_RLE`, `EXC_STG_BAD_REC_MEMB` |
-| Java | `com.idq.cli.source.ttf.TtfParty` |
+| Java | `com.idq.cli.source.ttf.etlmap.svc.TtfPartyService` |
 
 ## Business purpose
 
@@ -29,7 +29,7 @@ flowchart LR
 
 All rows of the TTF view. No filter in IDQ.
 
-Entity: `TtfQueries.ClientDemographics` - named query: `TtfQueries#fetchClientDemographics`.
+Entity: `TtfQueryRows.ClientDemographics` - named query: `TtfEtlSrcViewRepository#fetchClientDemographics`.
 
 ```sql
 SELECT submitdate, load_date, clients_id, pty_src_key, firstname, lastname, middlename, dob,
@@ -60,6 +60,6 @@ Unit test: `TtfPkeyTest#m_Tgt_C_S_TTF_Pty_pkey_test`.
 
 ## Java implementation
 
-* `TtfParty.gender`, `ethnicity`, `transform`; entities `TtfTargets.Party`, `TtfTargets.PartyRole`.
+* `TtfPartyService.gender`, `ethnicity`, `transform`; entities `TtfTargets.Party`, `TtfTargets.PartyRole`.
 * Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TtfSources.EtlSrc`
   (`V_TTF_ETL_SRC`), `TtfTargets.InactiveStatus` (`STG_TTF_PTY_INACTIVE_STS`).
