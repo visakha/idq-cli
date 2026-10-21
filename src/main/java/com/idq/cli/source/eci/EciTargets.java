@@ -41,11 +41,67 @@ public final class EciTargets {
 
     @Table("C_S_ECI_PTY_RLE_REL")
     public record Relationship(@Id String pkeySrcObject, @Embedded.Empty MdmAudit audit,
-            @Embedded.Empty Columns.Relationship columns) implements StagingRow<Columns.Relationship> {}
+            @Embedded.Empty Columns.Relationship columns) implements StagingRow<Columns.Relationship> {
+
+        /// The embedded [Columns.Relationship] group is set column by column, as the table has it:
+        /// `Relationship.builder().pkeySrcObject(key).audit(audit).ptyRleFk1(from).ptyRleFk2(to).relTp(type).build()`.
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public static final class Builder {
+            private String pkeySrcObject;
+            private MdmAudit audit;
+            private String ptyRleFk1;
+            private String ptyRleFk2;
+            private String relTypeCode;
+            private String hierarchyCode;
+            private String relTp;
+
+            private Builder() {}
+
+            public Builder pkeySrcObject(String value) { pkeySrcObject = value; return this; }
+            public Builder audit(MdmAudit value) { audit = value; return this; }
+            public Builder ptyRleFk1(String value) { ptyRleFk1 = value; return this; }
+            public Builder ptyRleFk2(String value) { ptyRleFk2 = value; return this; }
+            public Builder relTypeCode(String value) { relTypeCode = value; return this; }
+            public Builder hierarchyCode(String value) { hierarchyCode = value; return this; }
+            public Builder relTp(String value) { relTp = value; return this; }
+
+            public Relationship build() {
+                return new Relationship(pkeySrcObject, audit,
+                        new Columns.Relationship(ptyRleFk1, ptyRleFk2, relTypeCode, hierarchyCode, relTp));
+            }
+        }
+    }
 
     @Table("STG_ECI_PTY_INACTIVE_STS")
     public record InactiveStatus(@Id String srcKey, String rowidSystem, String deactivationSts,
-            LocalDateTime deactivationDt) {}
+            LocalDateTime deactivationDt) {
+
+        /// `InactiveStatus.builder().srcKey("0000000042").rowidSystem("ECI").deactivationSts("P").build()`.
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public static final class Builder {
+            private String srcKey;
+            private String rowidSystem;
+            private String deactivationSts;
+            private LocalDateTime deactivationDt;
+
+            private Builder() {}
+
+            public Builder srcKey(String value) { srcKey = value; return this; }
+            public Builder rowidSystem(String value) { rowidSystem = value; return this; }
+            public Builder deactivationSts(String value) { deactivationSts = value; return this; }
+            public Builder deactivationDt(LocalDateTime value) { deactivationDt = value; return this; }
+
+            public InactiveStatus build() {
+                return new InactiveStatus(srcKey, rowidSystem, deactivationSts, deactivationDt);
+            }
+        }
+    }
 
     @Table("STG_ECI_PTY_INACTIVE_LOG")
     public record InactiveLog(@Id String srcKey, String rowidSystem, String action, LocalDateTime actionDt) {}

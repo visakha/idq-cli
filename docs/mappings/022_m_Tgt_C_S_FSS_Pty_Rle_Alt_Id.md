@@ -4,6 +4,7 @@
 |---|---|
 | Source system | FSS |
 | Sub-domain | Alternate-ID |
+| Sources | `V_FSS_ETL_SRC`, `STG_FSS_PTY_INACTIVE_STS` |
 | Targets | `C_S_FSS_PTY_RLE_ALT_ID` |
 | Java | `com.idq.cli.source.fss.FssAlternateId` |
 

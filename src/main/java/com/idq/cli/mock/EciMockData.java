@@ -4,9 +4,9 @@ import static com.idq.cli.core.EntityBuilder.entity;
 
 import com.idq.cli.config.EtlSettings;
 import com.idq.cli.core.EntityBuilder;
-import com.idq.cli.source.eci.EciSources.DChild;
-import com.idq.cli.source.eci.EciSources.DFamily;
-import com.idq.cli.source.eci.EciSources.DMedicaid;
+import com.idq.cli.source.eci.EciSources.ChildDelta;
+import com.idq.cli.source.eci.EciSources.FamilyDelta;
+import com.idq.cli.source.eci.EciSources.MedicaidDelta;
 import com.idq.cli.source.eci.EciSources.EtlSrcFamilyAddress;
 import com.idq.cli.source.eci.EciSources.EtlSrcFamilyPhone;
 import com.idq.cli.source.eci.EciSources.SnCase;
@@ -51,41 +51,43 @@ public class EciMockData {
         for (var id : ids()) {
             int i = (int) (id - ID);
             var gender = faker.options().option("M", "F");
-            tables.insert(entity(DChild.class)
-                    .with(DChild::idChild, id)
-                    .with(DChild::childSsn, i % 4 == 0 ? "000123456" : "%09d".formatted(123_450_000 + i))
-                    .with(DChild::firstName, i == 2 ? null : tables.text(faker.name().firstName()))
-                    .with(DChild::lastName, tables.text(faker.name().lastName()))
-                    .with(DChild::middleInitial, "A")
-                    .with(DChild::dob, past(3))
-                    .with(DChild::gender, gender)
-                    .with(DChild::birthWtLb, 7)
-                    .with(DChild::birthWtOz, 4)
-                    .with(DChild::languageCd, i % 5 == 0 ? 99 : 1)
-                    .with(DChild::ethnicity, 1)
-                    .with(DChild::raceWhite, 1)
-                    .with(DChild::raceAa, i % 3 == 0 ? 1 : 0)
-                    .with(DChild::raceAsian, 0)
-                    .with(DChild::racePi, 0)
-                    .with(DChild::raceAn, 0)
-                    .with(DChild::dateCreated, past(2))
-                    .with(DChild::dateModified, past(1))
-                    .with(DChild::createdBy, "mock")
-                    .with(DChild::modifiedBy, "mock")
-                    .with(DChild::loadDate, LocalDateTime.now()));
-            tables.insert(entity(SnChild.class)
-                    .with(SnChild::idChild, id)
-                    .with(SnChild::gender, gender));
-            tables.insert(entity(DFamily.class)
-                    .with(DFamily::idFamily, id)
-                    .with(DFamily::idChild, id)
-                    .with(DFamily::familyCd, 1)
-                    .with(DFamily::gender, "F")
-                    .with(DFamily::firstName, tables.text(faker.name().firstName()))
-                    .with(DFamily::lastName, tables.text(faker.name().lastName()))
-                    .with(DFamily::dob, past(40))
-                    .with(DFamily::dateCreated, past(2))
-                    .with(DFamily::loadDate, LocalDateTime.now()));
+            tables.insert(entity(ChildDelta.class)
+                    .with(ChildDelta::idChild, id)
+                    .with(ChildDelta::childSsn, i % 4 == 0 ? "000123456" : "%09d".formatted(123_450_000 + i))
+                    .with(ChildDelta::firstName, i == 2 ? null : tables.text(faker.name().firstName()))
+                    .with(ChildDelta::lastName, tables.text(faker.name().lastName()))
+                    .with(ChildDelta::middleInitial, "A")
+                    .with(ChildDelta::dob, past(3))
+                    .with(ChildDelta::gender, gender)
+                    .with(ChildDelta::birthWtLb, 7)
+                    .with(ChildDelta::birthWtOz, 4)
+                    .with(ChildDelta::languageCd, i % 5 == 0 ? 99 : 1)
+                    .with(ChildDelta::ethnicity, 1)
+                    .with(ChildDelta::raceWhite, 1)
+                    .with(ChildDelta::raceAa, i % 3 == 0 ? 1 : 0)
+                    .with(ChildDelta::raceAsian, 0)
+                    .with(ChildDelta::racePi, 0)
+                    .with(ChildDelta::raceAn, 0)
+                    .with(ChildDelta::dateCreated, past(2))
+                    .with(ChildDelta::dateModified, past(1))
+                    .with(ChildDelta::createdBy, "mock")
+                    .with(ChildDelta::modifiedBy, "mock")
+                    .with(ChildDelta::loadDate, LocalDateTime.now()));
+            tables.insert(SnChild.builder()
+                    .idChild(id)
+                    .gender(gender)
+                    .build());
+            tables.insert(FamilyDelta.builder()
+                    .idFamily(id)
+                    .idChild(id)
+                    .familyCd(1)
+                    .gender("F")
+                    .firstName(tables.text(faker.name().firstName()))
+                    .lastName(tables.text(faker.name().lastName()))
+                    .dob(past(40))
+                    .dateCreated(past(2))
+                    .loadDate(LocalDateTime.now())
+                    .build());
         }
     }
 
@@ -128,12 +130,12 @@ public class EciMockData {
             tables.insert(entity(SnCase.class)
                     .with(SnCase::idCase, id)
                     .with(SnCase::idChild, id));
-            tables.insert(entity(DMedicaid.class)
-                    .with(DMedicaid::idMedicaid, 800L + i)
-                    .with(DMedicaid::idCase, id)
-                    .with(DMedicaid::medicaidNbr, i % 4 == 0 ? "12-34" : "%09d".formatted(512_000_000 + i))
-                    .with(DMedicaid::dateCreated, past(2))
-                    .with(DMedicaid::dateModified, past(1)));
+            tables.insert(entity(MedicaidDelta.class)
+                    .with(MedicaidDelta::idMedicaid, 800L + i)
+                    .with(MedicaidDelta::idCase, id)
+                    .with(MedicaidDelta::medicaidNbr, i % 4 == 0 ? "12-34" : "%09d".formatted(512_000_000 + i))
+                    .with(MedicaidDelta::dateCreated, past(2))
+                    .with(MedicaidDelta::dateModified, past(1)));
         }
     }
 

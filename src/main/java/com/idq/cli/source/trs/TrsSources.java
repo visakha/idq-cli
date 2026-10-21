@@ -13,8 +13,11 @@ import org.springframework.data.relational.core.mapping.Table;
 /// are the raw-table view used by the audit reports (`adhoc_runs_TRS`) and the rows the mock data inserts. Source
 /// tables have no primary key; each record carries a provisional `@Id` because Spring Data JDBC needs one to insert.
 ///
+/// Tables with the `_D_` (delta detection) infix are named `<Name>Delta` and `_H_` (history) tables `<Name>Hist`:
+/// `STG_TRS_DC_CASES` is [DcCases], `STG_TRS_D_DC_CASES` is [DcCasesDelta], `STG_TRS_H_DC_INDV` is [DcIndvHist].
+///
 /// `STG_TRS_VALID_MEMBERS` and `STG_TRS_D_UNQ_ADDR` are loaded by mappings 001 and 011 before later mappings
-/// read them, so their entities are [TrsTargets.ValidMember] and [TrsTargets.UniqueAddress].
+/// read them, so their entities are [TrsTargets.ValidMember] and [TrsTargets.UniqueAddressDelta].
 public final class TrsSources {
 
     private TrsSources() {}
@@ -78,13 +81,13 @@ public final class TrsSources {
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_CV_DC_MCI_ALIAS")
-    public record DCvDcMciAlias(@Id BigDecimal indvId, BigDecimal sequenceNum, BigDecimal historySeq, String firstName,
+    public record CvDcMciAliasDelta(@Id BigDecimal indvId, BigDecimal sequenceNum, BigDecimal historySeq, String firstName,
             String midName, String lastName, String sufxName, String prefixName, String createUserId,
             LocalDateTime createDt, BigDecimal uniqueTransId, LocalDateTime archiveDt, String saverrMessageId) {}
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_CV_DC_MCI_INDV")
-    public record DCvDcMciIndv(@Id BigDecimal indvId, BigDecimal historySeq, String firstName, String midName,
+    public record CvDcMciIndvDelta(@Id BigDecimal indvId, BigDecimal historySeq, String firstName, String midName,
             String lastName, String sufxName, String prefixName, BigDecimal ssn, String genderCd, LocalDateTime dobDt,
             String raceCd, String ethnicityCd, LocalDateTime otTanfDt, BigDecimal fipsCntyCd, LocalDateTime twConvertDt,
             LocalDateTime ltcConvertDt, String createSystemCd, String createUserId, LocalDateTime createDt,
@@ -97,13 +100,13 @@ public final class TrsSources {
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_CV_DC_MRG_SPRT_INDV")
-    public record DCvDcMrgSprtIndv(@Id BigDecimal indvId, BigDecimal oldIndvId, BigDecimal sequenceNum, String typeCd,
+    public record CvDcMrgSprtIndvDelta(@Id BigDecimal indvId, BigDecimal oldIndvId, BigDecimal sequenceNum, String typeCd,
             BigDecimal historySeq, LocalDateTime mergeSeparateDt, String createUserId, LocalDateTime createDt,
             BigDecimal uniqueTransId, String saverrMessageId, String primaryIndvSw, LocalDateTime archiveDt) {}
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_CV_ED_MCI_EDG_INDV")
-    public record DCvEdMciEdgIndv(@Id BigDecimal indvId, String programCd, BigDecimal edgNum, BigDecimal mciCreateSeq,
+    public record CvEdMciEdgIndvDelta(@Id BigDecimal indvId, String programCd, BigDecimal edgNum, BigDecimal mciCreateSeq,
             BigDecimal historySeq, BigDecimal caseNum, String partStatusCd, String typeOfAssistanceCd,
             String createUserId, LocalDateTime createDt, BigDecimal uniqueTransId, LocalDateTime archiveDt,
             String systemCd, String conversionInd, LocalDateTime eligEffBeginDt, LocalDateTime eligEffEndDt,
@@ -112,7 +115,7 @@ public final class TrsSources {
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_CV_MCI_EDG_INDV_TOA")
-    public record DCvMciEdgIndvToa(@Id BigDecimal indvId, String programCd, BigDecimal edgNum, BigDecimal mciCreateSeq,
+    public record CvMciEdgIndvToaDelta(@Id BigDecimal indvId, String programCd, BigDecimal edgNum, BigDecimal mciCreateSeq,
             BigDecimal historySeq, BigDecimal caseNum, String partStatusCd, String typeOfAssistanceCd,
             String createUserId, LocalDateTime createDt, BigDecimal uniqueTransId, LocalDateTime archiveDt,
             String systemCd, String conversionInd, LocalDateTime eligEffBeginDt, LocalDateTime eligEffEndDt,
@@ -121,14 +124,14 @@ public final class TrsSources {
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_DC_ALIAS")
-    public record DDcAlias(@Id BigDecimal indvId, BigDecimal seqNum, BigDecimal historySeq, String createUserId,
+    public record DcAliasDelta(@Id BigDecimal indvId, BigDecimal seqNum, BigDecimal historySeq, String createUserId,
             LocalDateTime createDt, BigDecimal uniqueTransId, String lastName, String firstName, String sufxName,
             String prefixName, String midName, BigDecimal aliasIndvId, LocalDateTime archiveDt, String isCompleteSw,
             LocalDateTime loadDate) {}
 
     /// Provisional `@Id` `CASE_NUM`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_DC_CASES")
-    public record DDcCases(@Id BigDecimal caseNum, BigDecimal historySeq, String createUserId, LocalDateTime createDt,
+    public record DcCasesDelta(@Id BigDecimal caseNum, BigDecimal historySeq, String createUserId, LocalDateTime createDt,
             BigDecimal uniqueTransId, String languageCd, LocalDateTime caseClosedDt, String caseStatusCd,
             String caseModeCd, String reactivationInd, LocalDateTime reactivationDt, LocalDateTime interviewDt,
             String authrepFirstName, String authrepLastName, String authrepMidName, String authrepPrefixName,
@@ -146,7 +149,7 @@ public final class TrsSources {
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_DC_INDV")
-    public record DDcIndv(@Id BigDecimal indvId, BigDecimal historySeq, String createUserId, LocalDateTime createDt,
+    public record DcIndvDelta(@Id BigDecimal indvId, BigDecimal historySeq, String createUserId, LocalDateTime createDt,
             BigDecimal uniqueTransId, BigDecimal ssn, LocalDateTime dobDt, String lastName, String firstName,
             String sufxName, String prefixName, String midName, String dobVrfCd, String raceCd, String ssaValidationSw,
             String ssnVrfCd, String ethnicityCd, String genderCd, String inactiveInd, BigDecimal empId,
@@ -164,7 +167,7 @@ public final class TrsSources {
 
     /// Provisional `@Id` `CASE_NUM`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_DC_PRIMARY_PAYEE")
-    public record DDcPrimaryPayee(@Id BigDecimal caseNum, BigDecimal edgNum, BigDecimal historySeq, String createUserId,
+    public record DcPrimaryPayeeDelta(@Id BigDecimal caseNum, BigDecimal edgNum, BigDecimal historySeq, String createUserId,
             LocalDateTime createDt, BigDecimal uniqueTransId, String typeOfAssistanceCd, String issuanceMethodCd,
             String addrDiffFromCaseSw, String addrStNum, String addrStNumFrac, String addrStNm, String addrAptNum,
             String addrLine, String addrCity, String addrZip5, String addrZip4, String addrDwellingTypeCd,
@@ -175,7 +178,7 @@ public final class TrsSources {
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_DC_RELATIONSHIPS")
-    public record DDcRelationships(@Id BigDecimal indvId, BigDecimal refIndvId, BigDecimal historySeq,
+    public record DcRelationshipsDelta(@Id BigDecimal indvId, BigDecimal refIndvId, BigDecimal historySeq,
             String createUserId, String updateUserId, LocalDateTime createDt, LocalDateTime updateDt,
             BigDecimal uniqueTransId, LocalDateTime effBeginDt, LocalDateTime effEndDt, String histNavInd,
             String relationshipTypeCd, String preparesAndPurchasesSw, String fillsParentalRoleSw, String taxDependentSw,
@@ -185,7 +188,7 @@ public final class TrsSources {
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_INDV_ADDR")
-    public record DIndvAddr(LocalDateTime updateDt, @Id BigDecimal indvId, String addrStNum, String addrStNumFrac,
+    public record IndvAddrDelta(LocalDateTime updateDt, @Id BigDecimal indvId, String addrStNum, String addrStNumFrac,
             String addrStNm, String addrAptNum, String addrLine, String addrCity, String addrCountyCd,
             String addrStateCd, String addrZip5, String addrZip4, BigDecimal caseNum, String addrDwellingTypeCd,
             String addrStTypeCd, LocalDateTime effBeginDt, LocalDateTime effEndDt, BigDecimal edgNum,
@@ -194,7 +197,7 @@ public final class TrsSources {
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_D_IN_MANAGED_CARE")
-    public record DInManagedCare(@Id BigDecimal indvId, String mcProgCode, LocalDateTime beginDt, BigDecimal historySeq,
+    public record InManagedCareDelta(@Id BigDecimal indvId, String mcProgCode, LocalDateTime beginDt, BigDecimal historySeq,
             String mcEligCode, String mcCandidateFlag, String mcPlan, String mcStatusCd, String mcEventCd,
             LocalDateTime mcEventDt, BigDecimal uniqueTransId, String createUserId, LocalDateTime createDt,
             String providerNum, LocalDateTime endDt, LocalDateTime archiveDt, String mcCountyCd,
@@ -203,7 +206,7 @@ public final class TrsSources {
 
     /// Provisional `@Id` `INDV_ID`: the table has no primary key, Spring Data JDBC needs one.
     @Table("STG_TRS_H_DC_INDV")
-    public record HDcIndv(@Id BigDecimal indvId, BigDecimal historySeq, String createUserId, LocalDateTime createDt,
+    public record DcIndvHist(@Id BigDecimal indvId, BigDecimal historySeq, String createUserId, LocalDateTime createDt,
             BigDecimal uniqueTransId, BigDecimal ssn, LocalDateTime dobDt, String lastName, String firstName,
             String sufxName, String prefixName, String midName, String dobVrfCd, String raceCd, String ssaValidationSw,
             String ssnVrfCd, String ethnicityCd, String genderCd, String inactiveInd, BigDecimal empId,

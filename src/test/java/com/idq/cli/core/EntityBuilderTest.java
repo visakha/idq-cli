@@ -3,7 +3,7 @@ package com.idq.cli.core;
 import static com.idq.cli.core.EntityBuilder.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.idq.cli.source.eci.EciSources.DChild;
+import com.idq.cli.source.eci.EciSources.ChildDelta;
 import com.idq.cli.source.eci.EciSources.SnCase;
 import org.junit.jupiter.api.Test;
 
@@ -11,10 +11,10 @@ class EntityBuilderTest {
 
     @Test
     void setsComponentsByAccessorAndLeavesTheRestNull() {
-        var child = entity(DChild.class)
-                .with(DChild::idChild, 9100000001L)
-                .with(DChild::firstName, "Mia")
-                .with(DChild::birthWtLb, 7)
+        var child = entity(ChildDelta.class)
+                .with(ChildDelta::idChild, 9100000001L)
+                .with(ChildDelta::firstName, "Mia")
+                .with(ChildDelta::birthWtLb, 7)
                 .build();
         assertThat(child.idChild()).isEqualTo(9100000001L);
         assertThat(child.firstName()).isEqualTo("Mia");

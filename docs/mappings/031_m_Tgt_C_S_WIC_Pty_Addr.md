@@ -4,6 +4,7 @@
 |---|---|
 | Source system | WIC |
 | Sub-domain | Address |
+| Sources | `V_WIC_ETL_SRC`, `STG_WIC_PTY_INACTIVE_STS` |
 | Targets | `C_S_WIC_PTY_RLE_ADDR`, `DQM_ADDRESS`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.wic.WicAddress` |
 

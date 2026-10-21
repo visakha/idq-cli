@@ -4,6 +4,7 @@
 |---|---|
 | Source system | FSS |
 | Sub-domain | Role |
+| Sources | `V_FSS_ETL_SRC_RELATIONS`, `STG_FSS_PTY_INACTIVE_STS` |
 | Targets | `C_S_FSS_PTY_RLE_REL`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.fss.FssRelationship` |
 

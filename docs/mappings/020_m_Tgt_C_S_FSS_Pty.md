@@ -4,6 +4,7 @@
 |---|---|
 | Source system | FSS, after 019 |
 | Sub-domain | Demographics (plus Role) |
+| Sources | `V_FSS_ETL_SRC`, `STG_FSS_PTY_INACTIVE_STS` |
 | Targets | `C_S_FSS_PTY`, `C_S_FSS_PTY_RLE`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.fss.FssParty` |
 

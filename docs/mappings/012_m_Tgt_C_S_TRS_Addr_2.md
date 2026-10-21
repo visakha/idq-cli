@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TRS, after 011 |
 | Sub-domain | Address |
+| Sources | `STG_TRS_D_INDV_ADDR`, `STG_TRS_D_UNQ_ADDR`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_RLE_ADDR`, `DQM_ADDRESS`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.trs.TrsAddress` |
 
@@ -96,6 +97,6 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Addr_2_pkey_test`.
 * `TrsAddress.transform`, `pkey`, `dqmKey`, `dqmRow`; `AddressRules.score` / `holdLines`;
   `PersonRules.notBeyondFiftyYears`; `AddressPatterns.badData4Address`; entities `TrsTargets.Address`,
   `DqmAddress`.
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DIndvAddr`
-  (`STG_TRS_D_INDV_ADDR`), `TrsTargets.UniqueAddress` (`STG_TRS_D_UNQ_ADDR`), `TrsTargets.ValidMember`
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.IndvAddrDelta`
+  (`STG_TRS_D_INDV_ADDR`), `TrsTargets.UniqueAddressDelta` (`STG_TRS_D_UNQ_ADDR`), `TrsTargets.ValidMember`
   (`STG_TRS_VALID_MEMBERS`).

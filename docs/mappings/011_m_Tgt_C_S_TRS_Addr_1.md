@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TRS, followed by 012 |
 | Sub-domain | Address |
+| Sources | `STG_TRS_D_INDV_ADDR`, `STG_TRS_CD_REF` |
 | Targets | `STG_TRS_D_UNQ_ADDR` (staging, emptied first) |
 | Java | `com.idq.cli.source.trs.TrsUniqueAddress` |
 
@@ -65,6 +66,6 @@ FROM stg_trs_d_indv_addr a
 ## Java implementation
 
 * `TrsUniqueAddress.direction`, `line1`, `line2`, `transform`; `AddressValidator` (default
-  `PassThroughAddressValidator`); entity `TrsTargets.UniqueAddress`; load `replaceAll`.
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DIndvAddr`
+  `PassThroughAddressValidator`); entity `TrsTargets.UniqueAddressDelta`; load `replaceAll`.
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.IndvAddrDelta`
   (`STG_TRS_D_INDV_ADDR`), `TrsSources.CdRef` (`STG_TRS_CD_REF`).

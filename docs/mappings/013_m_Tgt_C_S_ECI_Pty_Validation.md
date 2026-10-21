@@ -4,6 +4,7 @@
 |---|---|
 | Source system | ECI, workflow `wf_ECI_Stage_Load`, first mapping |
 | Sub-domain | Demographics (party activation status) |
+| Sources | `STG_ECI_D_CHILD`, `STG_ECI_D_FAMILY`, `C_B_PTY_XREF`, `STG_ECI_PTY_INACTIVE_STS`, `V_ECI_ETL_LU_DUP_CASES`, `V_ECI_ETL_LU_FAMILY_VALIDATION` |
 | Targets | `STG_ECI_PTY_INACTIVE_STS`, `STG_ECI_PTY_INACTIVE_LOG`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.eci.EciPartyValidation` |
 
@@ -102,7 +103,7 @@ No `C_S_*` target. Status / log key `SRC_KEY` = party key, `ROWID_SYSTEM` = `ECI
 * `EciPartyValidation.transform` + `InactiveStatus.Changes` (deactivate / reactivate) + `InactiveStatus.output`
   (log append, status delete by key, status append). Entities `EciTargets.InactiveStatus`,
   `EciTargets.InactiveLog`.
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.DChild`
-  (`STG_ECI_D_CHILD`), `EciSources.DFamily` (`STG_ECI_D_FAMILY`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`),
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.ChildDelta`
+  (`STG_ECI_D_CHILD`), `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`), `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`),
   `EciTargets.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`), `EciSources.EtlLuDupCases` (`V_ECI_ETL_LU_DUP_CASES`),
   `EciSources.EtlLuFamilyValidation` (`V_ECI_ETL_LU_FAMILY_VALIDATION`).

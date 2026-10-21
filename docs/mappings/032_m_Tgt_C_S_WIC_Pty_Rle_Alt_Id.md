@@ -4,6 +4,7 @@
 |---|---|
 | Source system | WIC |
 | Sub-domain | Alternate-ID |
+| Sources | `V_WIC_ETL_SRC`, `STG_WIC_PTY_INACTIVE_STS` |
 | Targets | `C_S_WIC_PTY_RLE_ALT_ID` |
 | Java | `com.idq.cli.source.wic.WicAlternateId` |
 

@@ -32,7 +32,7 @@ public class TrsPrimaryCareProvider extends SourceMapping<PrimaryCareProvider, T
         implements MemberMapping.Role<PrimaryCareProvider, TrsPrimaryCareProvider.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("010", "m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP",
-            SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL_PROV"), List.of(TrsSources.DInManagedCare.class,
+            SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL_PROV"), List.of(TrsSources.InManagedCareDelta.class,
             TrsTargets.ValidMember.class, MdmBaseTables.PartyRoleAltId.class, MdmBaseTables.PartyRoleAltIdXref.class));
 
     /// IDQ parameter `$PCP_REL_TP`.

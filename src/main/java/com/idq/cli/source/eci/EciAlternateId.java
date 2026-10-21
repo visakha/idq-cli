@@ -30,8 +30,8 @@ public class EciAlternateId extends SourceMapping<PartyIdentifier, InactiveStatu
         implements MemberMapping.AlternateId<PartyIdentifier, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("016", "m_Tgt_C_S_ECI_Pty_Rle_Alt_Id", SourceSystem.ECI,
-            List.of("C_S_ECI_PTY_RLE_ALT_ID"), List.of(EciSources.DChild.class, EciSources.DFamily.class,
-            EciSources.DMedicaid.class, EciSources.SnCase.class, EciTargets.InactiveStatus.class));
+            List.of("C_S_ECI_PTY_RLE_ALT_ID"), List.of(EciSources.ChildDelta.class, EciSources.FamilyDelta.class,
+            EciSources.MedicaidDelta.class, EciSources.SnCase.class, EciTargets.InactiveStatus.class));
 
     public EciAlternateId(EciQueries queries) {
         super(INFO, queries::fetchPartyIdentifiers,

@@ -65,7 +65,7 @@ Every table has a Spring Data JDBC `@Table` record (no JPA):
 | Kind | Where | Example |
 |---|---|---|
 | `IdqMapInitQuery` rows | records next to their `@Query` in `<Src>Queries` | `EciQueries.FamilyRelation` |
-| Source tables / views | `<Src>Sources` | `EciSources.DFamily` (`STG_ECI_D_FAMILY`) |
+| Source tables / views | `<Src>Sources` | `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`) |
 | Target `C_S_*` tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
 | MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
 | Lookup / reference tables | `ReferenceTables` | `ReferenceTables.CodeValue` (`LOOKUP_CODE_VALUE`) |
@@ -73,6 +73,11 @@ Every table has a Spring Data JDBC `@Table` record (no JPA):
 The source, MDM and reference tables have no primary key. Spring Data JDBC needs an `@Id` to insert, so each of
 those records carries a provisional `@Id` on its most natural key column, marked `/// Provisional @Id` (find them with
 `grep -rn "Provisional" src/main/java`). Tables with `BAK` or a date stamp in their name are never modelled.
+
+Staging-table infixes become record suffixes: `_D_` (delta detection) gives `Delta` and `_H_` (history) gives `Hist`,
+so `STG_ECI_D_CHILD` is `EciSources.ChildDelta` and `STG_TRS_H_DC_INDV` is `TrsSources.DcIndvHist`. The plain table of
+the same name keeps the bare record name (`STG_TRS_DC_CASES` is `TrsSources.DcCases`, `STG_TRS_D_DC_CASES` is
+`TrsSources.DcCasesDelta`).
 
 Three tables have a composite key, modelled as a nested `Key` record annotated `@Id` (see
 `instructions-for-rewrite.md`, "Primary Keys for few tables"):
@@ -87,10 +92,10 @@ Mock data is written as these entity records through Spring Data JDBC. Wide reco
 `EntityBuilder` (columns named by accessor, unset columns `NULL`):
 
 ```java
-tables.insert(entity(DChild.class)
-        .with(DChild::idChild, id)
-        .with(DChild::firstName, tables.text(faker.name().firstName()))
-        .with(DChild::dob, past(3)));
+tables.insert(entity(ChildDelta.class)
+        .with(ChildDelta::idChild, id)
+        .with(ChildDelta::firstName, tables.text(faker.name().firstName()))
+        .with(ChildDelta::dob, past(3)));
 ```
 
 `MappingInfo.sourceEntities` lists the source entities of each mapping. During a run `EtlAudit` publishes Spring

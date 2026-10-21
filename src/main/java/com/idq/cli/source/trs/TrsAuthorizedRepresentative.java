@@ -26,9 +26,9 @@ public class TrsAuthorizedRepresentative extends SourceMapping<AuthorizedReprese
         implements MemberMapping.ManagedAttribute<AuthorizedRepresentative, NoLookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("002", "m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing",
-            SourceSystem.TRS, List.of("C_S_TRS_PTY_MNG_ATTR"), List.of(TrsSources.DDcPrimaryPayee.class,
-            TrsSources.DcPrimaryPayee.class, TrsSources.CvEdMciEdgIndv.class, TrsSources.DCvEdMciEdgIndv.class,
-            TrsSources.DcCases.class, TrsSources.DDcCases.class, TrsSources.DcCaseIndv.class,
+            SourceSystem.TRS, List.of("C_S_TRS_PTY_MNG_ATTR"), List.of(TrsSources.DcPrimaryPayeeDelta.class,
+            TrsSources.DcPrimaryPayee.class, TrsSources.CvEdMciEdgIndv.class, TrsSources.CvEdMciEdgIndvDelta.class,
+            TrsSources.DcCases.class, TrsSources.DcCasesDelta.class, TrsSources.DcCaseIndv.class,
             TrsTargets.ValidMember.class));
 
     /// IDQ parameter `$ATTR_TP_AUTH_REP`.

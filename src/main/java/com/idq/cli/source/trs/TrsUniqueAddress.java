@@ -29,7 +29,7 @@ public class TrsUniqueAddress extends SourceMapping<DistinctAddress, NoLookups>
         implements MemberMapping.Address<DistinctAddress, NoLookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("011", "m_Tgt_C_S_TRS_Addr_1", SourceSystem.TRS,
-            List.of("STG_TRS_D_UNQ_ADDR"), List.of(TrsSources.DIndvAddr.class, TrsSources.CdRef.class));
+            List.of("STG_TRS_D_UNQ_ADDR"), List.of(TrsSources.IndvAddrDelta.class, TrsSources.CdRef.class));
 
     private final AddressValidator validator;
 
@@ -62,7 +62,7 @@ public class TrsUniqueAddress extends SourceMapping<DistinctAddress, NoLookups>
             var l2 = line2(a);
             var av = validator.validate(new AddressValidator.Input(l1, l2, a.addrCity(), a.addrStateCd(),
                     concat(a.addrZip5(), "-", a.addrZip4()), "US", "TRS"), ctx.reference());
-            return new TrsTargets.UniqueAddress(a.addrId(), av.deliveryAddressLine1(), av.deliveryAddressLine2(),
+            return new TrsTargets.UniqueAddressDelta(a.addrId(), av.deliveryAddressLine1(), av.deliveryAddressLine2(),
                     av.buildingName(), av.subBuildingNumber(), av.city(), av.countyFips(), av.stateFips(),
                     av.countryIso2(), av.zip5(), av.zip4(), av.latitude(), av.longitude(), av.matchCode(),
                     av.matchCodeDescription(), av.mailabilityScore(), av.addressType(), av.organizationDescriptor(),
@@ -73,6 +73,6 @@ public class TrsUniqueAddress extends SourceMapping<DistinctAddress, NoLookups>
                     av.cassErrorCode(), av.deliveryPointValidation(), l1, l2, a.addrCity(), null, a.addrStateCd(),
                     "US", a.addrZip5(), a.addrZip4());
         }).toList();
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsTargets.UniqueAddress.class, addresses));
+        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsTargets.UniqueAddressDelta.class, addresses));
     }
 }

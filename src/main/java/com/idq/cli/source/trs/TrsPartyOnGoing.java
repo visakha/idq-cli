@@ -43,8 +43,8 @@ public class TrsPartyOnGoing extends SourceMapping<MemberDemographics, TrsPartyO
         implements MemberMapping.Demographics<MemberDemographics, TrsPartyOnGoing.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("001", "m_Tgt_C_S_TRS_Pty_OnGoing", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY", "C_S_TRS_PTY_RLE", "STG_TRS_VALID_MEMBERS"), List.of(TrsSources.DDcIndv.class,
-            TrsSources.DCvDcMciIndv.class, TrsSources.DCvMciEdgIndvToa.class, TrsTargets.ValidMember.class,
+            List.of("C_S_TRS_PTY", "C_S_TRS_PTY_RLE", "STG_TRS_VALID_MEMBERS"), List.of(TrsSources.DcIndvDelta.class,
+            TrsSources.CvDcMciIndvDelta.class, TrsSources.CvMciEdgIndvToaDelta.class, TrsTargets.ValidMember.class,
             TrsSources.DeactivedMembers.class));
 
     /// @param validMemberKeys `STG_TRS_VALID_MEMBERS.PTY_PK` before the run

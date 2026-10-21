@@ -4,6 +4,7 @@
 |---|---|
 | Source system | ECI |
 | Sub-domain | Phone-email |
+| Sources | `V_ECI_ETL_SRC_FAMILY_PHONE`, `STG_ECI_PTY_INACTIVE_STS` |
 | Targets | `C_S_ECI_PTY_RLE_PHN`, `C_S_ECI_PTY_RLE_EADDR`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.eci.EciPhoneEmail` |
 

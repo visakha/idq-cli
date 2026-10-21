@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TRS, runs after 007 (`m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw`) |
 | Sub-domain | Party-Managed-Attrib |
+| Sources | `STG_TRS_D_DC_PRIMARY_PAYEE`, `STG_TRS_DC_PRIMARY_PAYEE`, `STG_TRS_CV_ED_MCI_EDG_INDV`, `STG_TRS_D_CV_ED_MCI_EDG_INDV`, `STG_TRS_DC_CASES`, `STG_TRS_D_DC_CASES`, `STG_TRS_DC_CASE_INDV`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_MNG_ATTR` (attribute type `Auth_Rep_Flag` only) |
 | Java | `com.idq.cli.source.trs.TrsAuthorizedRepresentative` |
 
@@ -127,9 +128,9 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing_pkey_test`.
 * `TrsAuthorizedRepresentative.transform`: sort by individual and begin date, compute the maximum end per key,
   keep the last row per key (`Rows.lastPerKey`), build `TrsTargets.ManagedAttribute`.
 * Load mode `TargetBatch.replaceWhere(..., "MNG_ATTR_TP", "Auth_Rep_Flag", rows)` - the IDQ pre-SQL delete.
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DDcPrimaryPayee`
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DcPrimaryPayeeDelta`
   (`STG_TRS_D_DC_PRIMARY_PAYEE`), `TrsSources.DcPrimaryPayee` (`STG_TRS_DC_PRIMARY_PAYEE`),
-  `TrsSources.CvEdMciEdgIndv` (`STG_TRS_CV_ED_MCI_EDG_INDV`), `TrsSources.DCvEdMciEdgIndv`
-  (`STG_TRS_D_CV_ED_MCI_EDG_INDV`), `TrsSources.DcCases` (`STG_TRS_DC_CASES`), `TrsSources.DDcCases`
+  `TrsSources.CvEdMciEdgIndv` (`STG_TRS_CV_ED_MCI_EDG_INDV`), `TrsSources.CvEdMciEdgIndvDelta`
+  (`STG_TRS_D_CV_ED_MCI_EDG_INDV`), `TrsSources.DcCases` (`STG_TRS_DC_CASES`), `TrsSources.DcCasesDelta`
   (`STG_TRS_D_DC_CASES`), `TrsSources.DcCaseIndv` (`STG_TRS_DC_CASE_INDV`), `TrsTargets.ValidMember`
   (`STG_TRS_VALID_MEMBERS`).

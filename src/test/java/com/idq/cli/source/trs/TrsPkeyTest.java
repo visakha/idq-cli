@@ -147,7 +147,7 @@ class TrsPkeyTest {
         var out = new TrsUniqueAddress(q, new PassThroughAddressValidator()).transform(List.of(row),
                 NoLookups.NONE, ctx(TrsUniqueAddress.INFO));
 
-        var unique = out.rows(TrsTargets.UniqueAddress.class).getFirst();
+        var unique = out.rows(TrsTargets.UniqueAddressDelta.class).getFirst();
         assertThat(unique.addrId()).isEqualTo(row.addrId());
         assertThat(unique.srcAddrLn1()).isEqualTo("1  N MAIN St");
     }

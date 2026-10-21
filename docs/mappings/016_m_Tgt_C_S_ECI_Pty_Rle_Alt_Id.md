@@ -4,6 +4,7 @@
 |---|---|
 | Source system | ECI |
 | Sub-domain | Alternate-ID |
+| Sources | `STG_ECI_D_CHILD`, `STG_ECI_D_FAMILY`, `STG_ECI_D_MEDICAID`, `STG_ECI_SN_CASE`, `STG_ECI_PTY_INACTIVE_STS` |
 | Targets | `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.eci.EciAlternateId` |
 
@@ -85,6 +86,6 @@ Note the SSN key ends with the child id, not the SSN. Unit test: `EciPkeyTest#m_
 
 * `EciAlternateId.transform` switches on the type (`IdentifierRules.ssn` / `medicaidId`); `partyKey`; entity
   `EciTargets.AlternateId`.
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.DChild`
-  (`STG_ECI_D_CHILD`), `EciSources.DFamily` (`STG_ECI_D_FAMILY`), `EciSources.DMedicaid` (`STG_ECI_D_MEDICAID`),
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `EciSources.ChildDelta`
+  (`STG_ECI_D_CHILD`), `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`), `EciSources.MedicaidDelta` (`STG_ECI_D_MEDICAID`),
   `EciSources.SnCase` (`STG_ECI_SN_CASE`), `EciTargets.InactiveStatus` (`STG_ECI_PTY_INACTIVE_STS`).

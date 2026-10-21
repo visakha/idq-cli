@@ -4,6 +4,7 @@
 |---|---|
 | Source system | WIC, workflow `wf_WIC_Stage_Load`, first mapping |
 | Sub-domain | Demographics (party activation status) |
+| Sources | `V_WIC_ETL_SRC`, `C_B_PTY_XREF`, `STG_WIC_PTY_INACTIVE_STS` |
 | Targets | `STG_WIC_PTY_INACTIVE_STS`, `STG_WIC_PTY_INACTIVE_LOG`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.wic.WicPartyValidation` |
 

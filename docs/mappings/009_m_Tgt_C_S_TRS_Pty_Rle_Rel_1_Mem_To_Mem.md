@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TRS |
 | Sub-domain | Role |
+| Sources | `STG_TRS_D_DC_RELATIONSHIPS`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_RLE_REL`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.trs.TrsMemberRelationship` |
 
@@ -79,5 +80,5 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem_pkey_test`.
 
 * `TrsMemberRelationship.transform` with `roleOf`, `pkey`, `sourceLastUpdate`; consolidation
   `Rows.currentSegmentPerKey`; entity `TrsTargets.Relationship` (`Columns.Relationship`).
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DDcRelationships`
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DcRelationshipsDelta`
   (`STG_TRS_D_DC_RELATIONSHIPS`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`).

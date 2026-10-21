@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TTF |
 | Sub-domain | Alternate-ID |
+| Sources | `V_TTF_ETL_SRC`, `STG_TTF_PTY_INACTIVE_STS` |
 | Targets | `C_S_TTF_PTY_RLE_ALT_ID` |
 | Java | `com.idq.cli.source.ttf.TtfAlternateId` |
 

@@ -47,6 +47,17 @@ drop all
 
 
 
+# about the source specific tables (STG tables )
+for example `stg_eci_d_child`  the naming coventions is  
+ - stg for staging purposes in ETL terminology
+ - eci for short name for the source system ECI (Early Child Intervention) - a government program
+ - _d_ for Delta as in `Delta Detection`
+ - child the contextual table name to say 'this table contains the child information like first name, last name, date of birth etc'
+
+each mapping is source specific and has init-query that reads these tables and dependent tables to gather the data to work on
+
+
+
 # Business Logic extraction
 create a markdown file for each of the mappings and Extract the business logic and document it with mermaid Diagrams, also include the below items
 	- SQL query that the mapping invokes as its first task (lets coin the term for this SQL, lets call it  `idq-map-init-query` or `IdqMapInitQuery` )

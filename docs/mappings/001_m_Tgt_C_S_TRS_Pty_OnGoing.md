@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TRS (TIERS), workflow `wf_TRS_Stage_Load_1_Ongoing`, first mapping |
 | Sub-domain | Demographics (plus Role) |
+| Sources | `STG_TRS_D_DC_INDV`, `STG_TRS_D_CV_DC_MCI_INDV`, `STG_TRS_D_CV_MCI_EDG_INDV_TOA`, `STG_TRS_VALID_MEMBERS`, `STG_TRS_DEACTIVED_MEMBERS` |
 | Targets | `C_S_TRS_PTY`, `C_S_TRS_PTY_RLE`, `STG_TRS_VALID_MEMBERS` (registry), `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.trs.TrsPartyOnGoing` |
 
@@ -140,7 +141,7 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_OnGoing_pkey_test`.
 * Load: `TargetBatch.replaceAll` for `C_S_TRS_PTY` / `C_S_TRS_PTY_RLE` (IDQ truncate target), `append` for the
   registry and exceptions.
 * Entities `TrsTargets.Party` (`Columns.Party` + `DEATH_DT`), `TrsTargets.PartyRole`, `TrsTargets.ValidMember`.
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DDcIndv`
-  (`STG_TRS_D_DC_INDV`), `TrsSources.DCvDcMciIndv` (`STG_TRS_D_CV_DC_MCI_INDV`), `TrsSources.DCvMciEdgIndvToa`
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DcIndvDelta`
+  (`STG_TRS_D_DC_INDV`), `TrsSources.CvDcMciIndvDelta` (`STG_TRS_D_CV_DC_MCI_INDV`), `TrsSources.CvMciEdgIndvToaDelta`
   (`STG_TRS_D_CV_MCI_EDG_INDV_TOA`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`), `TrsSources.DeactivedMembers`
   (`STG_TRS_DEACTIVED_MEMBERS`).
