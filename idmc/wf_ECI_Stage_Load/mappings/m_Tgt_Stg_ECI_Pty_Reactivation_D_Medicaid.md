@@ -39,6 +39,27 @@ flowchart LR
   n2 --> n3
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_ECI_H_MEDICAID | SourceTx | source filter `(ID_MEDICAID,LOAD_DATE) IN (Select ID_MEDICAID, Max(m.LOAD_DATE) from STG_ECI_H_MEDICAID m inner join STG_ECI_SN_CASE c on m.ID_CASE = c.ID_CASE where ID_CHILD in (select ID from V_ECI_ETL_LU_REACTIVA …` | `STG_ECI_D_MEDICAID` | never read |
+| Filt_Keep_New_Medicaid | FilterTx | keep `IsNull(ID_MEDICAID)` | `STG_ECI_D_MEDICAID` | **discarded** |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Filt_Keep_New_Medicaid | `ID_MEDICAID` | source column `ID_MEDICAID` read by `Read_STG_ECI_H_MEDICAID` |
+
+### Rows that do not reach `C_S_*` tables
+
+This mapping writes no `C_S_*` table (it loads `STG_ECI_D_MEDICAID`); the steps above decide which rows it writes.
+
 ## Transformations
 
 In data-flow order.

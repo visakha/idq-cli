@@ -98,6 +98,37 @@ flowchart LR
   n14 --> n16
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_V_FSS_ETL_SRC | SourceTx | source filter `("V_FSS_ETL_SRC"."LAST_ACTIVE_CLIENT_REGISTRATION_YN" = 'Y' OR "V_FSS_ETL_SRC"."LAST_INACTV_CLIENT_YN" = 'Y')`; rows the view `V_FSS_ETL_SRC` returns (view logic is outside the export) | `EXC_STG_BAD_REC_MEMB`, `STG_FSS_PTY_INACTIVE_LOG`, `STG_FSS_PTY_INACTIVE_STS` | never read |
+| Rtr_Valid_Party | RouterTx | group `Invalid_Party_Name`: `(Length(Rtrim(FIRST_NAME))=0 OR Length(Rtrim(LAST_NAME))=0 OR IsNULL(FIRST_NAME) OR IsNULL(LAST_NAME) )` | `EXC_STG_BAD_REC_MEMB` |  |
+| Rtr_Valid_Party | RouterTx | group `Deactivation`: `Length(Rtrim(FIRST_NAME))=0 OR Length(Rtrim(LAST_NAME))=0 OR IsNULL(FIRST_NAME) OR IsNULL(LAST_NAME) OR CLIENT_DTL__CAPXACTION = 'D' OR LAST_INACTV_CLIENT_YN = 'Y'` (comments removed) | `STG_FSS_PTY_INACTIVE_LOG`, `STG_FSS_PTY_INACTIVE_STS` |  |
+| Rtr_Valid_Party | RouterTx | group `Reactivation`: `NOT IsNull(DEACTIVATION_STS) and Length(Rtrim(FIRST_NAME))>0 and Length(Rtrim(LAST_NAME))>0 and CLIENT_DTL__CAPXACTION <> 'D' and LAST_INACTV_CLIENT_YN <> 'Y'` (comments removed) | `STG_FSS_PTY_INACTIVE_STS` |  |
+| Rtr_Valid_Party | RouterTx | default group `Default`: rows that match no other group | nothing: group not linked, **discarded** |  |
+| Filt_new_deactivations | FilterTx | keep `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_FSS_PTY_INACTIVE_STS` | `STG_FSS_PTY_INACTIVE_STS` | **discarded** |
+| Upd_Delete_Inactive | UpdateStrategyTx | `DD_DELETE` | `STG_FSS_PTY_INACTIVE_STS` | not dropped: each row deletes the target row |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Rtr_Valid_Party | `FIRST_NAME` | mapplet `mplt_Name_Standardization_Indv_Member`: mapplet `mplt_Name_Standardization_Trailing_Num_Removal`: `exp_Name_Cor_numbr.var_FName` = `RTRIM(LTRIM( Decode (True, SUBSTR(LTRIM(RTRIM(FName_lbl)),LENGTH(LTRIM(RTRIM(FName_lbl)))-2,2)!= '99' AND SUBSTR(LTRIM(RTRIM(in_FName)),LENGTH(LTRIM(RTRIM(in_FName))),1) = '0',in_FName, INSTR(FName_lbl,'9') >0, SUBSTR(in_FName,1, INSTR( FName_lbl, '9', 1, 1 )-1), in_FName) ))` |
+| Rtr_Valid_Party | `LAST_NAME` | mapplet `mplt_Name_Standardization_Indv_Member`: mapplet `mplt_Name_Standardization_Trailing_Num_Removal`: `exp_Name_Cor_numbr.var_LName` = `RTRIM(LTRIM( Decode (True, SUBSTR(LTRIM(RTRIM(LName_lbl)),LENGTH(LTRIM(RTRIM(LName_lbl)))-2,2)!= '99' AND SUBSTR(LTRIM(RTRIM(in_LName)),LENGTH(LTRIM(RTRIM(in_LName))),1) = '0',in_LName, INSTR(LName_lbl,'9') >0, SUBSTR(in_LName,1, INSTR( LName_lbl, '9', 1, 1 )-1),in_LName) ))` |
+| Rtr_Valid_Party | `CLIENT_DTL__CAPXACTION` | source column `CLIENT_DTL__CAPXACTION` read by `Read_V_FSS_ETL_SRC` |
+| Rtr_Valid_Party | `LAST_INACTV_CLIENT_YN` | source column `LAST_INACTV_CLIENT_YN` read by `Read_V_FSS_ETL_SRC` |
+| Rtr_Valid_Party | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lookup_STG_FSS_PTY_INACTIVE_STS` on `STG_FSS_PTY_INACTIVE_STS` where `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches |
+| Filt_new_deactivations | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lookup_STG_FSS_PTY_INACTIVE_STS` on `STG_FSS_PTY_INACTIVE_STS` where `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+This mapping writes no `C_S_*` table (it loads `EXC_STG_BAD_REC_MEMB`, `STG_FSS_PTY_INACTIVE_LOG`, `STG_FSS_PTY_INACTIVE_STS`); the steps above decide which rows it writes.
+
 ## Transformations
 
 In data-flow order.

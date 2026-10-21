@@ -62,6 +62,37 @@ flowchart LR
   n8 --> n9
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_TRS_D_CV_DC_MCI_Alias | SourceTx | custom SQL query (see the step): only the rows it returns | `C_S_TRS_PTY_NM` | never read |
+| fltr_Null_Fn_Ln | FilterTx | keep `NOT ISNULL(FIRST_NAME) AND NOT ISNULL(LAST_NAME)` | `C_S_TRS_PTY_NM` | **discarded** |
+| srtr_Pkey | SorterTx | distinct: exact duplicate rows are collapsed into one | `C_S_TRS_PTY_NM` | collapsed into the row kept for the same key |
+| srtr_TRS_Pty_Nm | SorterTx | distinct: exact duplicate rows are collapsed into one | `C_S_TRS_PTY_NM` | collapsed into the row kept for the same key |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| fltr_Null_Fn_Ln | `FIRST_NAME` | source column `FIRST_NAME` read by `Read_STG_TRS_D_CV_DC_MCI_Alias` |
+| fltr_Null_Fn_Ln | `LAST_NAME` | source column `LAST_NAME` read by `Read_STG_TRS_D_CV_DC_MCI_Alias` |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_NM`** (`Write_C_S_TRS_PTY_NM`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_TRS_D_CV_DC_MCI_Alias` | custom SQL query (see the step): only the rows it returns | never read |
+| `fltr_Null_Fn_Ln` | `NOT ISNULL(FIRST_NAME) AND NOT ISNULL(LAST_NAME)` | **discarded** (not written anywhere) |
+| `srtr_Pkey` | not an exact duplicate of an earlier row | collapsed into the identical row |
+| `srtr_TRS_Pty_Nm` | not an exact duplicate of an earlier row | collapsed into the identical row |
+
 ## Transformations
 
 In data-flow order.

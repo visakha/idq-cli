@@ -110,6 +110,42 @@ flowchart LR
   class n10 retired
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_TRS_D_DC_RELATIONSHIPS | SourceTx | custom SQL query (see the step): only the rows it returns | `C_S_TRS_PTY_RLE_REL`, `EXC_STG_BAD_REC_MEMB` | never read |
+| rtr_AltId_Exp | RouterTx | group `Invalid_Main_Alt_Id`: `ISNULL(PTY_RLE_FK_1) = true` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_AltId_Exp | RouterTx | group `Invalid_Ref_Alt_Id`: `ISNULL(PTY_RLE_FK_2) = true` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_AltId_Exp | RouterTx | group `Invalid_Lookup`: `ISNULL(REL_TYPE_CODE) = true`<br>= no matching row in `V_LOOKUP_CODE_VALUE` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_AltId_Exp | RouterTx | group `Period_Start_Dt_GT_Period_End_Date`: `PERIOD_START_DATE > PERIOD_END_DATE` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_AltId_Exp | RouterTx | default group `Default`: rows that match no other group | `C_S_TRS_PTY_RLE_REL` |  |
+| MPLT_Member_PTY_RLE_REL_Consolidation | MappletTx | `Filter`: keep `NOT ISNULL(REL_TP)`<br>`Sorter`: distinct: exact duplicate rows are collapsed into one<br>`Aggregator`: one row per `PKEY_SRC_OBJECT`, `PERIOD_END_DATE`, `PERIOD_START_DATE` | `C_S_TRS_PTY_RLE_REL` | **discarded** inside the mapplet |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| rtr_AltId_Exp | `PTY_RLE_FK_1` | `exp_Build_FK.v_PTY_RLE_FK_INDV` = `IIF( ISNULL(in_PTY_FK_INDV) ,NULL ,LTRIM(RTRIM(in_PTY_FK_INDV)) \|\| '\|Member' )` |
+| rtr_AltId_Exp | `PTY_RLE_FK_2` | `exp_Build_FK.v_PTY_RLE_FK_REF_INDV` = `IIF( ISNULL(in_PTY_FK_REF_INDV) ,NULL ,LTRIM(RTRIM(in_PTY_FK_REF_INDV)) \|\| '\|Member' )` |
+| rtr_AltId_Exp | `REL_TYPE_CODE` | `MSTR_CODE_VALUE` returned by lookup `Lookup_V_LOOKUP_CODE_VALUE` on `V_LOOKUP_CODE_VALUE` where `SRC_CODE_VALUE = RELATIONSHIP_TYPE_CD AND SRC_SYS = SRC_SYS_IN`; NULL when no row matches |
+| rtr_AltId_Exp | `PERIOD_START_DATE` | source column `EFF_BEGIN_DT` read by `Read_STG_TRS_D_DC_RELATIONSHIPS` |
+| rtr_AltId_Exp | `PERIOD_END_DATE` | source column `EFF_END_DT` read by `Read_STG_TRS_D_DC_RELATIONSHIPS` |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_RLE_REL`** (`Write_C_S_TRS_PTY_RLE_REL`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_TRS_D_DC_RELATIONSHIPS` | custom SQL query (see the step): only the rows it returns | never read |
+| `rtr_AltId_Exp` | matches none of the other groups (default `Default`) | if `ISNULL(PTY_RLE_FK_1) = true`: group `Invalid_Main_Alt_Id` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `ISNULL(PTY_RLE_FK_2) = true`: group `Invalid_Ref_Alt_Id` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `ISNULL(REL_TYPE_CODE) = true`: group `Invalid_Lookup` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if `PERIOD_START_DATE > PERIOD_END_DATE`: group `Period_Start_Dt_GT_Period_End_Date` &rarr; `EXC_STG_BAD_REC_MEMB` |
+| `MPLT_Member_PTY_RLE_REL_Consolidation` | `Filter`: keep `NOT ISNULL(REL_TP)`<br>`Sorter`: distinct: exact duplicate rows are collapsed into one<br>`Aggregator`: one row per `PKEY_SRC_OBJECT`, `PERIOD_END_DATE`, `PERIOD_START_DATE` | **discarded** inside the mapplet |
+
 ## Transformations
 
 In data-flow order.

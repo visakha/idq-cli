@@ -35,3 +35,26 @@ python -I ext-tools/idmc_spec.py docs/wf_ECI_Stage_Load.xml idmc/wf_ECI_Stage_Lo
 * `cdq.md`: the CDQ assets for the IDQ data quality transformations, with their exact settings.
 * `mappings/`, `mapplets/`: one spec per object with sources, SQL overrides, every transformation (expressions
   translated to CDI syntax), lookups, router groups, targets and field-level links.
+* *Filtered data* (each mapping and mapplet spec, summarized in `README.md`): every step that can stop, divert or
+  collapse rows, where the fields its condition tests come from, and for each `C_S_*` target the steps a row must
+  pass and where it goes when it fails (discarded, exception table, collapsed). See `USER_GUIDE.md`.
+
+## IDMC CDI importable export
+
+Rewrites one IDQ workflow export as a PowerCenter repository export (POWERMART XML), which IDMC converts into CDI
+mappings, mapplets, mapping tasks and a taskflow. It reuses the IDQ parser of `idmc_spec.py`. Run from the repository
+root:
+
+```sh
+python -I ext-tools/idq_to_pc.py docs/wf_ECI_Stage_Load.xml idq-to-cdi
+```
+
+* `<workflow>.XML`: the whole folder (sources, targets, mapplets, mappings, sessions, workflow).
+* `mapplets/<name>.XML`: each mapplet on its own.
+* `<workflow>.param`: PowerCenter parameter file with the IDQ parameter defaults.
+* `conversion_report.md`: a *Filtered data* chapter per mapping (same analysis as `idmc_spec.py`), and every
+  translation that is not one to one (DQ transformations rebuilt as Expressions, the
+  Address Validator placeholder, renamed ports, stale timeline fields).
+
+The script stops with an error if a link cannot be resolved or a connector names a missing or wrong-direction port.
+See `idq-to-cdi/README.md` for the upload steps.

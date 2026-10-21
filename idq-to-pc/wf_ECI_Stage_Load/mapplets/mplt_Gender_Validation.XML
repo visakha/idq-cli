@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE POWERMART SYSTEM "powrmart.dtd">
+<POWERMART CREATION_DATE="10/21/2026 00:00:00" REPOSITORY_VERSION="186.95">
+  <REPOSITORY CODEPAGE="UTF-8" DATABASETYPE="Oracle" NAME="IDQ_CONVERTED" VERSION="186">
+    <FOLDER DESCRIPTION="Converted from the IDQ export " GROUP="" NAME="ECI" OWNER="Administrator" PERMISSIONS="rwx---r--" SHARED="NOTSHARED" UUID="">
+      <MAPPLET DESCRIPTION="This mapplet vallidates Gender Code from each source system&#13;&#10;&#13;&#10;[ML 12/29/2024]  Added WIC to the system list." ISVALID="YES" NAME="mplt_Gender_Validation" OBJECTVERSION="1" VERSIONNUMBER="1">
+        <TRANSFORMATION DESCRIPTION="" NAME="input" OBJECTVERSION="1" REUSABLE="NO" TYPE="Input Transformation" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Gender_Code" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" MAPPLETGROUP="input" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Src_Sys" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" MAPPLETGROUP="input" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Party_Type" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" MAPPLETGROUP="input" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="exp_Gender_Code_Validation" OBJECTVERSION="1" REUSABLE="NO" TYPE="Expression" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="in_Gender_Code" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="v_Gender_First_Digit" PICTURETEXT="" PORTTYPE="LOCAL VARIABLE" PRECISION="1" SCALE="0" EXPRESSION="in_Gender_Code" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Party_Type" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="v_Gender_Code" PICTURETEXT="" PORTTYPE="LOCAL VARIABLE" PRECISION="10" SCALE="0" EXPRESSION="Decode(True,&#10;IN(Party_Type,'I','Indv','INDV','HCP')&#10;AND&#10;IN(v_Gender_First_Digit,'B','U'),&#10;NULL,&#10;IN(Party_Type,'I','Indv','INDV','HCP')&#10;AND&#10;v_Gender_First_Digit= 'M',&#10;'1',&#10;IN(Party_Type,'I','Indv','INDV','HCP')&#10;AND&#10;v_Gender_First_Digit = 'F',&#10;'2',&#10;IN(Party_Type,'O','Org','ORG'),&#10;NULL&#10;)" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="ERROR('transformation error')" DESCRIPTION="" NAME="Gender_Code" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="10" SCALE="0" EXPRESSION="v_Gender_Code" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Src_Sys" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" EXPRESSION="" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="ERROR('transformation error')" DESCRIPTION="" NAME="Exception_Code" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="100" SCALE="0" EXPRESSION="Decode(TRUE,&#10;&#09;&#09;&#09;IN(LTRIM(RTRIM(Src_Sys)),'P23','C21','P88','MAX','P84','PMR','TRS','CRE','ECI','WIC','FSS','TTF') AND&#10;&#09;&#09;&#09;IN(Party_Type,'HCP','Indv','INDV','I') AND&#10;&#09;&#09;&#09;ISNULL(v_Gender_First_Digit), 'Invalid_Gender',&#10;&#10;&#09;&#09;&#09;IN(LTRIM(RTRIM(Src_Sys)),'P23','C21','P88','MAX','P84','PMR','TRS','CRE','ECI','WIC','FSS','TTF') AND&#10;&#09;&#09;&#09;IN(Party_Type,'HCP','Indv','INDV','I') AND&#10;&#09;&#09;&#09;IS_NUMBER(v_Gender_First_Digit),'Invalid_Gender',&#10;&#10;&#09;&#09;&#09;IN(LTRIM(RTRIM(Src_Sys)),'P23','C21','P88','MAX','P84','PMR','TRS','CRE','ECI','WIC','FSS','TTF') AND&#10;&#09;&#09;&#09;IN(Party_Type,'HCP','Indv','INDV','I') AND&#10;&#09;&#09;&#09;NOT IN(v_Gender_First_Digit,'M','F','U','B'),'Invalid_Gender', NULL)" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="ERROR('transformation error')" DESCRIPTION="" NAME="Exception_Description" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="100" SCALE="0" EXPRESSION="Decode(TRUE,&#10;ISNULL(v_Gender_First_Digit), 'Missing Gender',&#10;IS_NUMBER(v_Gender_First_Digit),'Gender Code is Numeric',&#10;NOT IN(v_Gender_First_Digit,'M','F','U','B'),'Invalid Gender', NULL)&#10;&#10;&#10;--NOT IN(Gender,'M','F','U','B'),'Invalid Gender Code Value' --&gt; Changed per agreement on Exception Handling of Gender Data DT:08/11/2023" EXPRESSIONTYPE="GENERAL" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="ERROR('transformation error')" DESCRIPTION="" NAME="Exception_Type" PICTURETEXT="" PORTTYPE="OUTPUT" PRECISION="100" SCALE="0" EXPRESSION="Decode(TRUE,&#10;ISNULL(v_Gender_First_Digit), 'Bad Value',&#10;IS_NUMBER(v_Gender_First_Digit),'Bad Value',&#10;NOT IN(v_Gender_First_Digit,'M','F','U','B'),'Bad Value', NULL)" EXPRESSIONTYPE="GENERAL" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="Lookup_EXC_LOOKUP_CODE_VALUE" OBJECTVERSION="1" REUSABLE="NO" TYPE="Lookup Procedure" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="In_Exception_Code" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="300" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="decimal" DEFAULTVALUE="" DESCRIPTION="" NAME="EXC_LOOKUP_CODE_VALUE_ID" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="10" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="CREATED_BY" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="50" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="date/time" DEFAULTVALUE="" DESCRIPTION="" NAME="CREATE_DATE" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="29" SCALE="9" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="UPDATED_BY" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="50" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="date/time" DEFAULTVALUE="" DESCRIPTION="" NAME="LAST_UPDATE_DATE" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="29" SCALE="9" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EXCEPTION_CODE" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="300" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EXCEPTION_DESC" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="300" SCALE="0" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="EXCEPTION_TYPE" PICTURETEXT="" PORTTYPE="LOOKUP/OUTPUT" PRECISION="300" SCALE="0" />
+          <TABLEATTRIBUTE NAME="Lookup Sql Override" VALUE="" />
+          <TABLEATTRIBUTE NAME="Lookup table name" VALUE="EXC_LOOKUP_CODE_VALUE" />
+          <TABLEATTRIBUTE NAME="Lookup Source Filter" VALUE="" />
+          <TABLEATTRIBUTE NAME="Lookup caching enabled" VALUE="YES" />
+          <TABLEATTRIBUTE NAME="Lookup policy on multiple match" VALUE="Use Any Value" />
+          <TABLEATTRIBUTE NAME="Lookup condition" VALUE="EXCEPTION_CODE = In_Exception_Code" />
+          <TABLEATTRIBUTE NAME="Connection Information" VALUE="STAGING" />
+          <TABLEATTRIBUTE NAME="Source Type" VALUE="Database" />
+          <TABLEATTRIBUTE NAME="Recache if Stale" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Tracing Level" VALUE="Normal" />
+          <TABLEATTRIBUTE NAME="Lookup cache directory name" VALUE="$PMCacheDir/" />
+          <TABLEATTRIBUTE NAME="Lookup cache initialize" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Lookup cache persistent" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Lookup Data Cache Size" VALUE="Auto" />
+          <TABLEATTRIBUTE NAME="Lookup Index Cache Size" VALUE="Auto" />
+          <TABLEATTRIBUTE NAME="Dynamic Lookup Cache" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Synchronize Dynamic Cache" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Output Old Value On Update" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Update Dynamic Cache Condition" VALUE="TRUE" />
+          <TABLEATTRIBUTE NAME="Cache File Name Prefix" VALUE="" />
+          <TABLEATTRIBUTE NAME="Re-cache from lookup source" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Insert Else Update" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Update Else Insert" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Datetime Format" VALUE="" />
+          <TABLEATTRIBUTE NAME="Thousand Separator" VALUE="None" />
+          <TABLEATTRIBUTE NAME="Decimal Separator" VALUE="." />
+          <TABLEATTRIBUTE NAME="Case Sensitive String Comparison" VALUE="YES" />
+          <TABLEATTRIBUTE NAME="Null ordering" VALUE="Null Is Highest Value" />
+          <TABLEATTRIBUTE NAME="Sorted Input" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Lookup source is static" VALUE="NO" />
+          <TABLEATTRIBUTE NAME="Pre-build lookup cache" VALUE="Auto" />
+          <TABLEATTRIBUTE NAME="Subsecond Precision" VALUE="6" />
+        </TRANSFORMATION>
+        <TRANSFORMATION DESCRIPTION="" NAME="output" OBJECTVERSION="1" REUSABLE="NO" TYPE="Output Transformation" VERSIONNUMBER="1">
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="o_Gender_Code" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="10" SCALE="0" MAPPLETGROUP="output" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Gender_Exception_Code" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="100" SCALE="0" MAPPLETGROUP="output" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Gender_Exception_Description" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="100" SCALE="0" MAPPLETGROUP="output" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="Gender_Exception_Type" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="100" SCALE="0" MAPPLETGROUP="output" />
+          <TRANSFORMFIELD DATATYPE="string" DEFAULTVALUE="" DESCRIPTION="" NAME="MDM_Gender_Code" PICTURETEXT="" PORTTYPE="INPUT" PRECISION="255" SCALE="0" MAPPLETGROUP="output" />
+        </TRANSFORMATION>
+        <INSTANCE DESCRIPTION="" NAME="input" TRANSFORMATION_TYPE="Input Transformation" TRANSFORMATION_NAME="input" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="exp_Gender_Code_Validation" TRANSFORMATION_TYPE="Expression" TRANSFORMATION_NAME="exp_Gender_Code_Validation" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="Lookup_EXC_LOOKUP_CODE_VALUE" TRANSFORMATION_TYPE="Lookup Procedure" TRANSFORMATION_NAME="Lookup_EXC_LOOKUP_CODE_VALUE" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <INSTANCE DESCRIPTION="" NAME="output" TRANSFORMATION_TYPE="Output Transformation" TRANSFORMATION_NAME="output" TYPE="TRANSFORMATION" REUSABLE="NO" />
+        <CONNECTOR FROMFIELD="Gender_Code" FROMINSTANCE="input" FROMINSTANCETYPE="Input Transformation" TOFIELD="in_Gender_Code" TOINSTANCE="exp_Gender_Code_Validation" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Src_Sys" FROMINSTANCE="input" FROMINSTANCETYPE="Input Transformation" TOFIELD="Src_Sys" TOINSTANCE="exp_Gender_Code_Validation" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Party_Type" FROMINSTANCE="input" FROMINSTANCETYPE="Input Transformation" TOFIELD="Party_Type" TOINSTANCE="exp_Gender_Code_Validation" TOINSTANCETYPE="Expression" />
+        <CONNECTOR FROMFIELD="Exception_Code" FROMINSTANCE="exp_Gender_Code_Validation" FROMINSTANCETYPE="Expression" TOFIELD="In_Exception_Code" TOINSTANCE="Lookup_EXC_LOOKUP_CODE_VALUE" TOINSTANCETYPE="Lookup Procedure" />
+        <CONNECTOR FROMFIELD="Gender_Code" FROMINSTANCE="exp_Gender_Code_Validation" FROMINSTANCETYPE="Expression" TOFIELD="MDM_Gender_Code" TOINSTANCE="output" TOINSTANCETYPE="Output Transformation" />
+        <CONNECTOR FROMFIELD="Gender_Code" FROMINSTANCE="input" FROMINSTANCETYPE="Input Transformation" TOFIELD="o_Gender_Code" TOINSTANCE="output" TOINSTANCETYPE="Output Transformation" />
+        <CONNECTOR FROMFIELD="EXCEPTION_DESC" FROMINSTANCE="Lookup_EXC_LOOKUP_CODE_VALUE" FROMINSTANCETYPE="Lookup Procedure" TOFIELD="Gender_Exception_Description" TOINSTANCE="output" TOINSTANCETYPE="Output Transformation" />
+        <CONNECTOR FROMFIELD="EXCEPTION_TYPE" FROMINSTANCE="Lookup_EXC_LOOKUP_CODE_VALUE" FROMINSTANCETYPE="Lookup Procedure" TOFIELD="Gender_Exception_Type" TOINSTANCE="output" TOINSTANCETYPE="Output Transformation" />
+        <CONNECTOR FROMFIELD="Exception_Code" FROMINSTANCE="exp_Gender_Code_Validation" FROMINSTANCETYPE="Expression" TOFIELD="Gender_Exception_Code" TOINSTANCE="output" TOINSTANCETYPE="Output Transformation" />
+      </MAPPLET>
+    </FOLDER>
+  </REPOSITORY>
+</POWERMART>

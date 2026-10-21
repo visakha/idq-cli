@@ -78,6 +78,18 @@ The legacy MDM timeline of the C_S_* tables is stale, so its logic is not built 
 
 No whole steps are retired in this workflow; only the timeline fields are omitted.
 
+## Filtered data
+
+Which steps can keep a source row out of each `C_S_*` table, and where the diverted rows go instead. Each mapping spec has a *Filtered data* section with the conditions, the origin of every field they test and what happens to the rows that fail.
+
+| Mapping | `C_S_*` table | Steps that can keep a row out | Failed rows diverted to |
+|---|---|---|---|
+| [`m_Tgt_C_S_TTF_Pty_Validation`](mappings/m_Tgt_C_S_TTF_Pty_Validation.md#filtered-data) | (no `C_S_*` target) |  |  |
+| [`m_Tgt_C_S_TTF_Pty`](mappings/m_Tgt_C_S_TTF_Pty.md#filtered-data) | `C_S_TTF_PTY` | `Read_V_TTF_ETL_SRC`, `Flt_Remove_Inactive`, `Rtr_Exception` |  |
+| [`m_Tgt_C_S_TTF_Pty`](mappings/m_Tgt_C_S_TTF_Pty.md#filtered-data) | `C_S_TTF_PTY_RLE` | `Read_V_TTF_ETL_SRC`, `Flt_Remove_Inactive`, `Rtr_Exception` |  |
+| [`m_Tgt_C_S_TTF_Pty_Rle_Alt_Id`](mappings/m_Tgt_C_S_TTF_Pty_Rle_Alt_Id.md#filtered-data) | `C_S_TTF_PTY_RLE_ALT_ID` | `Read_V_TTF_ETL_SRC`, `Filter` |  |
+| [`m_Tgt_C_S_TTF_Pty_Rle_Phn`](mappings/m_Tgt_C_S_TTF_Pty_Rle_Phn.md#filtered-data) | `C_S_TTF_PTY_RLE_PHN` | `Read_V_TTF_ETL_SRC`, `fil_deactivated_status`, `Filt_null_phone`, `RTR_Valid_PhoneNumbers` | `EXC_STG_BAD_REC_MEMB` |
+
 ## Translation rules applied
 
 | IDQ | CDI | Where |

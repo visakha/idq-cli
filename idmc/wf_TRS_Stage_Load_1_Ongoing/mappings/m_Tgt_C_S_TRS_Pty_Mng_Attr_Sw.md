@@ -48,6 +48,34 @@ flowchart LR
   n6 --> n7
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_Stg_TRS_D_DC_Indv | SourceTx | custom SQL query (see the step): only the rows it returns | `C_S_TRS_PTY_MNG_ATTR` | never read |
+| fltr_Null_Values | FilterTx | keep `NOT ISNULL(ATTR_VALUE) AND LENGTH(RTRIM(ATTR_VALUE)) > 0` | `C_S_TRS_PTY_MNG_ATTR` | **discarded** |
+| srtr_Pkey | SorterTx | distinct: exact duplicate rows are collapsed into one | `C_S_TRS_PTY_MNG_ATTR` | collapsed into the row kept for the same key |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| fltr_Null_Values | `ATTR_VALUE` | `ATTR_VALUE_1` output of `nrm_Attribute_Types` (CDI Normalizer) |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_MNG_ATTR`** (`Write_C_S_TRS_PTY_MNG_ATTR`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_Stg_TRS_D_DC_Indv` | custom SQL query (see the step): only the rows it returns | never read |
+| `fltr_Null_Values` | `NOT ISNULL(ATTR_VALUE) AND LENGTH(RTRIM(ATTR_VALUE)) > 0` | **discarded** (not written anywhere) |
+| `srtr_Pkey` | not an exact duplicate of an earlier row | collapsed into the identical row |
+
 ## Transformations
 
 In data-flow order.

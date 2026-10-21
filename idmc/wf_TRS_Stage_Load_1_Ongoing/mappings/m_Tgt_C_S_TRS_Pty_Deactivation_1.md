@@ -54,6 +54,28 @@ flowchart LR
   n4 --> n5
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_TRS_D_DC_INDV_and_CV | SourceTx | custom SQL query (see the step): only the rows it returns | `STG_TRS_DEACTIVED_MEMBERS`, `STG_TRS_VALID_MEMBERS` | never read |
+| Delete_Valid_Stage | UpdateStrategyTx | `DD_DELETE` | `STG_TRS_VALID_MEMBERS` | not dropped: each row deletes the target row |
+| Filt_New_Only | FilterTx | keep `ISNULL(PTY_PK1)`<br>= no matching row in `STG_TRS_DEACTIVED_MEMBERS` | `STG_TRS_DEACTIVED_MEMBERS` | **discarded** |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Filt_New_Only | `PTY_PK1` | `PTY_PK` returned by lookup `Lookup_STG_TRS_DEACTIVED_MEMBERS` on `STG_TRS_DEACTIVED_MEMBERS` where `PTY_PK = PTY_PK1`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+This mapping writes no `C_S_*` table (it loads `STG_TRS_DEACTIVED_MEMBERS`, `STG_TRS_VALID_MEMBERS`); the steps above decide which rows it writes.
+
 ## Transformations
 
 In data-flow order.

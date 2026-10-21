@@ -118,6 +118,54 @@ flowchart LR
   n23 --> n24
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_ECI_D_CHILD_AND_FAMILY | SourceTx | custom SQL query (see the step): only the rows it returns<br>Note: filter `"STG_ECI_D_CHILD"."ID_CHILD" IN ('0001252185','0001252521','0001267262','0001303720','0001252810')` is also stored; it is not part of the custom query text and looks like a test filter: confirm it is not applied | `C_S_ECI_PTY`, `C_S_ECI_PTY_RLE`, `EXC_STG_BAD_REC_MEMB` | never read |
+| Flt_Remove_Inactive | FilterTx | keep `IsNull(DEACTIVATION_STS)` (comments removed)<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | `C_S_ECI_PTY`, `C_S_ECI_PTY_RLE`, `EXC_STG_BAD_REC_MEMB` | **discarded** |
+| Rtr_Exception | RouterTx | group `Valid_Party`: `TRUE` | `C_S_ECI_PTY`, `C_S_ECI_PTY_RLE` |  |
+| Rtr_Exception | RouterTx | group `Invalid_Birth_Date`: `NOT ISNULL(BirthDate_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` |  |
+| Rtr_Exception | RouterTx | group `Invalid_Gender_Code`: `NOT ISNULL(Gender_Exception_Description)` | `EXC_STG_BAD_REC_MEMB` |  |
+| Rtr_Exception | RouterTx | group `Invalid_Ethnicity`: `NOT IsNull(Ethnicity_EXCEPTION_CODE) and SRC_TBL='ECI_CHILD'` | `EXC_STG_BAD_REC_MEMB` |  |
+| Rtr_Exception | RouterTx | group `Invalid_Race`: `NOT IsNull(Race_Exception_Desc) and SRC_TBL='ECI_CHILD'` | `EXC_STG_BAD_REC_MEMB` |  |
+| Rtr_Exception | RouterTx | group `Invalid_Language`: `NOT IsNull(Language_EXCEPTION_CODE) and SRC_TBL='ECI_CHILD'` | `EXC_STG_BAD_REC_MEMB` |  |
+| Rtr_Exception | RouterTx | default group `Default`: rows that match no other group | nothing: group not linked, **discarded** |  |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Flt_Remove_Inactive | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lkp_STG_ECI_PTY_INACTIVE_STS` on `STG_ECI_PTY_INACTIVE_STS` where `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches; `STG_ECI_PTY_INACTIVE_STS` is loaded by `m_Tgt_C_S_ECI_Pty_Validation` in this workflow |
+| Rtr_Exception | `BirthDate_Exception_Code` | mapplet `mplt_BirthDate_Validation`: `exp_BirthDate_Validation.Exception_Code` = `Decode(TRUE, IN(Src_Sys,'P23','C21','P88','MAX','P84','PMR','TRS','CRE','ECI','WIC','FSS', 'TTF') AND IN(Party_Type,'HCP','Indv','INDV','I') AND BirthDate > sysdate, 'Invalid_Birth_Date', NULL)` |
+| Rtr_Exception | `Gender_Exception_Description` | mapplet `mplt_Gender_Validation`: `EXCEPTION_DESC` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = In_Exception_Code`; NULL when no row matches |
+| Rtr_Exception | `Ethnicity_EXCEPTION_CODE` | mapplet `mplt_Ethnicity_Validation`: `EXCEPTION_CODE` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = EXCEPTION_CODE1`; NULL when no row matches |
+| Rtr_Exception | `SRC_TBL` | source column `SOURCE_TABLE` read by `Read_STG_ECI_D_CHILD_AND_FAMILY` |
+| Rtr_Exception | `Race_Exception_Desc` | mapplet `mplt_Race_Ind_Validation`: `EXCEPTION_DESC` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = in_Exception_Code`; NULL when no row matches |
+| Rtr_Exception | `Language_EXCEPTION_CODE` | mapplet `mplt_Language_Validation`: `EXCEPTION_CODE` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = EXCEPTION_CODE1`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_ECI_PTY`** (`Write_C_S_ECI_PTY`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_ECI_D_CHILD_AND_FAMILY` | custom SQL query (see the step): only the rows it returns<br>Note: filter `"STG_ECI_D_CHILD"."ID_CHILD" IN ('0001252185','0001252521','0001267262','0001303720','0001252810')` is also stored; it is not part of the custom query text and looks like a test filter: confirm it is not applied | never read |
+| `Flt_Remove_Inactive` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+| `Rtr_Exception` | group `Valid_Party`: `TRUE`<br>(a row that also matches `Invalid_Birth_Date`, `Invalid_Gender_Code`, `Invalid_Ethnicity`, `Invalid_Race`, `Invalid_Language` is written there as well) | never (condition is always TRUE) |
+
+**`C_S_ECI_PTY_RLE`** (`Write_C_S_ECI_PTY_RLE`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_ECI_D_CHILD_AND_FAMILY` | custom SQL query (see the step): only the rows it returns<br>Note: filter `"STG_ECI_D_CHILD"."ID_CHILD" IN ('0001252185','0001252521','0001267262','0001303720','0001252810')` is also stored; it is not part of the custom query text and looks like a test filter: confirm it is not applied | never read |
+| `Flt_Remove_Inactive` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+| `Rtr_Exception` | group `Valid_Party`: `TRUE`<br>(a row that also matches `Invalid_Birth_Date`, `Invalid_Gender_Code`, `Invalid_Ethnicity`, `Invalid_Race`, `Invalid_Language` is written there as well) | never (condition is always TRUE) |
+
 ## Transformations
 
 In data-flow order.

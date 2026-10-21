@@ -89,6 +89,66 @@ flowchart LR
   n21 --> n22
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_ECI_D_CHILD | SourceTx | custom SQL query (see the step): only the rows it returns | `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB` | never read |
+| Filter | FilterTx | keep `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB` | **discarded** |
+| Rtr_ALT_ID_Type | RouterTx | group `CHILD_SSN`: `ALT_ID_TP='004'` | `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB` |  |
+| Rtr_ALT_ID_Type | RouterTx | group `ECI_IDs`: `ALT_ID_TP='018' or ALT_ID_TP='019'` | `C_S_ECI_PTY_RLE_ALT_ID` |  |
+| Rtr_ALT_ID_Type | RouterTx | group `MEDICAID_NBR`: `ALT_ID_TP='002'` | `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB` |  |
+| Rtr_ALT_ID_Type | RouterTx | default group `Default`: rows that match no other group | nothing: group not linked, **discarded** |  |
+| RTR_Valid_SSN | RouterTx | group `Valid_CHILD_SSN`: `ISNULL(SSN_Exception_Code)` | `C_S_ECI_PTY_RLE_ALT_ID` |  |
+| RTR_Valid_SSN | RouterTx | group `Invalid_CHILD_SSN`: `NOT ISNULL(SSN_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` |  |
+| RTR_Valid_SSN | RouterTx | default group `Default`: rows that match no other group | no row gets here: every row matches `Valid_CHILD_SSN` or `Invalid_CHILD_SSN` |  |
+| RTR_Valid_Medicaid_ID | RouterTx | group `VALID_Medicaid_Id`: `ISNULL(Medicaid_Id_Exception_Code)` | `C_S_ECI_PTY_RLE_ALT_ID` |  |
+| RTR_Valid_Medicaid_ID | RouterTx | group `INVALID_Medicaid_Id`: `NOT ISNULL(Medicaid_Id_Exception_Code)` | `EXC_STG_BAD_REC_MEMB` |  |
+| RTR_Valid_Medicaid_ID | RouterTx | default group `Default`: rows that match no other group | no row gets here: every row matches `VALID_Medicaid_Id` or `INVALID_Medicaid_Id` |  |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Filter | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lkp_STG_ECI_PTY_INACTIVE_STS` on `STG_ECI_PTY_INACTIVE_STS` where `SRC_KEY = PTY_SRC_KEY AND ROWID_SYSTEM = SRC_SYSTEM`; NULL when no row matches; `STG_ECI_PTY_INACTIVE_STS` is loaded by `m_Tgt_C_S_ECI_Pty_Validation` in this workflow |
+| Rtr_ALT_ID_Type | `ALT_ID_TP` | source column `ALT_ID_TP` read by `Read_STG_ECI_D_CHILD` |
+| RTR_Valid_SSN | `SSN_Exception_Code` | `exp_validate_ssn.EXCEPTION_CODE1` = `IIF( SSN_Status = 'Invalid' ,'Invalid_SSN' ,Null )` |
+| RTR_Valid_Medicaid_ID | `Medicaid_Id_Exception_Code` | mapplet `rule_MEDICAID_ID_Std`: `EXCEPTION_CODE1` returned by lookup `Lookup_EXC_LOOKUP_CODE_VALUE1` on `EXC_LOOKUP_CODE_VALUE` where `EXCEPTION_CODE = EXCEPTION_CODE1`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_ECI_PTY_RLE_ALT_ID`** (`Write_C_S_ECI_PTY_RLE_ALT_ID`): a source row is written only when it passes every step below on one of its 3 paths.
+
+Path 1:
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_ECI_D_CHILD` | custom SQL query (see the step): only the rows it returns | never read |
+| `Filter` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+| `Rtr_ALT_ID_Type` | group `CHILD_SSN`: `ALT_ID_TP='004'` | if `ALT_ID_TP='018' or ALT_ID_TP='019'`: group `ECI_IDs` &rarr; `C_S_ECI_PTY_RLE_ALT_ID`<br>if `ALT_ID_TP='002'`: group `MEDICAID_NBR` &rarr; `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB`<br>if no group matches: **discarded** (default group not linked) |
+| `RTR_Valid_SSN` | group `Valid_CHILD_SSN`: `ISNULL(SSN_Exception_Code)` | if `NOT ISNULL(SSN_Exception_Code)`: group `Invalid_CHILD_SSN` &rarr; `EXC_STG_BAD_REC_MEMB` |
+
+Path 2:
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_ECI_D_CHILD` | custom SQL query (see the step): only the rows it returns | never read |
+| `Filter` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+| `Rtr_ALT_ID_Type` | group `ECI_IDs`: `ALT_ID_TP='018' or ALT_ID_TP='019'` | if `ALT_ID_TP='004'`: group `CHILD_SSN` &rarr; `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB`<br>if `ALT_ID_TP='002'`: group `MEDICAID_NBR` &rarr; `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB`<br>if no group matches: **discarded** (default group not linked) |
+
+Path 3:
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_ECI_D_CHILD` | custom SQL query (see the step): only the rows it returns | never read |
+| `Filter` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_ECI_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+| `Rtr_ALT_ID_Type` | group `MEDICAID_NBR`: `ALT_ID_TP='002'` | if `ALT_ID_TP='004'`: group `CHILD_SSN` &rarr; `C_S_ECI_PTY_RLE_ALT_ID`, `EXC_STG_BAD_REC_MEMB`<br>if `ALT_ID_TP='018' or ALT_ID_TP='019'`: group `ECI_IDs` &rarr; `C_S_ECI_PTY_RLE_ALT_ID`<br>if no group matches: **discarded** (default group not linked) |
+| `RTR_Valid_Medicaid_ID` | group `VALID_Medicaid_Id`: `ISNULL(Medicaid_Id_Exception_Code)` | if `NOT ISNULL(Medicaid_Id_Exception_Code)`: group `INVALID_Medicaid_Id` &rarr; `EXC_STG_BAD_REC_MEMB` |
+
 ## Transformations
 
 In data-flow order.

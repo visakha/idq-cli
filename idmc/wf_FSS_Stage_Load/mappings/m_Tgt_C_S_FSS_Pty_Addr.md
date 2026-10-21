@@ -88,6 +88,37 @@ flowchart LR
   n13 --> n14
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_V_FSS_ETL_SRC | SourceTx | source filter `"V_FSS_ETL_SRC"."DTL__CAPXACTION"<>'D'`; rows the view `V_FSS_ETL_SRC` returns (view logic is outside the export) | `DQM_ADDRESS`, `EXC_STG_BAD_REC_MEMB`, `C_S_FSS_PTY_RLE_ADDR` | never read |
+| Fil_Inactive_recs | FilterTx | keep `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_FSS_PTY_INACTIVE_STS` | `DQM_ADDRESS`, `EXC_STG_BAD_REC_MEMB`, `C_S_FSS_PTY_RLE_ADDR` | **discarded** |
+| rtr_Good_vs_Exception_Pty_Records | RouterTx | group `Good`: `Score = '100'` | `C_S_FSS_PTY_RLE_ADDR` |  |
+| rtr_Good_vs_Exception_Pty_Records | RouterTx | group `Exception`: `Score = '40'` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Good_vs_Exception_Pty_Records | RouterTx | default group `Default`: rows that match no other group | nothing: group not linked, **discarded** |  |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Fil_Inactive_recs | `DEACTIVATION_STS` | `DEACTIVATION_STS` returned by lookup `Lookup_STG_FSS_PTY_INACTIVE_STS` on `STG_FSS_PTY_INACTIVE_STS` where `SRC_KEY = PTY_SRC_KEY AND ROWID_SYSTEM = SRC_SYS`; NULL when no row matches; `STG_FSS_PTY_INACTIVE_STS` is loaded by `m_Tgt_C_S_FSS_Pty_Validation` in this workflow |
+| rtr_Good_vs_Exception_Pty_Records | `Score` | `exp_Score_and_Exception_details.Score` = `Decode(True, Addr_Tp_Mstr_Cd != '002' AND MailabilityScore <= '3','40', Addr_Tp_Mstr_Cd = '002' AND MailabilityScore < '3' AND IN(SUBSTR(MatchCode,1,1),'I','N'),'40', ISNULL(Addr_Tp_Mstr_Cd), '40', '100')` |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_FSS_PTY_RLE_ADDR`** (`Write_C_S_FSS_PTY_RLE_ADDR`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_V_FSS_ETL_SRC` | source filter `"V_FSS_ETL_SRC"."DTL__CAPXACTION"<>'D'`; rows the view `V_FSS_ETL_SRC` returns (view logic is outside the export) | never read |
+| `Fil_Inactive_recs` | `IsNull(DEACTIVATION_STS)`<br>= no matching row in `STG_FSS_PTY_INACTIVE_STS` | **discarded** (not written anywhere) |
+| `rtr_Good_vs_Exception_Pty_Records` | group `Good`: `Score = '100'` | if `Score = '40'`: group `Exception` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if no group matches: **discarded** (default group not linked) |
+
 ## Transformations
 
 In data-flow order.

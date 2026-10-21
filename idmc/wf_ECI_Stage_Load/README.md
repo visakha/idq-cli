@@ -91,6 +91,24 @@ The legacy MDM timeline of the C_S_* tables is stale, so its logic is not built 
 
 No whole steps are retired in this workflow; only the timeline fields are omitted.
 
+## Filtered data
+
+Which steps can keep a source row out of each `C_S_*` table, and where the diverted rows go instead. Each mapping spec has a *Filtered data* section with the conditions, the origin of every field they test and what happens to the rows that fail.
+
+| Mapping | `C_S_*` table | Steps that can keep a row out | Failed rows diverted to |
+|---|---|---|---|
+| [`m_Tgt_C_S_ECI_Pty_Validation`](mappings/m_Tgt_C_S_ECI_Pty_Validation.md#filtered-data) | (no `C_S_*` target) |  |  |
+| [`m_Tgt_C_S_ECI_Pty`](mappings/m_Tgt_C_S_ECI_Pty.md#filtered-data) | `C_S_ECI_PTY` | `Read_STG_ECI_D_CHILD_AND_FAMILY`, `Flt_Remove_Inactive`, `Rtr_Exception` |  |
+| [`m_Tgt_C_S_ECI_Pty`](mappings/m_Tgt_C_S_ECI_Pty.md#filtered-data) | `C_S_ECI_PTY_RLE` | `Read_STG_ECI_D_CHILD_AND_FAMILY`, `Flt_Remove_Inactive`, `Rtr_Exception` |  |
+| [`m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Addr`](mappings/m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Addr.md#filtered-data) | (no `C_S_*` target) |  |  |
+| [`m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Phn`](mappings/m_Tgt_Stg_ECI_Pty_Reactivation_D_Family_Phn.md#filtered-data) | (no `C_S_*` target) |  |  |
+| [`m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid`](mappings/m_Tgt_Stg_ECI_Pty_Reactivation_D_Medicaid.md#filtered-data) | (no `C_S_*` target) |  |  |
+| [`m_Tgt_C_S_ECI_Pty_Rle_Alt_Id`](mappings/m_Tgt_C_S_ECI_Pty_Rle_Alt_Id.md#filtered-data) | `C_S_ECI_PTY_RLE_ALT_ID` | `Read_STG_ECI_D_CHILD`, `Filter`, `Rtr_ALT_ID_Type`, `RTR_Valid_SSN`, `RTR_Valid_Medicaid_ID` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr`](mappings/m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr.md#filtered-data) | `C_S_ECI_PTY_RLE_PHN` | `Read_V_ECI_ETL_SRC_FAMILY_PHONE`, `fil_deactivated_status`, `rtr_Phone_Email`, `RTR_Valid_PhoneNumbers` | `EXC_STG_BAD_REC_MEMB`, `C_S_ECI_PTY_RLE_EADDR` |
+| [`m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr`](mappings/m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr.md#filtered-data) | `C_S_ECI_PTY_RLE_EADDR` | `Read_V_ECI_ETL_SRC_FAMILY_PHONE`, `fil_deactivated_status`, `rtr_Phone_Email`, `rtr_Valid_EAddr_Records` | `EXC_STG_BAD_REC_MEMB`, `C_S_ECI_PTY_RLE_PHN` |
+| [`m_Tgt_C_S_ECI_Pty_Addr`](mappings/m_Tgt_C_S_ECI_Pty_Addr.md#filtered-data) | `C_S_ECI_PTY_RLE_ADDR` | `Read_V_ECI_ETL_SRC_FAMILY_ADDRESS`, `Fil_Inactive_recs`, `rtr_Good_vs_Exception_Pty_Records` | `EXC_STG_BAD_REC_MEMB` |
+| [`m_Tgt_C_S_ECI_Pty_Rle_Rel`](mappings/m_Tgt_C_S_ECI_Pty_Rle_Rel.md#filtered-data) | `C_S_ECI_PTY_RLE_REL` | `Read_STG_ECI_D_FAMILY`, `Filter_Fam_Child_Valid`, `Route_Good_vs_Exceptions` | `EXC_STG_BAD_REC_MEMB` |
+
 ## Translation rules applied
 
 | IDQ | CDI | Where |

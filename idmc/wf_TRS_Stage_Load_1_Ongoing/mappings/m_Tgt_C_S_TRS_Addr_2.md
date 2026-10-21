@@ -89,6 +89,34 @@ flowchart LR
   n14 --> n15
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| read_Staging_Delta_Tables | SourceTx | custom SQL query (see the step): only the rows it returns | `DQM_ADDRESS`, `C_S_TRS_PTY_RLE_ADDR`, `EXC_STG_BAD_REC_MEMB` | never read |
+| rtr_Good_vs_Exception_Pty_Records | RouterTx | group `Good`: `Score = '100'` | `C_S_TRS_PTY_RLE_ADDR` |  |
+| rtr_Good_vs_Exception_Pty_Records | RouterTx | group `Exception`: `Score = '40'` | `EXC_STG_BAD_REC_MEMB` |  |
+| rtr_Good_vs_Exception_Pty_Records | RouterTx | default group `Default`: rows that match no other group | nothing: group not linked, **discarded** |  |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| rtr_Good_vs_Exception_Pty_Records | `Score` | `exp_Score_and_Exception_details.Score` = `Decode(True, Addr_Tp_Mstr_Cd != '002' AND MailabilityScore <= '3','40', Addr_Tp_Mstr_Cd = '002' AND MailabilityScore < '3' AND IN(SUBSTR(MatchCode,1,1),'I','N'),'40', ISNULL(Addr_Tp_Mstr_Cd), '40', '100')` |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_RLE_ADDR`** (`Write_C_S_TRS_PTY_RLE_ADDR`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `read_Staging_Delta_Tables` | custom SQL query (see the step): only the rows it returns | never read |
+| `rtr_Good_vs_Exception_Pty_Records` | group `Good`: `Score = '100'` | if `Score = '40'`: group `Exception` &rarr; `EXC_STG_BAD_REC_MEMB`<br>if no group matches: **discarded** (default group not linked) |
+
 ## Transformations
 
 In data-flow order.

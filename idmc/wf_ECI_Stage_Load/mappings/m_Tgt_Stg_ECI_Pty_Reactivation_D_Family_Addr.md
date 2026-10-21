@@ -39,6 +39,27 @@ flowchart LR
   n2 --> n3
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_ECI_H_FAMILY_ADDRESS | SourceTx | source filter `(ID_FAMILY_ADDRESS,LOAD_DATE) IN (Select ID_FAMILY_ADDRESS, Max(LOAD_DATE) from STG_ECI_H_FAMILY_ADDRESS where ID_FAMILY in (select ID from V_ECI_ETL_LU_REACTIVATED_ID where ID_TYPE = 'ID_FAMILY') gro …` | `STG_ECI_D_FAMILY_ADDRESS` | never read |
+| Filt_Keep_New_Addr | FilterTx | keep `IsNull(LKP_ID_FAMILY_ADDRESS)`<br>= no matching row in `STG_ECI_D_FAMILY_ADDRESS` | `STG_ECI_D_FAMILY_ADDRESS` | **discarded** |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Filt_Keep_New_Addr | `LKP_ID_FAMILY_ADDRESS` | `ID_FAMILY_ADDRESS` returned by lookup `Lookup_STG_ECI_D_FAMILY_ADDRESS` on `STG_ECI_D_FAMILY_ADDRESS` where `ID_FAMILY_ADDRESS = ID_FAMILY_ADDRESS1`; NULL when no row matches |
+
+### Rows that do not reach `C_S_*` tables
+
+This mapping writes no `C_S_*` table (it loads `STG_ECI_D_FAMILY_ADDRESS`); the steps above decide which rows it writes.
+
 ## Transformations
 
 In data-flow order.

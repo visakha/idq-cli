@@ -30,6 +30,24 @@ flowchart LR
   n4 --> n5
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Filter | FilterTx | keep `NOT ISNULL(REL_TP)` | mapplet output `output` | **discarded** |
+| Sorter | SorterTx | distinct: exact duplicate rows are collapsed into one | mapplet output `output` | collapsed into the row kept for the same key |
+| Aggregator | AggregatorTx | one row per `PKEY_SRC_OBJECT`, `PERIOD_END_DATE`, `PERIOD_START_DATE` | mapplet output `output` | collapsed into the row kept for the same key |
+
+### Where the condition fields come from
+
+| Step | Field | Origin |
+|---|---|---|
+| Filter | `REL_TP` | mapplet input `REL_TP_CD` |
+
 ## Transformations
 
 In data-flow order.

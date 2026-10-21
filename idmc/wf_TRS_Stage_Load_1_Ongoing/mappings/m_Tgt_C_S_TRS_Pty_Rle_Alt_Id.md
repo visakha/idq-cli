@@ -73,6 +73,27 @@ flowchart LR
   class n5,n6 retired
 ```
 
+## Filtered data
+
+Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches no group goes to the default group and is discarded when that group is not linked. Comments (`--`, `//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return in plain terms; *no matching row* also covers a matching row whose returned field is NULL.
+
+### Steps that filter rows
+
+| Step | IDQ type | Rule | Rows that pass go to | Rows that do not pass |
+|---|---|---|---|---|
+| Read_STG_TRS_D_DC_INDV | SourceTx | custom SQL query (see the step): only the rows it returns<br>Note: filter `INDV_ID=504937068` is also stored; it is not part of the custom query text and looks like a test filter: confirm it is not applied | `C_S_TRS_PTY_RLE_ALT_ID` | never read |
+| mplt_TRS_Pty_Rle_Alt_Id_Normalization | MappletTx | `FLTR_Remove_Null_Alt_IDs`: keep `NOT ISNULL(ALT_ID_VAL) AND RTRIM(ALT_ID_VAL) <> ''`<br>`RTR_Invalid_Alt_Ids`: passes only rows of the linked group(s) `Valid_Alt_ID` (`ISNULL(DQ_EXCP_CD) OR LENGTH(RTRIM(DQ_EXCP_CD))=0`), default `Default` | `C_S_TRS_PTY_RLE_ALT_ID` | **discarded** inside the mapplet |
+| fltr_Rank | FilterTx | **not ported** (stale MDM timeline): Keeps `VERSION_SEQ = 1`. Replace `exp_Rank` + `fltr_Rank` with an Aggregator grouped by `PKEY_SRC_OBJECT` (one row per key, as the Java port does); a CDI Aggregator without aggregate functions returns the last row of each group in the upstream `srtr_Pkey` order. |  |  |
+
+### Rows that do not reach `C_S_*` tables
+
+**`C_S_TRS_PTY_RLE_ALT_ID`** (`Write_C_S_TRS_PTY_RLE_ALT_ID`): a source row is written only when it passes every step below.
+
+| Step | Must hold | Otherwise the row |
+|---|---|---|
+| `Read_STG_TRS_D_DC_INDV` | custom SQL query (see the step): only the rows it returns<br>Note: filter `INDV_ID=504937068` is also stored; it is not part of the custom query text and looks like a test filter: confirm it is not applied | never read |
+| `mplt_TRS_Pty_Rle_Alt_Id_Normalization` | `FLTR_Remove_Null_Alt_IDs`: keep `NOT ISNULL(ALT_ID_VAL) AND RTRIM(ALT_ID_VAL) <> ''`<br>`RTR_Invalid_Alt_Ids`: passes only rows of the linked group(s) `Valid_Alt_ID` (`ISNULL(DQ_EXCP_CD) OR LENGTH(RTRIM(DQ_EXCP_CD))=0`), default `Default` | **discarded** inside the mapplet |
+
 ## Transformations
 
 In data-flow order.

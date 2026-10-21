@@ -152,6 +152,21 @@ class Model:
                        if (local(e.tag) == 'Table' or short(e) == 'Table') and e.get(IMX + 'id')}
         self.mappings = [e for e in self.root.iter()
                          if (local(e.tag) == 'Mapping' or short(e) == 'Mapping') and e.get('name')]
+        self._inbound = None
+        self.writers = {}  # target table -> mappings that load it (set by the caller for cross-references)
+
+    def inbound(self, inst):
+        """Links into an instance: (field label, upstream instance, upstream field label)."""
+        if self._inbound is None:
+            self._inbound = defaultdict(list)
+            for i in self.instances:
+                for p in i.iter():
+                    if short(p) not in ('TransformationFieldPort', 'NestedPort') or not p.get('fromPort'):
+                        continue
+                    src_inst, src = self.label(p.get('fromPort'))
+                    if src_inst is not None:
+                        self._inbound[i].append((self.label(p.get(IMX + 'id'))[1], src_inst, src))
+        return self._inbound[inst]
 
     def group(self, field):
         """Interface (group) name of a field, only for transformations with several groups per direction."""
@@ -552,6 +567,559 @@ def instance_section(doc, m, inst, params, inbound, used_mapplets, upd=False, re
     links_table(doc, inbound)
 
 
+# ---- filtered data: where rows leave the flow and which rows never reach a C_S_* table ----
+
+PASS_THROUGH = ('FilterTx', 'RouterTx', 'SorterTx', 'UnionTx', 'UpdateStrategyTx')
+# literal key lists, single hard-coded ids, row caps and hash sampling: typical leftovers of a test run
+TEST_FILTER = re.compile(r"\bIN\s*\(\s*'[^']*'\s*,|\bIN\s*\(\s*\)|=\s*'?\d{6,}'?|\brownum\b|\bORA_HASH\b", re.I)
+UPDATE_OPS = {'DD_DELETE': 'deletes', 'DD_UPDATE': 'updates', 'DD_INSERT': 'inserts', 'DD_REJECT': 'is rejected from'}
+
+
+def one_line(text):
+    return ' '.join((text or '').split())
+
+
+def abbrev(text, n=300):
+    text = one_line(text)
+    return text if len(text) <= n else text[:n].rstrip() + ' …'
+
+
+def strip_comments(text, sql=False):
+    """Text without comments (expressions: -- and //; SQL: -- and /* */), string literals kept."""
+    out, i, n, quoted = [], 0, len(text or ''), False
+    while i < n:
+        c = text[i]
+        if quoted:
+            quoted = c != "'"
+        elif c == "'":
+            quoted = True
+        elif text.startswith('--', i) or (not sql and text.startswith('//', i)):
+            j = text.find('\n', i)
+            i = n if j < 0 else j
+            continue
+        elif sql and text.startswith('/*', i):
+            j = text.find('*/', i + 2)
+            i = n if j < 0 else j + 2
+            continue
+        out.append(c)
+        i += 1
+    return one_line(''.join(out))
+
+
+def always_true(cond):
+    return (cond or '').strip().upper() in ('TRUE', '1')
+
+
+def _equalities(cond):
+    """(FIELD, {literals}) when a condition only compares one field with string literals (`F='a' or F='b'`)."""
+    lits, field = set(), None
+    for part in re.split(r'\bOR\b', cond or '', flags=re.I):
+        hit = re.fullmatch(r"\s*\(?\s*(\w+)\s*=\s*'([^']*)'\s*\)?\s*", part)
+        if not hit or (field and hit.group(1).upper() != field):
+            return None
+        field = hit.group(1).upper()
+        lits.add(hit.group(2))
+    return (field, lits) if field else None
+
+
+def complementary(c1, c2):
+    """`ISNULL(F)` vs `NOT ISNULL(F)`: exactly one is TRUE for every row."""
+    a, b = (re.sub(r'\s+', '', c or '').upper() for c in (c1, c2))
+    return a.startswith('ISNULL(') and (b == 'NOT' + a) or b.startswith('ISNULL(') and (a == 'NOT' + b)
+
+
+def exclusive(c1, c2):
+    """True when no row can satisfy both router conditions."""
+    if complementary(c1, c2):
+        return True
+    e1, e2 = _equalities(c1), _equalities(c2)
+    return bool(e1 and e2 and e1[0] == e2[0] and not e1[1] & e2[1])
+
+
+def covering_pair(groups):
+    """Two groups that together take every row (`ISNULL(F) or ...` / `NOT ISNULL(F) or ...`), or None."""
+    conds = [(gn, re.split(r'\bOR\b', c, flags=re.I)) for gn, c, _ in groups if c]
+    return next(((a, b) for k, (a, p1) in enumerate(conds) for b, p2 in conds[k + 1:]
+                 if any(complementary(x, y) for x in p1 for y in p2)), None)
+
+
+def source_gate(m, tx, params):
+    dso = m.by_id.get(tx.get('dso'))
+    if dso is None:
+        return None
+    refs = (dso.get('tableDefinitions') or dso.get('tableDefinition') or '').split()
+    tabs = [m.table_of(r) for r in refs if m.table_of(r)]
+    sql = strip_comments(dec(dso.get('sqlQuery')), sql=True)
+    flt = strip_comments(dec(dso.get('filterCondition')), sql=True)
+    custom = bool(sql) and bool(dso.get('queryMode'))
+    views = [t['physical'] for t in tabs if (t['kind'] or '').upper() == 'VIEW' or t['physical'].upper().startswith('V_')]
+    if not (sql or flt or views):
+        return None
+    g = {'kind': 'source', 'custom': custom, 'views': views if not custom else [], 'notes': [],
+         'filter': to_cdi(flt, params) if flt else None, 'distinct': dso.get('distinct') == 'true' and not custom}
+    if custom:
+        g['rule'] = 'custom SQL query (see the step): only the rows it returns'
+        if flt:
+            inside = one_line(flt).upper().replace('"', '') in one_line(sql).upper().replace('"', '')
+            g['notes'].append(f'filter `{abbrev(flt, 200)}` is also stored'
+                              + (' and is part of the query' if inside else
+                                 '; it is not part of the custom query text'
+                                 + (' and looks like a test filter: confirm it is not applied'
+                                    if TEST_FILTER.search(flt) else '')))
+    else:
+        parts = []
+        if flt:
+            parts.append(f'source filter `{abbrev(g["filter"], 200)}`')
+            if TEST_FILTER.search(flt):
+                g['notes'].append('the filter looks like a test filter (hard-coded keys / row cap): confirm before '
+                                  'porting')
+        if g['distinct']:
+            parts.append('select distinct')
+        if views:
+            parts.append('rows the view ' + ', '.join(f'`{v}`' for v in views) + ' returns (view logic is outside '
+                         'the export)')
+        if sql:
+            g['notes'].append(f'stored SQL text `{abbrev(sql, 120)}` ' + (
+                'is a WHERE fragment, not a query, and the read has no custom-query mode: it looks unused, confirm'
+                if not re.match(r'\s*(SELECT|WITH)\b', sql, re.I) else
+                'is stored but the read has no custom-query mode: confirm whether it runs'))
+        g['rule'] = '; '.join(parts) if parts else 'all rows'
+    return g
+
+
+def gate_of(m, inst, params, retired=()):
+    """How a step can stop or reduce rows, or None when every row passes unchanged."""
+    if inst in retired:
+        return None
+    tx = m.tx(inst)
+    t = short(tx) if tx is not None else ''
+    if t == 'SourceTx':
+        return source_gate(m, tx, params)
+    if t == 'FilterTx':
+        raw = dec(tx.get('filterCondition')) or 'TRUE'
+        cond = to_cdi(strip_comments(raw), params) or 'TRUE'
+        return {'kind': 'filter', 'cond': cond, 'commented': one_line(raw) != cond and ('--' in raw or '//' in raw),
+                'meaning': lookup_meaning(m, inst, cond, params)}
+    if t == 'RouterTx':
+        groups = []
+        for g in tx.iter():
+            if short(g) == 'RouterDataInterface' and g.get('output') == 'true':
+                raw = dec(g.get('dataCondition'))
+                groups.append((g.get('name'), to_cdi(strip_comments(raw), params) or 'TRUE' if raw else None,
+                               bool(raw) and ('--' in raw or '//' in raw)))
+        linked = {m.label(p.get(IMX + 'id'))[1].split('.')[0] for p in inst.iter()
+                  if short(p) == 'TransformationFieldPort' and p.get('toPorts')}
+        return {'kind': 'router', 'groups': groups, 'linked': linked,
+                'meanings': {gn: lookup_meaning(m, inst, c, params) for gn, c, _ in groups if c}}
+    if t == 'SorterTx' and tx.get('distinct') == 'true':
+        return {'kind': 'distinct'}
+    if t == 'AggregatorTx':
+        refs = [m.by_id.get(r.get('transformationField')) for g in tx.iter() if local(g.tag) == 'groupByFields'
+                for r in g.iter() if short(r) == 'TransformationFieldRef']
+        return {'kind': 'aggregate', 'keys': [f.get('name') for f in refs if f is not None]}
+    if t == 'UpdateStrategyTx':
+        return {'kind': 'update', 'expr': one_line(dec(tx.get('updateStrategy')))}
+    if t == 'MappletTx':
+        mp = m.by_id.get(tx.get('mapplet'))
+        if mp is None or mp.get('name') in RETIRED_MAPPLETS:
+            return None
+        inner = mapplet_gates(m, mp, params)
+        return {'kind': 'mapplet', 'name': mp.get('name'), 'inner': inner} if inner else None
+    return None
+
+
+def mapplet_gates(m, mp, params, prefix=''):
+    """Gates inside a mapplet (nested mapplets flattened), in data-flow order."""
+    out = []
+    insts = [i for i in m.instances if m.container(i) is mp]
+    edges = {(s, i) for i in insts for _, s, _ in m.inbound(i)}
+    retired = {i for i in insts if retired_reason(m, mp.get('name'), i)}
+    for i in topo(insts, edges):
+        g = gate_of(m, i, params, retired)
+        if g is None or g['kind'] == 'update':
+            continue
+        if g['kind'] == 'mapplet':
+            out += [(f'{i.get("name")}/{n}', ig) for n, ig in g['inner']]
+        else:
+            out.append((prefix + i.get('name'), g))
+    return out
+
+
+def gate_rule(g):
+    k = g['kind']
+    if k == 'source':
+        return g['rule']
+    if k == 'filter':
+        return f'keep `{g["cond"]}`' + (' (comments removed)' if g['commented'] else '') +             (f'<br>= {g["meaning"]}' if g.get('meaning') else '')
+    if k == 'distinct':
+        return 'distinct: exact duplicate rows are collapsed into one'
+    if k == 'aggregate':
+        return ('one row per ' + ', '.join(f'`{x}`' for x in g['keys'])) if g['keys'] else 'one row in total'
+    if k == 'update':
+        return f'`{g["expr"]}`'
+    if k == 'mapplet':
+        return '<br>'.join(f'`{n}`: {gate_rule(ig)}' for n, ig in g['inner'])
+    if k == 'router':
+        kept = [f'`{gn}` (`{c}`)' if c else f'default `{gn}`' for gn, c, _ in g['groups'] if gn in g['linked']]
+        return ('passes only rows of the linked group(s) ' + ', '.join(kept)) if kept else 'no group linked'
+    return ''
+
+
+def field_origin(m, inst, field, params, lookups=None):
+    """Where a field read by `inst` comes from: source column, lookup return, expression or mapplet output.
+
+    When the field is a lookup return, the lookup's tables are appended to `lookups`."""
+    for _ in range(80):
+        hit = next(((si, sl) for dl, si, sl in m.inbound(inst) if dl.split('.')[-1].lower() == field.lower()), None)
+        if hit is None:
+            return 'not linked'
+        inst, field = hit[0], hit[1].split('.')[-1]
+        tx = m.tx(inst)
+        t = short(tx) if tx is not None else '?'
+        name = inst.get('name')
+        if t == 'SourceTx':
+            return f'source column `{field}` read by `{name}`'
+        if t == 'LookupTx':
+            dso = m.by_id.get(tx.get('dso'))
+            refs = (dso.get('tableDefinitions') or dso.get('tableDefinition') or '').split() if dso is not None else []
+            tables = [m.table_of(r)['physical'] for r in refs if m.table_of(r)]
+            if lookups is not None:
+                lookups.append((name, tables))
+            home = m.container(inst)
+            loaded = [f'`{t}` is loaded by ' + ', '.join(f'`{w}`' for w in ws) + ' in this workflow'
+                      for t in tables for ws in [[w for w in m.writers.get(t.upper(), ())
+                                                  if home is None or w != home.get('name')]] if ws]
+            return (f'`{field}` returned by lookup `{name}` on ' + (', '.join(f'`{t}`' for t in tables) or '?') +
+                    f' where `{one_line(dec(tx.get("lookupCondition")))}`; NULL when no row matches'
+                    + ''.join(f'; {x}' for x in loaded))
+        if t in ('ExpressionTx', 'AggregatorTx'):
+            by_name = {f.get('name'): f for f in fields_of(tx)}
+            ex = None
+            for _ in range(20):
+                f = by_name.get(field)
+                ex = dec(f.get('expression')) if f is not None else None
+                ident = (ex or '').strip()
+                if ex and re.fullmatch(r'\w+', ident) and ident in by_name and ident != field:
+                    field = ident
+                    continue
+                if ident == field:  # in/out port that repeats its own name: pass-through
+                    ex = None
+                break
+            if ex:
+                return f'`{name}.{field}` = `{abbrev(to_cdi(strip_comments(ex), params))}`'
+            continue
+        if t == 'MappletTx':
+            mp = m.by_id.get(tx.get('mapplet'))
+            outs = [i for i in m.instances if m.container(i) is mp and m.tx(i) is not None
+                    and short(m.tx(i)) == 'MappletOutputTx']
+            out = next((o for o in outs if any(dl.split('.')[-1].lower() == field.lower() for dl, _, _ in m.inbound(o))),
+                       None)
+            inner = field_origin(m, out, field, params) if out is not None else 'not linked'
+            return f'mapplet `{mp.get("name") if mp is not None else "?"}`: {inner}'
+        if t == 'MappletInputTx':
+            return f'mapplet input `{field}`'
+        if t in PASS_THROUGH:
+            continue
+        return f'`{field}` output of `{name}` (CDI {CDI_TX.get(t, ("manual",))[0]})'
+    return 'not resolved'
+
+
+def lookup_meaning(m, inst, cond, params):
+    """Plain reading of a condition that only null-checks lookup returns, e.g. `IsNull(DEACTIVATION_STS)`."""
+    if not cond or re.search(r'\bOR\b', cond, re.I):
+        return None
+    parts = []
+    for c in re.split(r'\bAND\b', cond, flags=re.I):
+        hit = re.fullmatch(r'\s*(NOT\s+)?ISNULL\s*\(\s*(\w+)\s*\)\s*(=\s*(0|1|TRUE|FALSE))?\s*', c, re.I)
+        if not hit:
+            return None
+        tables = []
+        field_origin(m, inst, hit.group(2), params, tables)
+        if not tables:
+            return None
+        is_null = (hit.group(1) is None) == (hit.group(4) is None or hit.group(4).upper() in ('1', 'TRUE'))
+        lkp, tabs = tables[0]
+        parts.append((lkp, ', '.join(f'`{t}`' for t in tabs), is_null))
+    by = len(parts) > 1
+    return ' and '.join((f'no matching row in {t}' if is_null else f'a matching row exists in {t}')
+                        + (f' (lookup `{lkp}`)' if by else '') for lkp, t, is_null in parts)
+
+
+def condition_fields(m, inst, cond):
+    """Input fields of `inst` named in a condition, in order of appearance."""
+    names = {dl.split('.')[-1].lower(): dl.split('.')[-1] for dl, _, _ in m.inbound(inst)}
+    text = re.sub(r"'[^']*'", '', cond or '')
+    return list(dict.fromkeys(names[w.lower()] for w in re.findall(r'(?<![$\w])[A-Za-z_]\w*', text)
+                              if w.lower() in names))
+
+
+def flow_graph(m, insts):
+    """Row flow between instances: {instance: [(router group or None, downstream instance)]}."""
+    out = defaultdict(set)
+    for i in insts:
+        for _, si, sl in m.inbound(i):
+            grp = sl.split('.')[0] if '.' in sl and m.tx(si) is not None and short(m.tx(si)) == 'RouterTx' else None
+            out[si].add((grp, i))
+    for i in insts:  # whole-row links (port groups) that have no field-level link
+        for ol in i.iter():
+            if short(ol) == 'OutlineLink':
+                a, b = m.by_id.get(ol.get('fromInstance')), m.by_id.get(ol.get('toInstance'))
+                if a in insts and b in insts and not any(d is b for _, d in out[a]):
+                    out[a].add((None, b))
+    return out
+
+
+def sink_label(m, inst):
+    tx = m.tx(inst)
+    if short(tx) == 'TargetTx':
+        dso = m.by_id.get(tx.get('dso'))
+        refs = (dso.get('tableDefinitions') or dso.get('tableDefinition') or '').split() if dso is not None else []
+        tabs = [m.table_of(r)['physical'] for r in refs if m.table_of(r)]
+        return ', '.join(f'`{t}`' for t in tabs) or f'`{inst.get("name")}`'
+    return f'mapplet output `{inst.get("name")}`'
+
+
+def is_cs(m, inst):
+    return sink_label(m, inst).strip('`').upper().startswith('C_S_')
+
+
+FILTER_INTRO = ('A Filter keeps a row only when its condition is TRUE: FALSE **or NULL** drops the row silently (no target, '
+                'no reject file). A Router writes a row to **every** group whose condition is TRUE; a row that matches '
+                'no group goes to the default group and is discarded when that group is not linked. Comments (`--`, '
+                '`//`) are removed from the conditions shown here. A `= ...` line reads a null check on a lookup return '
+                'in plain terms; *no matching row* also covers a matching row whose returned field is NULL.')
+
+
+def filtered_section(doc, m, mapping, kind, params, order, retired, h='##', title='Filtered data', intro=True):
+    """Write the *Filtered data* section; returns [(C_S table, [gate step names], [diverted-to tables])]."""
+    insts = [i for i in order]
+    sinks = [i for i in insts if m.tx(i) is not None and short(m.tx(i)) in ('TargetTx', 'MappletOutputTx')]
+    out = flow_graph(m, insts)
+    gates = {i: g for i in insts for g in [gate_of(m, i, params, retired)] if g is not None}
+    if not gates:
+        if kind == 'mapping':
+            doc(f'{h} {title}', '', 'No step in this mapping drops, diverts or collapses rows: every source row '
+                'reaches every target.', '')
+        return [(sink_label(m, s).strip('`'), [], []) for s in sinks if is_cs(m, s)]
+    order_ix = {i: n for n, i in enumerate(order)}
+
+    reach_memo = {}
+
+    def reach(n):
+        if n not in reach_memo:
+            reach_memo[n] = set()
+            r = {n} if n in sinks else set()
+            for _, d in out.get(n, ()):
+                r |= reach(d)
+            reach_memo[n] = r
+        return reach_memo[n]
+
+    def reach_group(n, grp):
+        r = set()
+        for g, d in out.get(n, ()):
+            if g == grp:
+                r |= reach(d)
+        return r
+
+    def fmt(targets):
+        if not targets:
+            return 'nothing: **discarded**'
+        return ', '.join(dict.fromkeys(sink_label(m, t) for t in sorted(targets, key=order_ix.get)))
+
+    doc(f'{h} {title}', '')
+    if intro:
+        doc('Every step that can stop, divert or collapse rows, and what happens to the rows that do not pass. '
+            + FILTER_INTRO, '')
+    rows = []
+    for i in order:
+        g = gates.get(i)
+        if g is None:
+            continue
+        t = short(m.tx(i))
+        if g['kind'] == 'router':
+            cover = covering_pair(g['groups'])
+            for gn, cond, commented in g['groups']:
+                linked = reach_group(i, gn)
+                connected = gn in g['linked']
+                if cond is None and cover:
+                    rows.append([i.get('name'), t, f'default group `{gn}`: rows that match no other group',
+                                 f'no row gets here: every row matches `{cover[0]}` or `{cover[1]}`', ''])
+                    continue
+                rule = (f'group `{gn}`: `{cond}`' + (' (comments removed)' if commented else '') if cond
+                        else f'default group `{gn}`: rows that match no other group')
+                if g['meanings'].get(gn):
+                    rule += f'<br>= {g["meanings"][gn]}'
+                rows.append([i.get('name'), t, rule, fmt(linked) if connected else 'nothing: group not linked, '
+                             '**discarded**', ''])
+            continue
+        down = reach(i)
+        if g['kind'] == 'source':
+            lost = 'never read'
+        elif g['kind'] == 'filter':
+            lost = 'never (condition is always TRUE)' if always_true(g['cond']) else '**discarded**'
+        elif g['kind'] in ('distinct', 'aggregate'):
+            lost = 'collapsed into the row kept for the same key'
+        elif g['kind'] == 'update':
+            ops = [v for k, v in UPDATE_OPS.items() if k in g['expr'].upper()]
+            lost = f'not dropped: each row {" / ".join(ops) or "changes"} the target row'
+        else:
+            lost = '**discarded** inside the mapplet'
+        note = ''.join(f'<br>Note: {n}' for n in g.get('notes', ()))
+        rows.append([i.get('name'), t, gate_rule(g) + note, fmt(down), lost])
+    for i in order:
+        tx = m.tx(i)
+        if i in retired and tx is not None and short(tx) in ('FilterTx', 'RouterTx', 'SorterTx', 'AggregatorTx'):
+            rows.append([i.get('name'), short(tx), f'**not ported** (stale MDM timeline): {retired[i]}', '', ''])
+    doc(f'{h}# Steps that filter rows', '')
+    doc.table(['Step', 'IDQ type', 'Rule', 'Rows that pass go to', 'Rows that do not pass'], rows)
+
+    rows = []
+    for i in order:
+        g = gates.get(i)
+        conds = ([g['cond']] if g and g['kind'] == 'filter' else
+                 [c for _, c, _ in g['groups'] if c] if g and g['kind'] == 'router' else [])
+        for f in condition_fields(m, i, ' '.join(conds)):
+            rows.append([i.get('name'), f'`{f}`', field_origin(m, i, f, params)])
+    if rows:
+        doc(f'{h}# Where the condition fields come from', '')
+        doc.table(['Step', 'Field', 'Origin'], rows)
+
+    if kind != 'mapping':
+        return []
+
+    # gate sequences from every start step to every sink
+    memo = {}
+
+    def walk(n):
+        if n not in memo:
+            res = defaultdict(set)
+            if n in sinks:
+                res[n].add(())
+            for grp, d in sorted(out.get(n, ()), key=lambda x: (order_ix.get(x[1], 0), x[0] or '')):
+                step = ((n, grp),) if n in gates else ()
+                for t, seqs in walk(d).items():
+                    res[t] |= {step + s for s in seqs}
+            memo[n] = res
+        return memo[n]
+
+    starts = [i for i in insts if not m.inbound(i)]
+    paths = defaultdict(set)
+    for s in starts:
+        for t, seqs in walk(s).items():
+            paths[t] |= seqs
+
+    doc(f'{h}# Rows that do not reach `C_S_*` tables', '')
+    cs = [s for s in sinks if is_cs(m, s)]
+    other = [s for s in sinks if not is_cs(m, s)]
+    summary = []
+    if not cs:
+        doc('This mapping writes no `C_S_*` table (it loads ' + fmt(set(other)) + '); the steps above decide which '
+            'rows it writes.', '')
+        return summary
+    for s in cs:
+        seqs = sorted(paths.get(s, ()), key=lambda q: [(order_ix[x[0]], x[1] or '') for x in q])
+        upd = [gates[x[0]] for q in seqs for x in q if gates[x[0]]['kind'] == 'update']
+        op = 'delete' if any('DD_DELETE' in u['expr'].upper() for u in upd) else 'write'
+        doc(f'**{sink_label(m, s)}** (`{s.get("name")}`): a source row is {"used to delete" if op == "delete" else "written"} '
+            f'only when it passes every step below{"" if len(seqs) < 2 else " on one of its " + str(len(seqs)) + " paths"}.', '')
+        steps_all, diverted = [], set()
+        if not seqs:
+            doc('No source row reaches this target through linked fields.', '')
+        for k, q in enumerate(seqs):
+            rows = []
+            for i, grp in q:
+                g = gates[i]
+                if g['kind'] == 'update':
+                    continue
+                steps_all.append(i.get('name'))
+                if g['kind'] == 'router':
+                    cond = next((c for gn, c, _ in g['groups'] if gn == grp), None)
+                    must = f'group `{grp}`: `{cond}`' if cond else f'matches none of the other groups (default `{grp}`)'
+                    if g['meanings'].get(grp):
+                        must += f'<br>= {g["meanings"][grp]}'
+                    if cond and always_true(cond):
+                        lost = 'never (condition is always TRUE)'
+                    else:
+                        alts = []
+                        for gn, c, _ in g['groups']:
+                            if gn == grp or c is None:
+                                continue
+                            dest = reach_group(i, gn)
+                            diverted |= dest
+                            linked = gn in g['linked']
+                            alts.append(f'if `{c}`: group `{gn}` &rarr; ' + (fmt(dest) if linked else
+                                                                             'not linked, **discarded**'))
+                        dflt = next((gn for gn, c, _ in g['groups'] if c is None and gn != grp), None)
+                        if dflt is not None and not covering_pair(g['groups']):
+                            dest = reach_group(i, dflt)
+                            diverted |= dest
+                            alts.append('if no group matches: ' + (f'default group `{dflt}` &rarr; {fmt(dest)}'
+                                                                    if dest else '**discarded** (default group not linked)'))
+                        lost = '<br>'.join(alts) or '**discarded**'
+                    others = [gn for gn, c, _ in g['groups'] if c and gn != grp and not (cond and exclusive(cond, c))]
+                    if cond and others:
+                        must += '<br>(a row that also matches ' + ', '.join(f'`{o}`' for o in others) + \
+                                ' is written there as well)'
+                elif g['kind'] == 'source':
+                    must = g['rule'] + ''.join(f'<br>Note: {n}' for n in g['notes'])
+                    lost = 'never read'
+                elif g['kind'] == 'filter':
+                    must = f'`{g["cond"]}`' + (f'<br>= {g["meaning"]}' if g.get('meaning') else '')
+                    lost = 'never (condition is always TRUE)' if always_true(g['cond']) else \
+                        '**discarded** (not written anywhere)'
+                elif g['kind'] == 'distinct':
+                    must = 'not an exact duplicate of an earlier row'
+                    lost = 'collapsed into the identical row'
+                elif g['kind'] == 'aggregate':
+                    must = gate_rule(g)
+                    lost = 'merged into the one row written for its key'
+                else:
+                    must = gate_rule(g)
+                    lost = '**discarded** inside the mapplet'
+                rows.append([f'`{i.get("name")}`', must, lost])
+            if len(seqs) > 1:
+                doc(f'Path {k + 1}:', '')
+            if rows:
+                doc.table(['Step', 'Must hold', 'Otherwise the row'], rows)
+            else:
+                doc('No filtering step on this path: every row read is written.', '')
+        diverted -= {s}
+        summary.append((sink_label(m, s).strip('`'), list(dict.fromkeys(steps_all)),
+                        list(dict.fromkeys(sink_label(m, d).strip('`') for d in sorted(diverted, key=order_ix.get)))))
+    return summary
+
+
+def table_writers(m, mapping_names):
+    """{TARGET TABLE: [mappings that load it]} for the given mappings."""
+    out = defaultdict(list)
+    for mp in m.mappings:
+        if mp.get('name') not in mapping_names:
+            continue
+        for i in m.instances:
+            if m.container(i) is mp and m.tx(i) is not None and short(m.tx(i)) == 'TargetTx':
+                t = sink_label(m, i).strip('`').upper()
+                if mp.get('name') not in out[t]:
+                    out[t].append(mp.get('name'))
+    return dict(out)
+
+
+def mapping_filtered(m, mapping, kind='mapping', h='##', title='Filtered data', intro=True):
+    """The *Filtered data* section of one mapping on its own: (markdown lines, summary)."""
+    insts = [i for i in m.instances if m.container(i) is mapping]
+    edges = {(si, i) for i in insts for _, si, _ in m.inbound(i)}
+    for i in insts:
+        for ol in i.iter():
+            if short(ol) == 'OutlineLink':
+                a, b = m.by_id.get(ol.get('fromInstance')), m.by_id.get(ol.get('toInstance'))
+                if a is not None and b is not None:
+                    edges.add((a, b))
+    retired = {i: r for i in insts for r in [retired_reason(m, mapping.get('name'), i)] if r}
+    doc = Doc()
+    summary = filtered_section(doc, m, mapping, kind, [p['name'] for p in mapping_params(m, mapping)],
+                               topo(insts, edges), retired, h, title, intro)
+    return doc.lines, summary
+
+
 def build_mapping(m, mapping, kind):
     doc = Doc()
     name = mapping.get('name')
@@ -561,13 +1129,7 @@ def build_mapping(m, mapping, kind):
     inbound = defaultdict(list)
     edges = set()
     for inst in insts:
-        for p in inst.iter():
-            if short(p) not in ('TransformationFieldPort', 'NestedPort') or not p.get('fromPort'):
-                continue
-            src_inst, src = m.label(p.get('fromPort'))
-            _, dst = m.label(p.get(IMX + 'id'))
-            if src_inst is None:
-                continue
+        for dst, src_inst, src in m.inbound(inst):
             inbound[inst].append((dst, src_inst.get('name'), src))
             edges.add((src_inst, inst))
         for ol in inst.iter():
@@ -652,13 +1214,17 @@ def build_mapping(m, mapping, kind):
             '  class ' + ','.join(ids[i] for i in order if i in retired) + ' retired')
     doc('```', '')
 
+    summary = []
+    if name not in RETIRED_MAPPLETS:
+        summary = filtered_section(doc, m, mapping, kind, params, order, retired)
+
     doc('## Transformations', '', 'In data-flow order.', '')
     used = set()
     for i in order:
         upd = any(a is not None and m.tx(a) is not None and short(m.tx(a)) == 'UpdateStrategyTx'
                   for a, b in edges if b is i)
         instance_section(doc, m, i, params, inbound.get(i), used, upd, retired.get(i), name)
-    return doc.text(), used, counts, retired_rows
+    return doc.text(), used, counts, retired_rows, summary
 
 
 def workflow(m):
@@ -903,7 +1469,8 @@ def param_file(m, wfm, tf, project, folder):
     return '\n'.join(lines) + '\n'
 
 
-def readme(m, wfm, tf, mappings, mapplets, counts, steps, project, folder, retired_steps=(), retired_mapplets=()):
+def readme(m, wfm, tf, mappings, mapplets, counts, steps, project, folder, retired_steps=(), retired_mapplets=(),
+           filtered=None):
     doc = Doc()
     doc(f'# {wfm["name"]} &rarr; IDMC CDI', '',
         f'Build specification generated from `docs/{wfm["name"]}.xml` by `ext-tools/idmc_spec.py`. It describes every '
@@ -959,6 +1526,18 @@ def readme(m, wfm, tf, mappings, mapplets, counts, steps, project, folder, retir
                    for r in retired_steps])
     if not retired_mapplets and not retired_steps:
         doc('No whole steps are retired in this workflow; only the timeline fields are omitted.', '')
+    if filtered:
+        doc('## Filtered data', '',
+            'Which steps can keep a source row out of each `C_S_*` table, and where the diverted rows go instead. '
+            'Each mapping spec has a *Filtered data* section with the conditions, the origin of every field they test '
+            'and what happens to the rows that fail.', '')
+        rows = []
+        for n in mappings:
+            for table, steps_, diverted in filtered.get(n) or [(None, [], [])]:
+                rows.append([f'[`{n}`](mappings/{n}.md#filtered-data)', f'`{table}`' if table else '(no `C_S_*` target)',
+                             ', '.join(f'`{x}`' for x in steps_) or ('none' if table else ''),
+                             ', '.join(f'`{x}`' for x in diverted)])
+        doc.table(['Mapping', '`C_S_*` table', 'Steps that can keep a row out', 'Failed rows diverted to'], rows)
     doc('## Translation rules applied', '')
     doc.table(['IDQ', 'CDI', 'Where'], [
         ['`$<Param>` (user parameter)', '`$$<Param>` input parameter', 'expressions, conditions, SQL'],
@@ -1004,12 +1583,15 @@ def main(path, out):
             t = next(t for t in wfm['tasks'].values() if t['name'] == n)
             mapping_order.append(t['mapping'])
     mapping_set = set(mapping_order)
+    m.writers = table_writers(m, mapping_set)
 
-    counts, mapplet_deps, retired_steps = [], {}, []
+    counts, mapplet_deps, retired_steps, filtered = [], {}, [], {}
     for mp in m.mappings:
         name = mp.get('name')
         kind = 'mapping' if name in mapping_set else 'mapplet'
-        text, used, c, r = build_mapping(m, mp, kind)
+        text, used, c, r, fsum = build_mapping(m, mp, kind)
+        if kind == 'mapping':
+            filtered[name] = fsum
         if kind == 'mapplet' and name not in RETIRED_MAPPLETS:
             mapplet_deps[name] = used
         counts.append(c)
@@ -1037,7 +1619,7 @@ def main(path, out):
         f'{tf}.param': param_file(m, wfm, tf, project, folder),
         'cdq.md': cdq_doc(m, mapping_order, mapplet_order),
         'README.md': readme(m, wfm, tf, mapping_order, mapplet_order, counts, steps, project, folder,
-                            retired_steps, retired_mapplets),
+                            retired_steps, retired_mapplets, filtered),
     }
     for n, text in files.items():
         with open(os.path.join(out, n), 'w', encoding='utf-8', newline='\n') as fh:
