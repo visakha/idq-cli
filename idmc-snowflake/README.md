@@ -9,6 +9,7 @@ One page per Snowflake stored procedure of [`idq-to-snowflake/`](../idq-to-snowf
 | [`wf_TTF_Stage_Load`](wf_TTF_Stage_Load/README.md) | 4 |
 | [`wf_WIC_Stage_Load`](wf_WIC_Stage_Load/README.md) | 5 |
 | [`wf_TRS_Stage_Load_1_Ongoing`](wf_TRS_Stage_Load_1_Ongoing/README.md) | 14 |
+| [`wf_CRE_Stage_Load_Ongoing`](wf_CRE_Stage_Load_Ongoing/README.md) | 1 |
 
 ## Shared functions
 
@@ -52,6 +53,7 @@ The IDQ mapplets and rules, written out as Snowflake SQL functions (nothing is a
 | `fn_snow_helper34_common` | mplt_Global_Addr_Validation (pass-through validator, OBJECT) |
 | `fn_snow_helper35_common` | mplt_DST_Correction (TIMELINE): end date corrected for daylight saving |
 | `fn_snow_helper36_common` | run log line: mapping, step, row count |
+| `fn_snow_helper37_common` | rule_CARE_ID_Std (CRE) (OBJECT) |
 | `fn_snow_helper40_common` | EXC_LOOKUP_CODE_VALUE (every rule's exception lookup): EXCEPTION_CODE -> DESC, TYPE |
 | `fn_snow_helper41_common` | V_LOOKUP_CODE_VALUE by code type (PREFIX, SUFFIX, RACE, ETHNICITY, LANGUAGE_CD, STATE, ...): CODE_TYPE, SRC_SYS, SRC_CODE_VALUE -> MSTR_CODE_VALUE |
 | `fn_snow_helper42_common` | V_LOOKUP_CODE_VALUE without a code-type filter (rule_Suffix_Std): SRC_SYS, SRC_CODE_VALUE -> MSTR_CODE_VALUE |

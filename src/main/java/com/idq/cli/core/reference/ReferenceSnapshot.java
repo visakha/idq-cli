@@ -27,6 +27,7 @@ public final class ReferenceSnapshot implements ReferenceData {
             String mstrLabel) {
         var value = new CodeValue(mstrCode, mstrLabel);
         codeValues.putIfAbsent(key(codeType, srcSys, srcValue), value);
+        codeValues.putIfAbsent(key(null, srcSys, srcValue), value);
         codeValuesByMaster.putIfAbsent(key(codeType, srcSys, mstrCode), value);
         return this;
     }

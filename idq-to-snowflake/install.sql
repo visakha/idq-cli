@@ -7,7 +7,7 @@
 --
 -- Order matters for the functions: a SQL UDF is validated when it is created, so every function it calls (and every
 -- table a lookup function reads) must exist first. Procedures are compiled when they run.
---   1. common/01_snow_common_functions.sql  the mapplets / rules and IDQ helpers (fn_snow_helper01..36_common)
+--   1. common/01_snow_common_functions.sql  the mapplets / rules and IDQ helpers (fn_snow_helper01..37_common)
 --   2. common/02_snow_common_lookups.sql    the reference lookups (fn_snow_helper40..47_common)
 --   3. per workflow: mapping helpers (fn_snow_helper01_<mapping>), then every sp_snow_main_<mapping>
 -- Nothing here deletes, truncates or drops; CREATE OR REPLACE only replaces these functions and procedures.
@@ -67,6 +67,9 @@
 !source wf_WIC_Stage_Load/sp_snow_main_m_Tgt_C_S_WIC_Pty_Addr.sql
 !source wf_WIC_Stage_Load/sp_snow_main_m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr.sql
 !source wf_WIC_Stage_Load/sp_snow_main_m_Tgt_C_S_WIC_Pty_Rle_Alt_Id.sql
+
+-- wf_CRE_Stage_Load_Ongoing
+!source wf_CRE_Stage_Load_Ongoing/sp_snow_main_m_Tgt_C_S_CRE_CARE_Clients.sql
 
 -- what was installed
 SHOW USER FUNCTIONS LIKE 'FN_SNOW_HELPER%';

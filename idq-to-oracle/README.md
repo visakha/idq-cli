@@ -1,6 +1,6 @@
 # IDQ → Oracle stored procedures
 
-Drop-in Oracle PL/SQL replacements for the 38 IDQ mappings of the five stage-load workflows in `docs/`:
+Drop-in Oracle PL/SQL replacements for the 39 IDQ mappings of the six stage-load workflows in `docs/`:
 
 | Workflow (IDQ export) | Mappings | Folder | Run script |
 |---|---|---|---|
@@ -9,6 +9,7 @@ Drop-in Oracle PL/SQL replacements for the 38 IDQ mappings of the five stage-loa
 | `docs/wf_TTF_Stage_Load.xml` | 4 | [wf_TTF_Stage_Load](wf_TTF_Stage_Load/) | [run_wf_TTF_Stage_Load.sql](wf_TTF_Stage_Load/run_wf_TTF_Stage_Load.sql) |
 | `docs/wf_WIC_Stage_Load.xml` | 5 | [wf_WIC_Stage_Load](wf_WIC_Stage_Load/) | [run_wf_WIC_Stage_Load.sql](wf_WIC_Stage_Load/run_wf_WIC_Stage_Load.sql) |
 | `docs/wf_TRS_Stage_Load_1_Ongoing.xml` | 14 | [wf_TRS_Stage_Load_1_Ongoing](wf_TRS_Stage_Load_1_Ongoing/) | [run_wf_TRS_Stage_Load_1_Ongoing.sql](wf_TRS_Stage_Load_1_Ongoing/run_wf_TRS_Stage_Load_1_Ongoing.sql) |
+| `docs/wf_CRE_Stage_Load_Ongoing.xml` | 1 | [wf_CRE_Stage_Load_Ongoing](wf_CRE_Stage_Load_Ongoing/) | [run_wf_CRE_Stage_Load_Ongoing.sql](wf_CRE_Stage_Load_Ongoing/run_wf_CRE_Stage_Load_Ongoing.sql) |
 
 Each mapping spec in `idmc/<workflow>/mappings/<mapping>.md` has an **Oracle stored procedure** section with what
 the procedure does, its parameters, the tables it writes and the shared objects it calls. Each workflow README in
@@ -61,6 +62,7 @@ output port), and do their own reference lookups internally.
 | `rule_USA_SSN_Validation_post_June2011` | `fn_dq_valid_ssn` | `t_dq_ssn` |
 | `rule_MEDICAID_ID_Std` | `fn_dq_std_medicaid_id` | `t_dq_ident` |
 | `rule_Member_Id_Std` | `fn_dq_std_member_id` | `t_dq_ident` |
+| `rule_CARE_ID_Std` (CRE) | `fn_dq_std_care_id` | `t_dq_ident` |
 | `mplt_Global_Addr_Validation` (+ `rule_Addr_Line_*`) | `fn_dq_valid_global_addr` | `t_dq_address` |
 | `mplt_DST_Correction` (timeline) | `fn_dq_dst_correction` | `DATE` |
 | `mplt_Member_Pty_Rle_Phn_Normalization` (TRS) | `fn_dq_norm_member_phn` (pipelined) | `t_dq_member_phn_tab` |

@@ -60,6 +60,9 @@ SET DEFINE OFF
 @@wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr.sql
 @@wf_WIC_Stage_Load/sp_ors_main_m_Tgt_C_S_WIC_Pty_Rle_Alt_Id.sql
 
+-- wf_CRE_Stage_Load_Ongoing
+@@wf_CRE_Stage_Load_Ongoing/sp_ors_main_m_Tgt_C_S_CRE_CARE_Clients.sql
+
 SHOW ERRORS
 SELECT object_type, object_name, status FROM user_objects
  WHERE (object_name LIKE 'SP\_ORS\_%' ESCAPE '\' OR object_name LIKE 'FN\_ORS\_%' ESCAPE '\'

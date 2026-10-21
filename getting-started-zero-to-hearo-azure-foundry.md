@@ -368,7 +368,8 @@ Read first: README.md, user-guide-cli.md, the newest gathered-kb-todos-and-impro
 
 ## Conventions
 - STG _D_ / _H_ tables map to `<Name>Delta` / `<Name>Hist` records.
-- 5 sources (TRS, ECI, FSS, TTF, WIC), 33 in-scope mappings. WIC is the 5th.
+- 6 sources (TRS, ECI, FSS, TTF, WIC, CRE), 34 in-scope mappings. CRE is the 6th: one mapping
+  (m_Tgt_C_S_CRE_CARE_Clients, 034) loads every C_S_CRE_* target plus CRE_SRC_MRG; no validation mapping.
 - New non-obvious IDQ behaviour (quirks/defects) goes into docs/common_insights.md and is called out in the reply.
 - Mapping docs (docs/mappings/*.md) were generated; edit them directly now and keep SQL in sync with *Queries classes.
   "## Lookups" blocks between <!-- lookups:begin/end --> markers come from ext-tools/lookups.py + render_lookups.py.

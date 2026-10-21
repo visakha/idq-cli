@@ -17,6 +17,12 @@ public sealed interface Columns {
             String fullNm, String gndrCd, LocalDateTime birthDt, String flagSrc, String srcFullNm,
             String ethncty, String srcEthncty, String raceCd, String srcRaceCd) implements Columns {}
 
+    /// `C_S_*_PTY` of the sources whose table has no `FLAG_SRC` column (CRE).
+    record PartyWithoutFlag(
+            String ptyBoClassCd, String prfxNm, String frstNm, String mdlNm, String lstNm, String sfxNm,
+            String fullNm, String gndrCd, LocalDateTime birthDt, String srcFullNm, String ethncty,
+            String srcEthncty, String raceCd, String srcRaceCd) implements Columns {}
+
     /// `C_S_*_PTY_RLE` - the member role of a party.
     record PartyRole(String ptyFk, String rleBoClassCd) implements Columns {}
 
@@ -33,6 +39,10 @@ public sealed interface Columns {
             String ptyRleFk, String altIdTp, String altIdVal, String stsCd, String altIdTpFltr, String cvInd)
             implements Columns {}
 
+    /// `C_S_*_PTY_RLE_ALT_ID` of the sources whose table has no `CV_IND` column (CRE).
+    record AlternateIdWithoutCvInd(String ptyRleFk, String altIdTp, String altIdVal, String stsCd, String altIdTpFltr)
+            implements Columns {}
+
     /// `C_S_*_PTY_RLE_PHN` - phone numbers.
     record Phone(String ptyRleFk, String phnTp, String usgTp, String phnNum, String prefLvl) implements Columns {}
 
@@ -46,6 +56,13 @@ public sealed interface Columns {
             @Embedded.Empty ValidatedAddress validated,
             @Embedded.Empty SourceAddress source,
             LocalDateTime effStrtDt, LocalDateTime effEndDt) implements Columns {}
+
+    /// `C_S_*_PTY_RLE_ADDR` of the sources whose table has a usage type but no effective dates (CRE).
+    record AddressWithUsage(
+            String ptyRleFk, String addrTp, String usgTp, String prefLvl, String hierarchyCode, String hmRelTpCd,
+            String locIdn,
+            @Embedded.Empty ValidatedAddress validated,
+            @Embedded.Empty SourceAddress source) implements Columns {}
 
     /// `C_S_*_PTY_RLE_REL` / `_REL_PROV` - relationships between two party roles.
     record Relationship(

@@ -28,10 +28,10 @@ public class SampleData {
     private final MockTables tables;
     private final ApplicationEventPublisher events;
 
-    public SampleData(TrsMockData trs, EciMockData eci, ViewMockData views, RealSampleData real,
+    public SampleData(TrsMockData trs, EciMockData eci, ViewMockData views, CreMockData cre, RealSampleData real,
             ReferenceMockData reference, DatabaseBootstrap bootstrap, EtlSettings settings, MockTables tables,
             ApplicationEventPublisher events) {
-        this.generators = List.of(trs, eci, views, real);
+        this.generators = List.of(trs, eci, views, cre, real);
         this.reference = reference;
         this.bootstrap = bootstrap;
         this.settings = settings;

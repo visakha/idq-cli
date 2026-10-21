@@ -6,7 +6,8 @@ import java.util.Optional;
 /// duplicates, so implementations keep the first row found per key.
 public interface ReferenceData {
 
-    /// `LOOKUP_CODE_VALUE` matched on `CODE_TYPE`, `SRC_SYS`, `SRC_CODE_VALUE`.
+    /// `LOOKUP_CODE_VALUE` matched on `CODE_TYPE`, `SRC_SYS`, `SRC_CODE_VALUE`; a `null` code type matches any type
+    /// (as in the CRE `lkp_ALT_ID_MSTR_REF_CODE`, which filters on the source system only).
     Optional<CodeValue> codeValue(String codeType, String srcSys, String srcCodeValue);
 
     /// `LOOKUP_CODE_VALUE` matched on `CODE_TYPE`, `SRC_SYS`, `MSTR_REF_CODE` (used for label lookups).

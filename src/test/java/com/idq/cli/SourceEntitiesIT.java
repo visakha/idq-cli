@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.reference.ReferenceTables;
+import com.idq.cli.source.cre.etldb.models.CreSources;
 import com.idq.cli.source.eci.etldb.models.EciSources;
 import com.idq.cli.source.fss.etldb.models.FssSources;
 import com.idq.cli.source.trs.etldb.models.TrsSources;
@@ -49,7 +50,7 @@ class SourceEntitiesIT {
 
     static Stream<Class<? extends Record>> entities() {
         return Stream.of(TrsSources.class, EciSources.class, FssSources.class, TtfSources.class, WicSources.class,
-                        MdmBaseTables.class, ReferenceTables.class)
+                        CreSources.class, MdmBaseTables.class, ReferenceTables.class)
                 .flatMap(holder -> Arrays.stream(holder.getDeclaredClasses()))
                 .filter(Class::isRecord)
                 .filter(type -> !BACKUP_OR_DATED.matcher(type.getAnnotation(Table.class).value()).find())

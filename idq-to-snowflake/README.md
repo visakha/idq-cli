@@ -1,6 +1,6 @@
 # IDQ → Snowflake stored procedures
 
-Drop-in Snowflake replacements for the 38 IDQ mappings of the five stage-load workflows in `docs/`. Unlike the Oracle
+Drop-in Snowflake replacements for the 39 IDQ mappings of the six stage-load workflows in `docs/`. Unlike the Oracle
 port in [`idq-to-oracle/`](../idq-to-oracle/README.md), **nothing is assumed to exist**: the IDQ mapplets and rules of
 [`docs/mappings/000_mapplets.md`](../docs/mappings/000_mapplets.md) are written out here as Snowflake SQL functions.
 
@@ -11,6 +11,7 @@ port in [`idq-to-oracle/`](../idq-to-oracle/README.md), **nothing is assumed to 
 | `docs/wf_TTF_Stage_Load.xml` | 4 | [wf_TTF_Stage_Load](wf_TTF_Stage_Load/) | [run_wf_TTF_Stage_Load.sql](wf_TTF_Stage_Load/run_wf_TTF_Stage_Load.sql) |
 | `docs/wf_WIC_Stage_Load.xml` | 5 | [wf_WIC_Stage_Load](wf_WIC_Stage_Load/) | [run_wf_WIC_Stage_Load.sql](wf_WIC_Stage_Load/run_wf_WIC_Stage_Load.sql) |
 | `docs/wf_TRS_Stage_Load_1_Ongoing.xml` | 14 | [wf_TRS_Stage_Load_1_Ongoing](wf_TRS_Stage_Load_1_Ongoing/) | [run_wf_TRS_Stage_Load_1_Ongoing.sql](wf_TRS_Stage_Load_1_Ongoing/run_wf_TRS_Stage_Load_1_Ongoing.sql) |
+| `docs/wf_CRE_Stage_Load_Ongoing.xml` | 1 | [wf_CRE_Stage_Load_Ongoing](wf_CRE_Stage_Load_Ongoing/) | [run_wf_CRE_Stage_Load_Ongoing.sql](wf_CRE_Stage_Load_Ongoing/run_wf_CRE_Stage_Load_Ongoing.sql) |
 
 Each procedure is documented, one page per mapping, in [`idmc-snowflake/`](../idmc-snowflake/README.md). Those pages
 are generated from the procedure headers here by `ext-tools/snowflake_spec.py`; after changing a header, regenerate:
@@ -47,7 +48,7 @@ Every procedure header has one paragraph per marker.
 | Object | Name | Where |
 |---|---|---|
 | One procedure per IDQ mapping | `sp_snow_main_<mapping name>` | `<workflow>/sp_snow_main_<mapping>.sql` |
-| Mapplets, rules and IDQ helpers shared by every mapping | `fn_snow_helperNN_common` (01-36 scalar, 40-47 lookups) | `common/01_snow_common_functions.sql`, `common/02_snow_common_lookups.sql` |
+| Mapplets, rules and IDQ helpers shared by every mapping | `fn_snow_helperNN_common` (01-37 scalar, 40-47 lookups) | `common/01_snow_common_functions.sql`, `common/02_snow_common_lookups.sql` |
 | Helper used by one mapping only | `fn_snow_helperNN_<mapping>` | `<workflow>/fn_snow_helperNN_<mapping>.sql` (the two TRS normalizers) |
 | Shared helper procedures | `sp_snow_helperNN_common` | none were needed: each mapping is one set-based statement |
 
@@ -68,6 +69,7 @@ Every procedure header has one paragraph per marker.
 | `rule_Phone_Extension_Std` | `fn_snow_helper25_common` | |
 | `rule_USA_SSN_Validation_post_June2011` | `fn_snow_helper26_common` | |
 | `rule_MEDICAID_ID_Std`, `rule_Member_Id_Std` | `fn_snow_helper27_common`, `fn_snow_helper28_common` | |
+| `rule_CARE_ID_Std` (CRE) | `fn_snow_helper37_common` | special characters removed; never raises an exception |
 | `mplt_Global_Addr_Validation` (+ `rule_Addr_Line_*`) | `fn_snow_helper34_common` (steps 29-33) | pass-through validator, see below |
 | `mplt_DST_Correction` (TIMELINE) | `fn_snow_helper35_common` + `fn_snow_helper47_common` | |
 | `mplt_Member_Pty_Rle_Phn_Normalization` (TRS) | `fn_snow_helper01_m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr` + SQL | |
@@ -156,7 +158,7 @@ connections (STAGING, the MDM ORS and the reference tables):
 
 - staging sources and targets (`STG_*`, `C_S_*`, `EXC_STG_BAD_REC_MEMB`, `DQM_ADDRESS`, the `V_*` views);
 - MDM hub tables read by lookups: `C_B_PTY_XREF`, `C_B_PTY_RLE_ALT_ID`, `C_B_PTY_RLE_ALT_ID_XREF`,
-  `C_B_PTY_RLE_REL_XREF`;
+  `C_B_PTY_RLE_REL_XREF`, `C_B_PTY_HMRG` (CRE merge history);
 - reference tables: `V_LOOKUP_CODE_VALUE`, `LOOKUP_CODE_VALUE`, `EXC_LOOKUP_CODE_VALUE`, `REF_JUNK_NAME_LIST`,
   `REF_MATCHCODE_DESC` (IDQ `ref_MatchCode_Desc`), `REF_DYLGHT_SVNGS_TM`, `STG_TRS_CD_REF`;
 - `RDM.REF_PHN_AREA_CD`, schema-qualified as the IDQ `Snowflake_PEI` lookup reads it (edit
