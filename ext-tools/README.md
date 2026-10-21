@@ -18,3 +18,20 @@ python -I ext-tools/render_lookups.py lookups.json docs/mappings
   marked block is replaced, so it is safe to re-run.
 
 `lookups.json` is an intermediate file; delete it afterwards.
+
+## IDMC CDI build specification
+
+Converts one IDQ workflow export into a build specification for IDMC Cloud Data Integration (taskflow, mapping
+tasks, mappings, mapplets) and Cloud Data Quality (Cleanse / Labeler / Verifier / Dictionary assets). Run from the
+repository root:
+
+```sh
+python -I ext-tools/idmc_spec.py docs/wf_ECI_Stage_Load.xml idmc/wf_ECI_Stage_Load
+```
+
+* `README.md`: asset inventory, connections, build order, translation rules and open items.
+* `taskflow.md`: the taskflow (IDQ gateways become Parallel Paths), mapping-task settings and the command task.
+* `<taskflow>.param`: CDI parameter file with the IDQ parameter defaults, one section per mapping task.
+* `cdq.md`: the CDQ assets for the IDQ data quality transformations, with their exact settings.
+* `mappings/`, `mapplets/`: one spec per object with sources, SQL overrides, every transformation (expressions
+  translated to CDI syntax), lookups, router groups, targets and field-level links.
