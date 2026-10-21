@@ -55,6 +55,24 @@ FROM stg_eci_d_family fam
 
 Lookup: `EciInactiveStatusRepository#fetchInactiveStatuses` (see [013](013_m_Tgt_C_S_ECI_Pty_Validation.md)).
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `Exp_ECI_Data_Load` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lkp_STG_ECI_PTY_INACTIVE_STS` | `STG_ECI_PTY_INACTIVE_STS` (STAGING)<br>multiple match: any row | `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM` | `PKEY_SRC_OBJECT` &larr; `PKEY_SRC_OBJECT`<br>`SRC_SYSTEM` &larr; `SRC_SYSTEM` | `DEACTIVATION_STS` &rarr; `Flt_Remove_Inactive.DEACTIVATION_STS` (Filter) |
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `mplt_BirthDate_Validation`, `mplt_Ethnicity_Validation`, `mplt_Gender_Validation`, `mplt_Language_Validation`, `mplt_Name_Standardization_Indv_Member`, `mplt_Race_Ind_Validation`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Inactive parties (status set by 013) are skipped.

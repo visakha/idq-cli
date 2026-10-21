@@ -37,6 +37,24 @@ SELECT submitdate, load_date, clients_id, pty_src_key, firstname, lastname, midd
 FROM v_ttf_etl_src
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `Expression` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_STG_TTF_PTY_INACTIVE_STS` | `STG_TTF_PTY_INACTIVE_STS` (STAGING)<br>multiple match: any row | `SRC_KEY = PTY_SRC_KEY AND ROWID_SYSTEM = SRC_SYSTEM` | `PTY_SRC_KEY` &larr; `PTY_SRC_KEY`<br>`SRC_SYSTEM` &larr; `SRC_SYSTEM` | `DEACTIVATION_STS` &rarr; `Flt_Remove_Inactive.DEACTIVATION_STS` (Filter) |
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `mplt_BirthDate_Validation`, `mplt_Ethnicity_Validation`, `mplt_Gender_Validation`, `mplt_Name_Standardization_Indv_Member`, `mplt_Race_Validation`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Gender: `SEXID` 33 -> `F`, 34 -> `M`, otherwise `U` (which the gender rule maps to `NULL`).

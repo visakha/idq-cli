@@ -45,6 +45,16 @@ JOIN stg_trs_dc_case_indv i ON c.case_num = i.case_num
 JOIN stg_trs_valid_members vm ON TO_CHAR(i.indv_id) = vm.pty_pk
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+This mapping has no lookup transformations of its own.
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `mplt_Member_Pty_Rle_Phn_Normalization`, `rule_Phone_Std`, `rule_email_validation_v01`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Phone normalization (`mplt_Member_Pty_Rle_Phn_Normalization`): `Primary` / `001` = `PH_NUM`; `Secondary` /

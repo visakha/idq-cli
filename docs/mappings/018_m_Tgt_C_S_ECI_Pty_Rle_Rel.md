@@ -49,6 +49,40 @@ Lookups: `EciInactiveStatusRepository#fetchInactiveStatuses`, and the child gend
 SELECT TO_CHAR(id_child) AS lookup_key, gender AS lookup_value FROM stg_eci_sn_child
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `Exp_Build_Keys` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lkp_CHILD_STG_ECI_PTY_INACTIVE_STS` | `STG_ECI_PTY_INACTIVE_STS` (STAGING)<br>multiple match: any row | `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM` | `PKEY_SRC_OBJECT` &larr; `Child_Pty_Src_Key`<br>`SRC_SYSTEM` &larr; `Source_System` | `DEACTIVATION_STS` &rarr; `Filter_Fam_Child_Valid.CHILD_DEACTIVATION_STS` (Filter) |
+| `Lkp_FAM_STG_ECI_PTY_INACTIVE_STS` | `STG_ECI_PTY_INACTIVE_STS` (STAGING)<br>multiple match: any row | `SRC_KEY = PKEY_SRC_OBJECT AND ROWID_SYSTEM = SRC_SYSTEM` | `PKEY_SRC_OBJECT` &larr; `Family_Pty_Src_Key`<br>`SRC_SYSTEM` &larr; `Source_System` | `DEACTIVATION_STS` &rarr; `Filter_Fam_Child_Valid.FAM_DEACTIVATION_STS1` (Filter) |
+
+### Fed by `Exp_Prep_Family_cd` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lkp_Rel_Tp_Code_Value` | `LOOKUP_CODE_VALUE` (STAGING)<br>filter: `"LOOKUP_CODE_VALUE"."CODE_TYPE" IN ('REL_TP','INVERSE_REL')`<br>multiple match: any row | `SRC_SYS = Source_System AND SRC_CODE_VALUE = FAMILY_CD` | `Source_System` &larr; `Source_System`<br>`FAMILY_CD` &larr; `out_FAMILY_CD` | `MSTR_REF_CODE` &rarr; `Route_Good_vs_Exceptions.MSTR_REF_CODE` (Router)<br>`MSTR_REF_LABEL` &rarr; `Route_Good_vs_Exceptions.MSTR_REF_LABEL` (Router)<br>`MSTR_REF_DESC` &rarr; `Route_Good_vs_Exceptions.MSTR_REF_DESC` (Router)<br>`FAMILY_CD` (pass-through) &rarr; `Route_Good_vs_Exceptions.all_FAMILY_CD` (Router) |
+
+### Fed by `Filter_Fam_Child_Valid` (Filter)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lkp_STG_ECI_SN_CHILD` | `STG_ECI_SN_CHILD` (STAGING)<br>multiple match: any row | `ID_CHILD = in_ID_CHILD` | `in_ID_CHILD` &larr; `ID_CHILD` | `GENDER` &rarr; `Exp_Prep_Family_cd.GENDER` (Expression) |
+
+### Fed by `Exp_Build_Exception` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = in_Exception_Code` | `in_Exception_Code` &larr; `Exception_Code` | `EXCEPTION_TYPE` &rarr; `Write_EXC_STG_BAD_REC_MEMB.EXCEPTION_TYPE` (Target)<br>`EXCEPTION_CODE` &rarr; `Write_EXC_STG_BAD_REC_MEMB.EXCEPTION_CODE` (Target)<br>`EXCEPTION_DESC` &rarr; `Write_EXC_STG_BAD_REC_MEMB.EXCEPTION_DESC` (Target) |
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Child key `LPAD(child,10)`, family key `LPAD(family,10)F`; both must be active.

@@ -50,6 +50,48 @@ JOIN min_pk pk2 ON rel.ref_indv_id = pk2.indv_id
 ORDER BY rel.indv_id, rel.eff_end_dt
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `Exp_safe_STG_TRS_D_DC_RELATIONSHIPS` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_V_LOOKUP_CODE_VALUE` | `V_LOOKUP_CODE_VALUE` (STAGING)<br>filter: `"V_LOOKUP_CODE_VALUE"."CODE_TYPE"='PTY_REL'`<br>multiple match: any row | `SRC_CODE_VALUE = RELATIONSHIP_TYPE_CD AND SRC_SYS = SRC_SYS_IN` | `RELATIONSHIP_TYPE_CD` &larr; `RELATIONSHIP_TYPE_CD`<br>`SRC_SYS_IN` &larr; `SRC_SYS` | `MSTR_CODE_VALUE` &rarr; `exp_Build_FK.in_RELATIONSHIP_TYPE_MSTR_CD` (Expression) |
+
+### Fed by `EXC_STG_BAD_REC_REL_TP_lookup` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXC_CODE_LKP` | `EXC_CODE_LKP` &larr; `EXC_CODE_LKP` | `EXCEPTION_TYPE` &rarr; `Write_EXC_STG_BAD_REC_MEMB_lookup.EXCEPTION_TYPE` (Target)<br>`EXCEPTION_DESC` &rarr; `Write_EXC_STG_BAD_REC_MEMB_lookup.EXCEPTION_DESC` (Target)<br>`EXCEPTION_CODE` &rarr; `Write_EXC_STG_BAD_REC_MEMB_lookup.EXCEPTION_CODE` (Target) |
+
+### Fed by `Exp_safe_EXC_STG_BAD_REC_MEMB_main_alt_id` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE1` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXC_CODE_LKP` | `EXC_CODE_LKP` &larr; `EXC_CODE_MEMB` | `EXCEPTION_DESC` &rarr; `Write_EXC_STG_BAD_REC_MEMB_main_alt_id.EXCEPTION_DESC` (Target)<br>`EXCEPTION_TYPE` &rarr; `Write_EXC_STG_BAD_REC_MEMB_main_alt_id.EXCEPTION_TYPE` (Target) |
+
+### Fed by `Exp_safe_EXC_STG_BAD_REC_MEMB_ref_alt_id` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE2` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXC_CODE_LKP` | `EXC_CODE_LKP` &larr; `EXC_CODE_MEMB` | `EXCEPTION_DESC` &rarr; `Write_EXC_STG_BAD_REC_MEMB_ref_alt_id.EXCEPTION_DESC` (Target)<br>`EXCEPTION_TYPE` &rarr; `Write_EXC_STG_BAD_REC_MEMB_ref_alt_id.EXCEPTION_TYPE` (Target) |
+
+### Fed by `EXC_STG_BAD_REC_REL_TP_Start_Date_End_Date` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE3` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXC_CODE_LKP` | `EXC_CODE_LKP` &larr; `EXC_CODE_LKP` | `EXCEPTION_DESC` &rarr; `Write_EXC_STG_BAD_REC_MEMB_Start_Date_End_Date.EXCEPTION_DESC` (Target)<br>`EXCEPTION_TYPE` &rarr; `Write_EXC_STG_BAD_REC_MEMB_Start_Date_End_Date.EXCEPTION_TYPE` (Target) |
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `mplt_DST_Correction`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Role keys: `trim(party key)|Member` for the member and the related member.

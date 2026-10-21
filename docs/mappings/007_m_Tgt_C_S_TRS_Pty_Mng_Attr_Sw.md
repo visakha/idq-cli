@@ -56,6 +56,13 @@ JOIN stg_trs_valid_members im ON dly.indv_id = im.indv_id AND dly.src_tbl = im.s
 WHERE key_rn = 1
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+This mapping has no lookup transformations of its own.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Normalizer `nrm_Attribute_Types` - five attributes per row, in order: `File_Clearance_SW`, `SSA_Validation_SW`,

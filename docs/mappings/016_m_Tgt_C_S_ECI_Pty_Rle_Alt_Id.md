@@ -66,6 +66,30 @@ FROM stg_eci_d_family
 `STG_ECI_SN_CASE` is not part of the exports; the placeholder in `db/missing-objects.sql` carries the columns this
 query needs (`ID_CASE`, `ID_CHILD`).
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `exp_ECI_Pty_Rle_Alt_Id` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lkp_STG_ECI_PTY_INACTIVE_STS` | `STG_ECI_PTY_INACTIVE_STS` (STAGING)<br>multiple match: any row | `SRC_KEY = PTY_SRC_KEY AND ROWID_SYSTEM = SRC_SYSTEM` | `SRC_SYSTEM` &larr; `SRC_SYSTEM`<br>`PTY_SRC_KEY` &larr; `PTY_SRC_KEY` | `DEACTIVATION_STS` &rarr; `Filter.DEACTIVATION_STS` (Filter) |
+
+### Fed by `RTR_Valid_SSN` (Router)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lkp_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = in_EXCEPTION_CODE` | `in_EXCEPTION_CODE` &larr; `SSN_Exception_Code` | `EXCEPTION_CODE` &rarr; `Exp_SSN_Exceptions.SSN_EXCEPTION_CODE` (Expression)<br>`EXCEPTION_DESC` &rarr; `Exp_SSN_Exceptions.SSN_EXCEPTION_DESC` (Expression)<br>`EXCEPTION_TYPE` &rarr; `Exp_SSN_Exceptions.SSN_EXCEPTION_TYPE` (Expression) |
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `rule_MEDICAID_ID_Std`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Party key = first 11 characters of the role key without a trailing `|`; inactive parties skipped.

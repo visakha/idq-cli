@@ -103,6 +103,13 @@ JOIN stg_trs_valid_members im ON TO_CHAR(a.indv_id) = im.pty_pk
 ORDER BY a.indv_id, a.eff_begin_dt, a.eff_end_dt
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+This mapping has no lookup transformations of its own.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. One row per member key; the latest eligibility segment (by begin date) supplies the begin and create dates, the

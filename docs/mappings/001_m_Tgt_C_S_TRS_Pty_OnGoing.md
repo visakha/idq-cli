@@ -98,6 +98,36 @@ ORDER BY a.indv_id, a.src_tbl
 SELECT PTY_PK FROM STG_TRS_VALID_MEMBERS
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `fltr_Dups` (Filter)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `lkp_Stg_TRS_Valid_Members` | `STG_TRS_VALID_MEMBERS` (STAGING)<br>multiple match: any row | `PTY_PK = PTY_PK_IN` | `PTY_PK_IN` &larr; `PKEY_SRC_OBJECT` | `PTY_PK` &rarr; `fltr_New_Valid_Members.PTY_PK_EXISTS` (Filter) |
+
+### Fed by `exp_Validate_Death_Dt` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `lkp_Exc_Death_Dt` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = Exception_Code_Death_Dt` | `Exception_Code_Death_Dt` &larr; `Exception_Code_Death_Dt` | `EXCEPTION_CODE` &rarr; `exp_Exception_Consolidation.Exception_Code_Death_Date` (Expression)<br>`EXCEPTION_DESC` &rarr; `exp_Exception_Consolidation.Exception_Desc_Death_Date` (Expression)<br>`EXCEPTION_TYPE` &rarr; `exp_Exception_Consolidation.Exception_Type_Death_Date` (Expression) |
+
+### Fed by `exp_Invalid_Party_Name` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = Exception_Code_Name` | `Exception_Code_Name` &larr; `Exception_Code_Name` | `EXCEPTION_TYPE` &rarr; `Write_Invalid_Party_Name.EXCEPTION_TYPE` (Target)<br>`EXCEPTION_DESC` &rarr; `Write_Invalid_Party_Name.EXCEPTION_DESC` (Target) |
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `mplt_BirthDate_Validation`, `mplt_Ethnicity_Validation`, `mplt_Gender_Validation`, `mplt_Name_Standardization_Indv_Member`, `mplt_Race_Validation`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. **Full name** = `first [middle] last`.

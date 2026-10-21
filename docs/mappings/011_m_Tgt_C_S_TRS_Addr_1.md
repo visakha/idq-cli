@@ -47,6 +47,24 @@ SELECT DISTINCT
 FROM stg_trs_d_indv_addr a
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `read_Staging_Delta_Tables` (Source)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `lkp_Addr_Street_Type` | `STG_TRS_CD_REF` (STAGING)<br>multiple match: any row | `CODE = ADDR_ST_TYPE_CD` | `ADDR_ST_TYPE_CD` &larr; `ADDR_ST_TYPE_CD` | `DESCRIPTION` &rarr; `exp_TRS_Addr_Derivation.STREET_TYPE_DESC` (Expression)<br>`ADDR_ST_TYPE_CD` (pass-through) &rarr; `exp_TRS_Addr_Derivation.ADDR_ST_TYPE_CD` (Expression) |
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `mplt_Global_Addr_Validation`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Street type description via `STG_TRS_CD_REF.CODE` (the IDQ lookup has no table-name filter).

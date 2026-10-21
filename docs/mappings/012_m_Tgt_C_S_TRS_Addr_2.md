@@ -67,6 +67,27 @@ JOIN stg_trs_valid_members vm ON a.indv_id = vm.indv_id
 WHERE key_rn = 1
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `Exp_src_defaults` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `lkp_Address_Type` | `V_LOOKUP_CODE_VALUE` (STAGING)<br>filter: `"V_LOOKUP_CODE_VALUE"."CODE_TYPE"='ADDR_TP'`<br>multiple match: any row | `SRC_CODE_VALUE = SRC_ADDR_TP AND SRC_SYS = SRC_SYS_IN` | `SRC_SYS_IN` &larr; `SRC_SYS`<br>`SRC_ADDR_TP` &larr; `ADDR_TYPE_CD` | `MSTR_CODE_VALUE` &rarr; `exp_Score_and_Exception_details.Addr_Tp_Mstr_Cd` (Expression) |
+
+### Fed by `exp_TRS_US_Addr_Exc_Rec` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = in_Exception_Code` | `in_Exception_Code` &larr; `Exception_Code` | `EXCEPTION_CODE` &rarr; `write_TRS_Exc_Member_Rec.EXCEPTION_CODE` (Target)<br>`EXCEPTION_DESC` &rarr; `write_TRS_Exc_Member_Rec.EXCEPTION_DESC` (Target)<br>`EXCEPTION_TYPE` &rarr; `write_TRS_Exc_Member_Rec.EXCEPTION_TYPE` (Target) |
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. `DQM_ADDRESS` row for every assignment: key = validated `line1|line2|city|zip[-ext]|state|country`, source

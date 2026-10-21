@@ -39,6 +39,24 @@ FROM v_fss_etl_src
 WHERE dtl__capxaction <> 'D'
 ```
 
+<!-- lookups:begin -->
+## Lookups
+
+Connected lookups, grouped by the transformation that feeds their input ports. In a lookup condition the
+left side is the lookup table column and the right side is the lookup input port. Output ports are the
+returned table columns (or input ports passed through) and the downstream port each one feeds.
+
+### Fed by `exp_Stage_Source_Attributes` (Expression)
+
+| Lookup | Table | Condition | Input ports | Output ports |
+|---|---|---|---|---|
+| `Lookup_STG_FSS_PTY_INACTIVE_STS` | `STG_FSS_PTY_INACTIVE_STS` (STAGING)<br>multiple match: any row | `SRC_KEY = PTY_SRC_KEY AND ROWID_SYSTEM = SRC_SYS` | `PTY_SRC_KEY` &larr; `PTY_SRC_KEY`<br>`SRC_SYS` &larr; `SRC_SYS` | `DEACTIVATION_STS` &rarr; `fil_deactivated_status.DEACTIVATION_STS` (Filter) |
+
+Lookups inside the mapplets / rules this mapping calls are listed in
+[000](000_mapplets.md#lookups-inside-mapplets-and-rules): `rule_Phone_Extension_Std`, `rule_Phone_Std`, `rule_email_validation_v01`.
+
+<!-- lookups:end -->
+
 ## Business rules
 
 1. Phone (when present): type `Telephone`, usage `001`, preference `Primary`; `rule_Phone_Std` with source `FSS`.
