@@ -1,8 +1,10 @@
 package com.idq.cli.cli;
 
+import com.idq.cli.domain.SourceSystem;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.springframework.shell.core.command.CommandContext;
 import org.springframework.shell.core.command.annotation.Argument;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.stereotype.Component;
@@ -136,6 +138,41 @@ public class IdqShellCommands {
             return "Workflow %s (%s)%n%s".formatted(run.source().workflow, run.engine(),
                     String.join("\n", run.output()));
         });
+    }
+
+    @Command(name = "compare-etl-process",
+            description = "Run ORA_SP then IDQ on the same source data and compare the target tables", group = GROUP)
+    public String compareEtlProcess(
+            @Argument(index = 0, description = "source system; prompted for when omitted", defaultValue = "")
+            String source, CommandContext context) {
+        return attempt(() -> {
+            var chosen = source == null || source.isBlank() ? promptSource(context) : source;
+            if (chosen.isBlank()) {
+                return "No source system chosen";
+            }
+            return String.join("\n", console.compareEtlProcesses(chosen).summary());
+        });
+    }
+
+    /// Lists the source systems and reads the choice (number or name); Enter keeps the latched source, if any.
+    private String promptSource(CommandContext context) {
+        var out = context.outputWriter();
+        var latched = console.latch().source();
+        out.println("Compare etl-process ORA_SP vs IDQ (no mock data; the source tables are left unchanged).");
+        out.println("Source systems:");
+        var values = SourceSystem.values();
+        for (int i = 0; i < values.length; i++) {
+            out.println("  %d) %-4s %s (%s)".formatted(i + 1, values[i], values[i].workflow, values[i].description));
+        }
+        out.flush();
+        var prompt = "Choose a source system [1-%d]%s: ".formatted(values.length,
+                latched.map(s -> " (Enter for " + s + ")").orElse(""));
+        try {
+            var answer = context.inputReader().readInput(prompt);
+            return answer == null || answer.isBlank() ? latched.map(Enum::name).orElse("") : answer.strip();
+        } catch (Exception e) {
+            throw new IllegalStateException("cannot read the source system: " + e.getMessage(), e);
+        }
     }
 
     @Command(name = "run-unit-tests", description = "Run the PKEY unit test of the latched mapping", group = GROUP)

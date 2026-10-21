@@ -96,7 +96,7 @@ public class FssAddressService {
         var routed = AddressPatterns.route(candidates, validator, ctx, FssTargets.Address::new);
         return MappingOutput.empty()
                 .load(TargetBatch.append(DqmAddress.class, routed.dqm()))
-                .load(TargetBatch.replaceAll(FssTargets.Address.class,
+                .load(TargetBatch.append(FssTargets.Address.class,
                         Rows.lastPerKey(routed.addresses(), FssTargets.Address::pkeySrcObject)))
                 .reject(routed.exceptions());
     }
@@ -105,7 +105,7 @@ public class FssAddressService {
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(DqmAddressRepository.TABLE, auditValidatedAddresses(output.rows(DqmAddress.class)));
-        loaded.put(FssAddressRepository.TABLE, replaceAddresses(output.rows(FssTargets.Address.class)));
+        loaded.put(FssAddressRepository.TABLE, insertAddresses(output.rows(FssTargets.Address.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
@@ -116,9 +116,7 @@ public class FssAddressService {
         return dqmAddresses.insertAll(rows).size();
     }
 
-    int replaceAddresses(List<FssTargets.Address> rows) {
-        settings.requireClearable(FssAddressRepository.TABLE);
-        addresses.deleteAll();
+    int insertAddresses(List<FssTargets.Address> rows) {
         return addresses.insertAll(rows).size();
     }
 }

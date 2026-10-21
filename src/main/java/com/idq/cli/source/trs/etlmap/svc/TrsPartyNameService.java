@@ -74,23 +74,21 @@ public class TrsPartyNameService {
             return new TrsTargets.PartyName(key, audit, new Columns.PartyName(r.pkeyPty(), ALIAS_NAME_TYPE,
                     std.first(), std.middle(), std.last(), std.prefix(), std.full(), std.suffix(), srcFull));
         }).toList();
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsTargets.PartyName.class,
+        return MappingOutput.empty().load(TargetBatch.append(TrsTargets.PartyName.class,
                 Rows.lastPerKey(Rows.distinct(names), TrsTargets.PartyName::pkeySrcObject)));
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TrsPartyNameRepository.TABLE, replacePartyNames(output.rows(TrsTargets.PartyName.class)));
+        loaded.put(TrsPartyNameRepository.TABLE, insertPartyNames(output.rows(TrsTargets.PartyName.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replacePartyNames(List<TrsTargets.PartyName> rows) {
-        settings.requireClearable(TrsPartyNameRepository.TABLE);
-        partyNames.deleteAll();
+    int insertPartyNames(List<TrsTargets.PartyName> rows) {
         return partyNames.insertAll(rows).size();
     }
 }

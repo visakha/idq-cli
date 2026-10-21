@@ -145,8 +145,8 @@ public class TrsPartyOnGoingService {
                 .toList();
 
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(TrsTargets.Party.class, parties))
-                .load(TargetBatch.replaceAll(TrsTargets.PartyRole.class, roles))
+                .load(TargetBatch.append(TrsTargets.Party.class, parties))
+                .load(TargetBatch.append(TrsTargets.PartyRole.class, roles))
                 .load(TargetBatch.append(TrsSources.ValidMember.class, newValidMembers))
                 .reject(bad);
     }
@@ -183,8 +183,8 @@ public class TrsPartyOnGoingService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TrsPartyRepository.TABLE, replaceParties(output.rows(TrsTargets.Party.class)));
-        loaded.put(TrsPartyRoleRepository.TABLE, replacePartyRoles(output.rows(TrsTargets.PartyRole.class)));
+        loaded.put(TrsPartyRepository.TABLE, insertParties(output.rows(TrsTargets.Party.class)));
+        loaded.put(TrsPartyRoleRepository.TABLE, insertPartyRoles(output.rows(TrsTargets.PartyRole.class)));
         loaded.put(TrsValidMemberRepository.TABLE, recordNewValidMembers(output.rows(TrsSources.ValidMember.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
@@ -192,15 +192,11 @@ public class TrsPartyOnGoingService {
         return loaded;
     }
 
-    int replaceParties(List<TrsTargets.Party> rows) {
-        settings.requireClearable(TrsPartyRepository.TABLE);
-        parties.deleteAll();
+    int insertParties(List<TrsTargets.Party> rows) {
         return parties.insertAll(rows).size();
     }
 
-    int replacePartyRoles(List<TrsTargets.PartyRole> rows) {
-        settings.requireClearable(TrsPartyRoleRepository.TABLE);
-        partyRoles.deleteAll();
+    int insertPartyRoles(List<TrsTargets.PartyRole> rows) {
         return partyRoles.insertAll(rows).size();
     }
 

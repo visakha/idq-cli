@@ -63,15 +63,15 @@ public class TrsMockData {
         return BigDecimal.valueOf(value);
     }
 
-    private void clean(String... indvTables) {
+    private void keepExisting(String... indvTables) {
         for (var table : indvTables) {
-            tables.deleteRange(table, "INDV_ID", INDV, INDV + 999_999);
+            tables.skipIfPresent(table, "INDV_ID", INDV, INDV + 999_999);
         }
     }
 
     /// MCI key for every individual, daily (`|DC_INDV`) key for the even ones.
     private void validMembers() {
-        clean("STG_TRS_VALID_MEMBERS");
+        keepExisting("STG_TRS_VALID_MEMBERS");
         for (var id : individuals()) {
             validMember(id, String.valueOf(id), "MCI");
             if (id % 2 == 0) {
@@ -150,15 +150,15 @@ public class TrsMockData {
     }
 
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_OnGoing() {
-        clean("STG_TRS_D_DC_INDV", "STG_TRS_D_CV_DC_MCI_INDV", "STG_TRS_D_CV_MCI_EDG_INDV_TOA");
+        keepExisting("STG_TRS_D_DC_INDV", "STG_TRS_D_CV_DC_MCI_INDV", "STG_TRS_D_CV_MCI_EDG_INDV_TOA");
         dailyIndividuals();
         convertedIndividuals();
     }
 
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing() {
-        tables.deleteRange("STG_TRS_D_DC_PRIMARY_PAYEE", "CASE_NUM", CASE, CASE + 999_999);
-        tables.deleteRange("STG_TRS_CV_ED_MCI_EDG_INDV", "CASE_NUM", CASE, CASE + 999_999);
-        tables.deleteRange("STG_TRS_DC_CASES", "CASE_NUM", CASE, CASE + 999_999);
+        tables.skipIfPresent("STG_TRS_D_DC_PRIMARY_PAYEE", "CASE_NUM", CASE, CASE + 999_999);
+        tables.skipIfPresent("STG_TRS_CV_ED_MCI_EDG_INDV", "CASE_NUM", CASE, CASE + 999_999);
+        tables.skipIfPresent("STG_TRS_DC_CASES", "CASE_NUM", CASE, CASE + 999_999);
         validMembers();
         for (var id : individuals()) {
             var caseNum = num(CASE + (id - INDV));
@@ -188,7 +188,7 @@ public class TrsMockData {
 
     /// Two aliases per individual; the second first name carries the junk suffix `0n`.
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_Nm() {
-        clean("STG_TRS_D_CV_DC_MCI_ALIAS", "STG_TRS_D_DC_ALIAS");
+        keepExisting("STG_TRS_D_CV_DC_MCI_ALIAS", "STG_TRS_D_DC_ALIAS");
         validMembers();
         for (var id : individuals()) {
             for (int seq = 1; seq <= 2; seq++) {
@@ -218,7 +218,7 @@ public class TrsMockData {
 
     /// The SSN history (`STG_TRS_H_DC_INDV`) repeats the SSN of every daily individual.
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_Rle_Alt_Id() {
-        clean("STG_TRS_D_DC_INDV", "STG_TRS_D_CV_DC_MCI_INDV", "STG_TRS_H_DC_INDV", "STG_TRS_D_CV_DC_MRG_SPRT_INDV");
+        keepExisting("STG_TRS_D_DC_INDV", "STG_TRS_D_CV_DC_MCI_INDV", "STG_TRS_H_DC_INDV", "STG_TRS_D_CV_DC_MRG_SPRT_INDV");
         validMembers();
         var daily = dailyIndividuals();
         convertedIndividuals();
@@ -231,7 +231,7 @@ public class TrsMockData {
 
     /// Every fourth individual is enrolled in the unknown plan `ZZ`.
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_Rle_Pln() {
-        clean("STG_TRS_D_IN_MANAGED_CARE");
+        keepExisting("STG_TRS_D_IN_MANAGED_CARE");
         validMembers();
         for (var id : individuals()) {
             tables.insert(InManagedCareDelta.builder()
@@ -247,8 +247,8 @@ public class TrsMockData {
 
     /// Every 7th main phone is too short, every 5th e-mail is not an address.
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr() {
-        tables.deleteRange("STG_TRS_D_DC_CASES", "CASE_NUM", CASE, CASE + 999_999);
-        tables.deleteRange("STG_TRS_DC_CASE_INDV", "CASE_NUM", CASE, CASE + 999_999);
+        tables.skipIfPresent("STG_TRS_D_DC_CASES", "CASE_NUM", CASE, CASE + 999_999);
+        tables.skipIfPresent("STG_TRS_DC_CASE_INDV", "CASE_NUM", CASE, CASE + 999_999);
         validMembers();
         for (var id : individuals()) {
             var caseNum = num(CASE + (id - INDV));
@@ -277,7 +277,7 @@ public class TrsMockData {
 
     /// Every 5th type of assistance is unknown, every 6th eligibility ends before it begins.
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_Rle_TOA() {
-        clean("STG_TRS_D_CV_MCI_EDG_INDV_TOA");
+        keepExisting("STG_TRS_D_CV_MCI_EDG_INDV_TOA");
         validMembers();
         for (var id : individuals()) {
             var begin = pastDate(3);
@@ -302,7 +302,7 @@ public class TrsMockData {
 
     /// Individuals related in pairs; every third pair has the unknown relationship `XX`.
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem() {
-        clean("STG_TRS_D_DC_RELATIONSHIPS");
+        keepExisting("STG_TRS_D_DC_RELATIONSHIPS");
         validMembers();
         var ids = individuals();
         for (int i = 0; i + 1 < ids.size(); i += 2) {
@@ -320,10 +320,10 @@ public class TrsMockData {
 
     /// Providers with a TPI; every 5th provider number is malformed, every 4th has no MDM provider record.
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP() {
-        clean("STG_TRS_D_IN_MANAGED_CARE");
+        keepExisting("STG_TRS_D_IN_MANAGED_CARE");
         validMembers();
-        tables.execute("DELETE FROM C_B_PTY_RLE_ALT_ID_XREF WHERE ROWID_OBJECT LIKE 'MOCK%'", Map.of());
-        tables.execute("DELETE FROM C_B_PTY_RLE_ALT_ID WHERE ROWID_OBJECT LIKE 'MOCK%'", Map.of());
+        tables.skipIf("C_B_PTY_RLE_ALT_ID_XREF", "ROWID_OBJECT LIKE 'MOCK%'", Map.of());
+        tables.skipIf("C_B_PTY_RLE_ALT_ID", "ROWID_OBJECT LIKE 'MOCK%'", Map.of());
         for (var id : individuals()) {
             int i = (int) (id - INDV);
             var tpi = "%09d".formatted(700_000_000 + i);
@@ -363,14 +363,14 @@ public class TrsMockData {
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Addr_2() {
         var addresses = addresses();
         validMembers();
-        tables.execute("DELETE FROM STG_TRS_D_UNQ_ADDR WHERE ADDR_ID LIKE '%MOCK %'", Map.of());
+        tables.skipIf("STG_TRS_D_UNQ_ADDR", "ADDR_ID LIKE '%MOCK %'", Map.of());
         tables.insertAll(Rows.firstPerKey(addresses.stream().map(TrsMockData::uniqueAddress).toList(),
                 UniqueAddressDelta::addrId));
     }
 
     /// Mailing (even) and physical (odd) addresses in Austin; every third one is an apartment.
     private List<IndvAddrDelta> addresses() {
-        clean("STG_TRS_D_INDV_ADDR");
+        keepExisting("STG_TRS_D_INDV_ADDR");
         return individuals().stream().map(id -> {
             int i = (int) (id - INDV);
             return tables.insert(IndvAddrDelta.builder()

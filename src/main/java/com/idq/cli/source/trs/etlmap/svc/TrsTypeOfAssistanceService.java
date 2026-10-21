@@ -106,7 +106,7 @@ public class TrsTypeOfAssistanceService {
                         r.convertDt())));
             }
         }
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsTargets.TypeOfAssistance.class, segments))
+        return MappingOutput.empty().load(TargetBatch.append(TrsTargets.TypeOfAssistance.class, segments))
                 .reject(bad);
     }
 
@@ -114,16 +114,14 @@ public class TrsTypeOfAssistanceService {
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(TrsTypeOfAssistanceRepository.TABLE,
-                replaceTypesOfAssistance(output.rows(TrsTargets.TypeOfAssistance.class)));
+                insertTypesOfAssistance(output.rows(TrsTargets.TypeOfAssistance.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceTypesOfAssistance(List<TrsTargets.TypeOfAssistance> rows) {
-        settings.requireClearable(TrsTypeOfAssistanceRepository.TABLE);
-        typesOfAssistance.deleteAll();
+    int insertTypesOfAssistance(List<TrsTargets.TypeOfAssistance> rows) {
         return typesOfAssistance.insertAll(rows).size();
     }
 }

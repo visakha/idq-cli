@@ -111,7 +111,7 @@ public class TrsAlternateIdService {
                     }
                 });
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(TrsTargets.AlternateId.class,
+                .load(TargetBatch.append(TrsTargets.AlternateId.class,
                         Rows.lastPerKey(valid, TrsTargets.AlternateId::pkeySrcObject)))
                 .reject(bad);
     }
@@ -130,16 +130,14 @@ public class TrsAlternateIdService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TrsAlternateIdRepository.TABLE, replaceAlternateIds(output.rows(TrsTargets.AlternateId.class)));
+        loaded.put(TrsAlternateIdRepository.TABLE, insertAlternateIds(output.rows(TrsTargets.AlternateId.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceAlternateIds(List<TrsTargets.AlternateId> rows) {
-        settings.requireClearable(TrsAlternateIdRepository.TABLE);
-        alternateIds.deleteAll();
+    int insertAlternateIds(List<TrsTargets.AlternateId> rows) {
         return alternateIds.insertAll(rows).size();
     }
 }

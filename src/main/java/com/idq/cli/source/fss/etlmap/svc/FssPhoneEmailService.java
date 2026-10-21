@@ -123,9 +123,9 @@ public class FssPhoneEmailService {
             }
         }
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(FssTargets.Phone.class,
+                .load(TargetBatch.append(FssTargets.Phone.class,
                         Rows.lastPerKey(phones, FssTargets.Phone::pkeySrcObject)))
-                .load(TargetBatch.replaceAll(FssTargets.Email.class,
+                .load(TargetBatch.append(FssTargets.Email.class,
                         Rows.lastPerKey(emails, FssTargets.Email::pkeySrcObject)))
                 .reject(bad);
     }
@@ -133,23 +133,19 @@ public class FssPhoneEmailService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(FssPhoneRepository.TABLE, replacePhones(output.rows(FssTargets.Phone.class)));
-        loaded.put(FssEmailRepository.TABLE, replaceEmails(output.rows(FssTargets.Email.class)));
+        loaded.put(FssPhoneRepository.TABLE, insertPhones(output.rows(FssTargets.Phone.class)));
+        loaded.put(FssEmailRepository.TABLE, insertEmails(output.rows(FssTargets.Email.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replacePhones(List<FssTargets.Phone> rows) {
-        settings.requireClearable(FssPhoneRepository.TABLE);
-        phones.deleteAll();
+    int insertPhones(List<FssTargets.Phone> rows) {
         return phones.insertAll(rows).size();
     }
 
-    int replaceEmails(List<FssTargets.Email> rows) {
-        settings.requireClearable(FssEmailRepository.TABLE);
-        emails.deleteAll();
+    int insertEmails(List<FssTargets.Email> rows) {
         return emails.insertAll(rows).size();
     }
 }

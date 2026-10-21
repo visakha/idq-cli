@@ -125,8 +125,8 @@ public class TrsPhoneEmailService {
         });
 
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(TrsTargets.Phone.class, Rows.latestPerKey(phones)))
-                .load(TargetBatch.replaceAll(TrsTargets.Email.class, Rows.latestPerKey(emails)))
+                .load(TargetBatch.append(TrsTargets.Phone.class, Rows.latestPerKey(phones)))
+                .load(TargetBatch.append(TrsTargets.Email.class, Rows.latestPerKey(emails)))
                 .reject(bad);
     }
 
@@ -138,23 +138,19 @@ public class TrsPhoneEmailService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TrsPhoneRepository.TABLE, replacePhones(output.rows(TrsTargets.Phone.class)));
-        loaded.put(TrsEmailRepository.TABLE, replaceEmails(output.rows(TrsTargets.Email.class)));
+        loaded.put(TrsPhoneRepository.TABLE, insertPhones(output.rows(TrsTargets.Phone.class)));
+        loaded.put(TrsEmailRepository.TABLE, insertEmails(output.rows(TrsTargets.Email.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replacePhones(List<TrsTargets.Phone> rows) {
-        settings.requireClearable(TrsPhoneRepository.TABLE);
-        phones.deleteAll();
+    int insertPhones(List<TrsTargets.Phone> rows) {
         return phones.insertAll(rows).size();
     }
 
-    int replaceEmails(List<TrsTargets.Email> rows) {
-        settings.requireClearable(TrsEmailRepository.TABLE);
-        emails.deleteAll();
+    int insertEmails(List<TrsTargets.Email> rows) {
         return emails.insertAll(rows).size();
     }
 }

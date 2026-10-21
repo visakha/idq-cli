@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_WIC_Pty (workflow wf_WIC_Stage_Load).
 --
--- Loads the WIC parties (V_WIC_ETL_SRC) into C_S_WIC_PTY and C_S_WIC_PTY_RLE (both truncated first) and logs
+-- Loads the WIC parties (V_WIC_ETL_SRC) into C_S_WIC_PTY and C_S_WIC_PTY_RLE (both insert only, never truncated) and logs
 -- demographic exceptions:
 --   -> Flt_Remove_Inactive: party not in STG_WIC_PTY_INACTIVE_STS
 --   -> name standardization, gender, birth date, ethnicity, race indicators, language
@@ -23,8 +23,7 @@ IS
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- SYSTIMESTAMP()
     l_sysdate  DATE := SYSDATE;
 BEGIN
-    sp_ors_helper01_common('C_S_WIC_PTY');
-    sp_ors_helper01_common('C_S_WIC_PTY_RLE');
+    -- Not performed: IDQ "truncate target table" of C_S_WIC_PTY, C_S_WIC_PTY_RLE. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Rtr_Exception.Valid_Party (TRUE) -> exp_Party_Consolidation -> Write_C_S_WIC_PTY

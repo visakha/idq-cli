@@ -75,7 +75,7 @@ public class TrsPlanService {
                 .thenComparing(Rows.asc(p -> p.audit().periodStartDate()))
                 .thenComparing(Rows.asc(p -> p.audit().periodEndDate())));
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(TrsTargets.Plan.class,
+                .load(TargetBatch.append(TrsTargets.Plan.class,
                         Rows.lastPerKey(ordered, TrsTargets.Plan::pkeySrcObject)))
                 .reject(bad);
     }
@@ -87,16 +87,14 @@ public class TrsPlanService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TrsPlanRepository.TABLE, replacePlans(output.rows(TrsTargets.Plan.class)));
+        loaded.put(TrsPlanRepository.TABLE, insertPlans(output.rows(TrsTargets.Plan.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replacePlans(List<TrsTargets.Plan> rows) {
-        settings.requireClearable(TrsPlanRepository.TABLE);
-        plans.deleteAll();
+    int insertPlans(List<TrsTargets.Plan> rows) {
         return plans.insertAll(rows).size();
     }
 }

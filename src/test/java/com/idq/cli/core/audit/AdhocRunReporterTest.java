@@ -80,7 +80,6 @@ class AdhocRunReporterTest {
         reporter.on(new MockDataGenerated(MockDataGenerated.REFERENCE_DATA, "Test_001",
                 List.of("INSERT INTO LOOKUP_CODE_VALUE (CODE_TYPE) VALUES ('REL_TP');")));
         reporter.on(new MockDataGenerated(info.name(), "Test_001", List.of(
-                "DELETE FROM STG_ECI_D_FAMILY WHERE ID_FAMILY BETWEEN 9100000000 AND 9100999999;",
                 "INSERT INTO STG_ECI_D_FAMILY (ID_FAMILY, FIRST_NAME) VALUES (9100000001, 'Test_001-Mia');")));
 
         for (var second : List.of(false, true)) {

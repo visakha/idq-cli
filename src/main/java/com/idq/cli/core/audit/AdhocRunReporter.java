@@ -134,7 +134,7 @@ public class AdhocRunReporter {
                 .append(run.source()).append(" ").append(engineLabel(run.engine())).append(" run started ")
                 .append(run.started().format(RUN_TIME)).append("\n")
                 .append("-- mock-data-pre-fix: ").append(prefix.isEmpty() ? "(none)" : prefix).append("\n")
-                .append("-- Replays the mock fills: earlier mock rows are deleted, then these rows inserted.\n")
+                .append("-- Replays the mock fills: these rows are inserted (nothing is deleted).\n")
                 .append("-- Run it in the OCI schema, then run-etl with mock_data=false to process exactly these")
                 .append(" rows.\n");
         Stream.concat(Stream.ofNullable(mockData.get(MockDataGenerated.REFERENCE_DATA)), fills.stream())

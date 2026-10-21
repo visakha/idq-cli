@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_TTF_Pty (workflow wf_TTF_Stage_Load).
 --
--- Loads the TTF clients (V_TTF_ETL_SRC) into C_S_TTF_PTY and C_S_TTF_PTY_RLE (both truncated first) and logs
+-- Loads the TTF clients (V_TTF_ETL_SRC) into C_S_TTF_PTY and C_S_TTF_PTY_RLE (both insert only, never truncated) and logs
 -- demographic exceptions:
 --   -> Flt_Remove_Inactive: party (PTY_SRC_KEY) not in STG_TTF_PTY_INACTIVE_STS
 --   -> Expression: gender from SEXID (33 -> F, 34 -> M, else U); ethnicity = '55' when RACEETHNICITYID = '55'
@@ -25,8 +25,7 @@ IS
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime
     l_sysdate  DATE := SYSDATE;
 BEGIN
-    sp_ors_helper01_common('C_S_TTF_PTY');
-    sp_ors_helper01_common('C_S_TTF_PTY_RLE');
+    -- Not performed: IDQ "truncate target table" of C_S_TTF_PTY, C_S_TTF_PTY_RLE. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Rtr_Exception.Valid_Party (TRUE) -> exp_Party_Consolidation -> Write_C_S_TTF_PTY

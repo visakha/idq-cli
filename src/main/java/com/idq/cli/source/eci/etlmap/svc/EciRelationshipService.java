@@ -136,7 +136,7 @@ public class EciRelationshipService {
                             .relTp(type)
                             .build());
                 });
-        return MappingOutput.empty().load(TargetBatch.replaceAll(EciTargets.Relationship.class,
+        return MappingOutput.empty().load(TargetBatch.append(EciTargets.Relationship.class,
                 Rows.lastPerKey(relationships, EciTargets.Relationship::pkeySrcObject))).reject(bad);
     }
 
@@ -144,16 +144,14 @@ public class EciRelationshipService {
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(EciRelationshipRepository.TABLE,
-                replaceRelationships(output.rows(EciTargets.Relationship.class)));
+                insertRelationships(output.rows(EciTargets.Relationship.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceRelationships(List<EciTargets.Relationship> rows) {
-        settings.requireClearable(EciRelationshipRepository.TABLE);
-        relationships.deleteAll();
+    int insertRelationships(List<EciTargets.Relationship> rows) {
         return relationships.insertAll(rows).size();
     }
 }

@@ -46,7 +46,7 @@ public class ReferenceMockData {
 
     private void exceptionCatalog() {
         var now = LocalDateTime.now();
-        tables.deleteMarked("EXC_LOOKUP_CODE_VALUE", "CREATED_BY");
+        tables.skipIfMarked("EXC_LOOKUP_CODE_VALUE", "CREATED_BY");
         for (int i = 0; i < EXCEPTIONS.size(); i++) {
             var code = EXCEPTIONS.get(i);
             tables.insert(ExceptionCode.builder()
@@ -61,7 +61,7 @@ public class ReferenceMockData {
     }
 
     private void codeValues() {
-        tables.deleteMarked("LOOKUP_CODE_VALUE", "CREATED_BY");
+        tables.skipIfMarked("LOOKUP_CODE_VALUE", "CREATED_BY");
         codeValue("TOA", "TRS", "A1", "100", "Medicaid TOA 100");
         codeValue("TOA", "TRS", "B2", "200", "Medicaid TOA 200");
         for (var usage : List.of("001", "002", "003")) {
@@ -99,7 +99,7 @@ public class ReferenceMockData {
     }
 
     private void areaCodes() {
-        tables.execute("DELETE FROM REF_PHN_AREA_CD WHERE NOTES = :m", Map.of("m", MARKER));
+        tables.skipIf("REF_PHN_AREA_CD", "NOTES = :m", Map.of("m", MARKER));
         for (var npa : List.of("512", "214", "713", "210", "817")) {
             tables.insert(AreaCode.builder()
                     .npaId(npa)
@@ -117,7 +117,7 @@ public class ReferenceMockData {
     }
 
     private void junkNames() {
-        tables.deleteMarked("REF_JUNK_NAME_LIST", "NOTES");
+        tables.skipIfMarked("REF_JUNK_NAME_LIST", "NOTES");
         tables.insert(JunkName.builder()
                 .name("UNKNOWN")
                 .notes(MARKER)
@@ -130,7 +130,7 @@ public class ReferenceMockData {
     }
 
     private void streetTypes() {
-        tables.deleteRange("STG_TRS_CD_REF", "REF_ID", 990000, 990999);
+        tables.skipIfPresent("STG_TRS_CD_REF", "REF_ID", 990000, 990999);
         streetType(990_001L, "ST", "St");
         streetType(990_002L, "AV", "Ave");
     }
@@ -145,12 +145,13 @@ public class ReferenceMockData {
                 .build());
     }
 
-    /// `V_LOOKUP_CODE_VALUE` has no marker column: the exact seeded row is deleted before it is inserted again.
+    /// `V_LOOKUP_CODE_VALUE` has no marker column: the row is inserted only when that exact row is not there yet.
     private void masterCode(String type, String source, String sourceValue, String master) {
-        tables.execute("""
-                DELETE FROM V_LOOKUP_CODE_VALUE
-                WHERE CODE_TYPE = :t AND SRC_SYS = :s AND SRC_CODE_VALUE = :v AND MSTR_CODE_VALUE = :m
-                """, Map.of("t", type, "s", source, "v", sourceValue, "m", master));
+        if (tables.exists("V_LOOKUP_CODE_VALUE",
+                "CODE_TYPE = :t AND SRC_SYS = :s AND SRC_CODE_VALUE = :v AND MSTR_CODE_VALUE = :m",
+                Map.of("t", type, "s", source, "v", sourceValue, "m", master))) {
+            return;
+        }
         tables.insert(MasterCodeValue.builder()
                 .codeType(type)
                 .srcSys(source)

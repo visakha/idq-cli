@@ -12,7 +12,6 @@ import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.reference.LookupRows;
 import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.rules.NameStandardization;
-import com.idq.cli.core.target.LoadMode;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.source.wic.etldb.models.WicQueryRows.ClientName;
@@ -92,8 +91,7 @@ public class WicPartyValidationService {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(WicInactiveLogRepository.TABLE, logActivationChanges(output.rows(WicSources.InactiveLog.class)));
         for (var batch : output.batches(WicSources.InactiveStatus.class)) {
-            loaded.merge(WicInactiveStatusRepository.TABLE, batch.mode() instanceof LoadMode.DeleteByKey<?>
-                    ? removeReactivatedStatuses(batch.rows()) : recordNewDeactivations(batch.rows()), Integer::sum);
+            loaded.merge(WicInactiveStatusRepository.TABLE, recordNewDeactivations(batch.rows()), Integer::sum);
         }
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
@@ -103,11 +101,6 @@ public class WicPartyValidationService {
 
     int logActivationChanges(List<WicSources.InactiveLog> logs) {
         return inactiveLog.insertAll(logs).size();
-    }
-
-    int removeReactivatedStatuses(List<WicSources.InactiveStatus> reactivated) {
-        return reactivated.stream()
-                .mapToInt(s -> inactiveStatuses.deleteBySrcKeyAndRowidSystem(s.srcKey(), s.rowidSystem())).sum();
     }
 
     int recordNewDeactivations(List<WicSources.InactiveStatus> deactivated) {

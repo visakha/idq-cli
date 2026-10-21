@@ -101,7 +101,7 @@ public class EciAddressService {
         var routed = AddressPatterns.route(candidates, validator, ctx, EciTargets.Address::new);
         return MappingOutput.empty()
                 .load(TargetBatch.append(DqmAddress.class, routed.dqm()))
-                .load(TargetBatch.replaceAll(EciTargets.Address.class,
+                .load(TargetBatch.append(EciTargets.Address.class,
                         Rows.lastPerKey(routed.addresses(), EciTargets.Address::pkeySrcObject)))
                 .reject(routed.exceptions());
     }
@@ -110,7 +110,7 @@ public class EciAddressService {
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(DqmAddressRepository.TABLE, auditValidatedAddresses(output.rows(DqmAddress.class)));
-        loaded.put(EciAddressRepository.TABLE, replaceAddresses(output.rows(EciTargets.Address.class)));
+        loaded.put(EciAddressRepository.TABLE, insertAddresses(output.rows(EciTargets.Address.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
@@ -121,9 +121,7 @@ public class EciAddressService {
         return dqmAddresses.insertAll(rows).size();
     }
 
-    int replaceAddresses(List<EciTargets.Address> rows) {
-        settings.requireClearable(EciAddressRepository.TABLE);
-        addresses.deleteAll();
+    int insertAddresses(List<EciTargets.Address> rows) {
         return addresses.insertAll(rows).size();
     }
 }

@@ -115,9 +115,9 @@ public class WicPhoneEmailService {
             }
         }
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(WicTargets.Phone.class,
+                .load(TargetBatch.append(WicTargets.Phone.class,
                         Rows.lastPerKey(phones, WicTargets.Phone::pkeySrcObject)))
-                .load(TargetBatch.replaceAll(WicTargets.Email.class,
+                .load(TargetBatch.append(WicTargets.Email.class,
                         Rows.lastPerKey(emails, WicTargets.Email::pkeySrcObject)))
                 .reject(bad);
     }
@@ -125,23 +125,19 @@ public class WicPhoneEmailService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(WicPhoneRepository.TABLE, replacePhones(output.rows(WicTargets.Phone.class)));
-        loaded.put(WicEmailRepository.TABLE, replaceEmails(output.rows(WicTargets.Email.class)));
+        loaded.put(WicPhoneRepository.TABLE, insertPhones(output.rows(WicTargets.Phone.class)));
+        loaded.put(WicEmailRepository.TABLE, insertEmails(output.rows(WicTargets.Email.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replacePhones(List<WicTargets.Phone> rows) {
-        settings.requireClearable(WicPhoneRepository.TABLE);
-        phones.deleteAll();
+    int insertPhones(List<WicTargets.Phone> rows) {
         return phones.insertAll(rows).size();
     }
 
-    int replaceEmails(List<WicTargets.Email> rows) {
-        settings.requireClearable(WicEmailRepository.TABLE);
-        emails.deleteAll();
+    int insertEmails(List<WicTargets.Email> rows) {
         return emails.insertAll(rows).size();
     }
 }

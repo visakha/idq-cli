@@ -4,7 +4,7 @@
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr (workflow wf_TRS_Stage_Load_1_Ongoing).
 --
 -- Phones and e-mail of the TIERS case delta (STG_TRS_D_DC_CASES x STG_TRS_DC_CASE_INDV, valid members only) into
--- C_S_TRS_PTY_RLE_PHN and C_S_TRS_PTY_RLE_EADDR (both truncated first):
+-- C_S_TRS_PTY_RLE_PHN and C_S_TRS_PTY_RLE_EADDR (both insert only, never truncated):
 --   -> fltr_Hold (TRUE)
 --   phones: mplt_Phone_Normalization (TABLE(fn_dq_norm_member_phn(...))): main PH_NUM (001), work
 --           WORK_PH_NUM || ' ' || WORK_PH_NUM_EXT (002), other OTHER_PH_NUM (003); each through rule_Phone_Std
@@ -35,8 +35,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- SYSTIMESTAMP()
 BEGIN
-    sp_ors_helper01_common('C_S_TRS_PTY_RLE_PHN');
-    sp_ors_helper01_common('C_S_TRS_PTY_RLE_EADDR');
+    -- Not performed: IDQ "truncate target table" of C_S_TRS_PTY_RLE_PHN, C_S_TRS_PTY_RLE_EADDR. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- rtr_Valid_Phone_Records.Valid_Records -> consolidation -> agg_Pty_Rle_Phone -> Write_C_S_TRS_PTY_RLE_PHN

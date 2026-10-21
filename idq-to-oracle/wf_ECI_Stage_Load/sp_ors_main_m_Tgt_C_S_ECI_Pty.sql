@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty (workflow wf_ECI_Stage_Load).
 --
--- Loads the ECI child and family parties of the delta into C_S_ECI_PTY and C_S_ECI_PTY_RLE (both truncated first)
+-- Loads the ECI child and family parties of the delta into C_S_ECI_PTY and C_S_ECI_PTY_RLE (both insert only, never truncated)
 -- and logs demographic exceptions:
 --   Read_STG_ECI_D_CHILD_AND_FAMILY (custom SQL)
 --     -> Flt_Remove_Inactive: IsNull(DEACTIVATION_STS) on STG_ECI_PTY_INACTIVE_STS (the stored condition is
@@ -34,8 +34,7 @@ IS
     l_run_ts       TIMESTAMP := SYSTIMESTAMP;   -- SYSTIMESTAMP() of RUN_DATE
     l_sysdate      DATE := SYSDATE;             -- SYSDATE of LAST_UPDATE_DATE
 BEGIN
-    sp_ors_helper01_common('C_S_ECI_PTY');
-    sp_ors_helper01_common('C_S_ECI_PTY_RLE');
+    -- Not performed: IDQ "truncate target table" of C_S_ECI_PTY, C_S_ECI_PTY_RLE. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Rtr_Exception.Valid_Party (TRUE) -> exp_Party_Consolidation -> Write_C_S_ECI_PTY

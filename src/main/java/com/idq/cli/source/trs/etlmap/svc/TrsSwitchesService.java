@@ -82,7 +82,7 @@ public class TrsSwitchesService {
         var ordered = Rows.sorted(Rows.distinct(attributes),
                 Rows.<TrsTargets.ManagedAttribute, String>asc(TrsTargets.ManagedAttribute::pkeySrcObject)
                         .thenComparing(Rows.asc(m -> m.audit().periodStartDate())));
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsTargets.ManagedAttribute.class,
+        return MappingOutput.empty().load(TargetBatch.append(TrsTargets.ManagedAttribute.class,
                 Rows.lastPerKey(ordered, TrsTargets.ManagedAttribute::pkeySrcObject)));
     }
 
@@ -90,16 +90,14 @@ public class TrsSwitchesService {
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(TrsManagedAttributeRepository.TABLE,
-                replaceManagedAttributes(output.rows(TrsTargets.ManagedAttribute.class)));
+                insertManagedAttributes(output.rows(TrsTargets.ManagedAttribute.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceManagedAttributes(List<TrsTargets.ManagedAttribute> rows) {
-        settings.requireClearable(TrsManagedAttributeRepository.TABLE);
-        managedAttributes.deleteAll();
+    int insertManagedAttributes(List<TrsTargets.ManagedAttribute> rows) {
         return managedAttributes.insertAll(rows).size();
     }
 }

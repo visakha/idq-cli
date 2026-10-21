@@ -61,8 +61,13 @@ public class WorkflowRunner {
             List<String> output) {}
 
     public WorkflowRun run(SourceSystem source) {
+        return run(source, settings.etlProcess());
+    }
+
+    /// Runs the workflow with the given engine, whatever `etl_process` says (used by `compare-etl-process`).
+    public WorkflowRun run(SourceSystem source, EtlProcess engine) {
         var mappings = catalog.of(source);
-        return switch (settings.etlProcess()) {
+        return switch (engine) {
             case JAVA -> runJava(source, mappings);
             case IDQ -> runIdq(source, mappings);
             case ORA_SP -> runOraSp(source, mappings);

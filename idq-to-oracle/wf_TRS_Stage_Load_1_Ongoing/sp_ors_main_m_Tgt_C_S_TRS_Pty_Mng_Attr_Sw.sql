@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw (workflow wf_TRS_Stage_Load_1_Ongoing).
 --
--- Managed attributes ("switches") of the valid TIERS members into C_S_TRS_PTY_MNG_ATTR (truncated first):
+-- Managed attributes ("switches") of the valid TIERS members into C_S_TRS_PTY_MNG_ATTR (insert only, never truncated):
 --   Read_Stg_TRS_D_DC_Indv (custom SQL: latest DC_INDV / MCI row per individual joined to STG_TRS_VALID_MEMBERS)
 --   -> exp_Attr_Type + nrm_Attribute_Types: one row per attribute (UNPIVOT here)
 --        File_Clearance_SW = FILE_CLEARANCE_SW, SSA_Validation_SW = SSA_VALIDATION_SW, TW_Convert_Ind,
@@ -22,7 +22,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TRS_Pty_Mng_Attr_Sw';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- SYSTIMESTAMP() / SESSSTARTTIME
 BEGIN
-    sp_ors_helper01_common('C_S_TRS_PTY_MNG_ATTR');
+    -- Not performed: IDQ "truncate target table" of C_S_TRS_PTY_MNG_ATTR. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT INTO C_S_TRS_PTY_MNG_ATTR
            (PKEY_SRC_OBJECT, ROWID_OBJECT, DELETED_IND, DELETED_DATE, DELETED_BY, PERIOD_START_DATE, PERIOD_END_DATE,

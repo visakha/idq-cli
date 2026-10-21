@@ -46,15 +46,13 @@ public final class InactiveStatus {
         T create(String srcKey, String rowidSystem, String statusOrAction, LocalDateTime when);
     }
 
-    /// Log rows appended, reactivated statuses deleted by key, new statuses appended - then the exception rows.
+    /// Log rows appended and new statuses appended - then the exception rows. Nothing is deleted: a reactivation is
+    /// logged only, the party's status row stays (the IDQ `DD_DELETE` of the status row is not performed).
     public static <S, L> MappingOutput output(Changes changes, List<BadRecord> bad, Class<S> statusType,
             RowFactory<S> status, Class<L> logType, RowFactory<L> log) {
-        var removed = changes.removedStatuses.stream()
-                .map(s -> status.create(s.srcKey(), s.rowidSystem(), null, null)).distinct().toList();
         return MappingOutput.empty()
                 .load(TargetBatch.append(logType, changes.logs.stream()
                         .map(l -> log.create(l.srcKey(), l.rowidSystem(), l.action(), l.actionDt())).toList()))
-                .load(TargetBatch.deleteByKey(statusType, removed))
                 .load(TargetBatch.append(statusType, changes.newStatuses.stream()
                         .map(s -> status.create(s.srcKey(), s.rowidSystem(), s.deactivationSts(), s.deactivationDt()))
                         .toList()))
@@ -65,7 +63,6 @@ public final class InactiveStatus {
     public static final class Changes {
         public final List<Log> logs = new ArrayList<>();
         public final List<Status> newStatuses = new ArrayList<>();
-        public final List<Status> removedStatuses = new ArrayList<>();
         private final String rowidSystem;
         private final LocalDateTime now;
 
@@ -82,10 +79,9 @@ public final class InactiveStatus {
             }
         }
 
-        /// Logs the reactivation and deletes the party's status row.
+        /// Logs the reactivation. The party's status row is not deleted.
         public void reactivate(String srcKey) {
             logs.add(new Log(srcKey, rowidSystem, "Reactivation", now));
-            removedStatuses.add(new Status(srcKey, rowidSystem, null, null));
         }
     }
 }

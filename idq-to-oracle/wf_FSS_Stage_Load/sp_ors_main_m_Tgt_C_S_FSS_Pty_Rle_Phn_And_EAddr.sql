@@ -13,7 +13,7 @@
 --           Bad_Phone_Records             -> EXC_STG_BAD_REC_MEMB ('Rejected Record')
 --           Bad_Phone_Ext__Records        -> EXC_STG_BAD_REC_MEMB ('Bad Value'); a row with a good phone and a bad
 --                                            extension is loaded AND logged
--- Both C_S targets are truncated first.
+-- Both C_S targets are only inserted into; nothing is truncated.
 --
 -- TIMELINE: VERSION_SEQ = '1' on both targets; PERIOD_START_DATE = DT_LAST_UPDATE.
 --------------------------------------------------------------------------------------------------------------------
@@ -22,8 +22,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_FSS_Pty_Rle_Phn_And_EAddr';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime / SYSTIMESTAMP()
 BEGIN
-    sp_ors_helper01_common('C_S_FSS_PTY_RLE_EADDR');
-    sp_ors_helper01_common('C_S_FSS_PTY_RLE_PHN');
+    -- Not performed: IDQ "truncate target table" of C_S_FSS_PTY_RLE_EADDR, C_S_FSS_PTY_RLE_PHN. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Filt_null_email -> rtr_Valid_EAddr_Records.Valid_Records -> Write_C_S_FSS_PTY_RLE_EADDR

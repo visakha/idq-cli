@@ -85,12 +85,7 @@ BEGIN
     sp_ors_helper02_common(c_mapping, 'insert (exceptions, deactivation log/status, reactivation log)', SQL%ROWCOUNT);
 
     -- Rtr_Valid_Party.Reactivation -> Upd_Delete_Inactive (DD_DELETE) -> Write_STG_WIC_PTY_INACTIVE_STS
-    DELETE FROM STG_WIC_PTY_INACTIVE_STS t
-     WHERE (t.SRC_KEY, t.ROWID_SYSTEM) IN (SELECT l.SRC_KEY, l.ROWID_SYSTEM
-                                             FROM STG_WIC_PTY_INACTIVE_LOG l
-                                            WHERE l.ACTION = 'Reactivation'
-                                              AND l.ACTION_DT = l_run_ts);
-    sp_ors_helper02_common(c_mapping, 'delete STG_WIC_PTY_INACTIVE_STS (reactivations)', SQL%ROWCOUNT);
+    -- Not performed: the IDQ DD_DELETE of STG_WIC_PTY_INACTIVE_STS. This code base never deletes, truncates or drops (rows are only inserted).
     COMMIT;
 EXCEPTION
     WHEN OTHERS THEN

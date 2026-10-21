@@ -18,7 +18,6 @@
 -- | fn_ors_helper10_common  | address issue text of exp_Score_and_Exception_details (Addr_Issue_Desc)     |
 -- | fn_ors_helper11_common  | exp_Address_Hold line 1: empty line 1 replaced by line 2                    |
 -- | fn_ors_helper12_common  | exp_Address_Hold line 2: cleared when it repeats the held line 1            |
--- | sp_ors_helper01_common  | truncate a target table (IDQ target property "Truncate target table")      |
 -- | sp_ors_helper02_common  | run log line: mapping, step, row count (DBMS_OUTPUT)                       |
 --
 -- The lookup functions run their own query per call, so they see committed reference data as of that call. They
@@ -230,18 +229,7 @@ BEGIN
 END fn_ors_helper07_common;
 /
 
--- IDQ target property "Truncate target table". TRUNCATE is DDL and commits, exactly as the IDQ truncation runs
--- before the mapping writes. The name is checked against the data dictionary.
-CREATE OR REPLACE PROCEDURE sp_ors_helper01_common (
-    p_table_name  IN VARCHAR2
-)
-IS
-BEGIN
-    EXECUTE IMMEDIATE 'TRUNCATE TABLE ' || DBMS_ASSERT.SQL_OBJECT_NAME(p_table_name);
-END sp_ors_helper01_common;
-/
-
--- One log line per step (rows inserted / deleted); replace with an audit table if needed.
+-- One log line per step (rows inserted); replace with an audit table if needed.
 CREATE OR REPLACE PROCEDURE sp_ors_helper02_common (
     p_mapping_name  IN VARCHAR2,
     p_step          IN VARCHAR2,

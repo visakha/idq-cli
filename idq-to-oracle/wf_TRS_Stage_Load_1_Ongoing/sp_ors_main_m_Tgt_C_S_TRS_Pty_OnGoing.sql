@@ -15,8 +15,8 @@
 --        Invalid_BirthDate                                           -> EXC_STG_BAD_REC_MEMB
 --        Valid_Party (first OR last name present)
 --          -> srtr_Dedup_Rec (distinct) -> fltr_Dups (TIMELINE, see below)
---             -> Sorter1 + Aggregator1 (one row per party key)      -> C_S_TRS_PTY        (truncated first)
---             -> Sorter  + Aggregator  (one row per role key)       -> C_S_TRS_PTY_RLE    (truncated first)
+--             -> Sorter1 + Aggregator1 (one row per party key)      -> C_S_TRS_PTY        (insert only, never truncated)
+--             -> Sorter  + Aggregator  (one row per role key)       -> C_S_TRS_PTY_RLE    (insert only, never truncated)
 --             -> lkp_Stg_TRS_Valid_Members + fltr_New_Valid_Members (key not yet valid)
 --                -> srtr_Pkey + agg_Valid_Members (one row per key)  -> STG_TRS_VALID_MEMBERS
 --             -> Fil_Race_Exceptions      (race code does not translate, configured) -> EXC_STG_BAD_REC_MEMB
@@ -52,8 +52,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TRS_Pty_OnGoing';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime / SYSTIMESTAMP()
 BEGIN
-    sp_ors_helper01_common('C_S_TRS_PTY');
-    sp_ors_helper01_common('C_S_TRS_PTY_RLE');
+    -- Not performed: IDQ "truncate target table" of C_S_TRS_PTY, C_S_TRS_PTY_RLE. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         ------------------------------------------------------------------------------------------------------------

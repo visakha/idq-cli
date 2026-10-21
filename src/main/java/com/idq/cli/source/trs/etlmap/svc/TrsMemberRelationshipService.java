@@ -106,23 +106,21 @@ public class TrsMemberRelationshipService {
                         new Columns.Relationship(fk1, fk2, "Member Relationship", "Member", relType)));
             }
         }
-        return MappingOutput.empty().load(TargetBatch.replaceAll(TrsTargets.Relationship.class,
+        return MappingOutput.empty().load(TargetBatch.append(TrsTargets.Relationship.class,
                 Rows.currentSegmentPerKey(relationships))).reject(bad);
     }
 
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TrsRelationshipRepository.TABLE, replaceRelationships(output.rows(TrsTargets.Relationship.class)));
+        loaded.put(TrsRelationshipRepository.TABLE, insertRelationships(output.rows(TrsTargets.Relationship.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceRelationships(List<TrsTargets.Relationship> rows) {
-        settings.requireClearable(TrsRelationshipRepository.TABLE);
-        relationships.deleteAll();
+    int insertRelationships(List<TrsTargets.Relationship> rows) {
         return relationships.insertAll(rows).size();
     }
 }

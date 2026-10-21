@@ -106,7 +106,7 @@ public class EciAlternateIdService {
             ids.add(new EciTargets.AlternateId(r.pkeySrcObject(), audit, new Columns.AlternateId(r.ptyRelFk(),
                     r.altIdTp(), value, "Issued", r.altIdTp(), null)));
         }
-        return MappingOutput.empty().load(TargetBatch.replaceAll(EciTargets.AlternateId.class,
+        return MappingOutput.empty().load(TargetBatch.append(EciTargets.AlternateId.class,
                 Rows.lastPerKey(ids, EciTargets.AlternateId::pkeySrcObject))).reject(bad);
     }
 
@@ -119,16 +119,14 @@ public class EciAlternateIdService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(EciAlternateIdRepository.TABLE, replaceAlternateIds(output.rows(EciTargets.AlternateId.class)));
+        loaded.put(EciAlternateIdRepository.TABLE, insertAlternateIds(output.rows(EciTargets.AlternateId.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceAlternateIds(List<EciTargets.AlternateId> rows) {
-        settings.requireClearable(EciAlternateIdRepository.TABLE);
-        alternateIds.deleteAll();
+    int insertAlternateIds(List<EciTargets.AlternateId> rows) {
         return alternateIds.insertAll(rows).size();
     }
 }

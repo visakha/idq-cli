@@ -4,7 +4,7 @@
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_FSS_Pty (workflow wf_FSS_Stage_Load).
 --
 -- Loads the FSS clients (V_FSS_ETL_SRC, last active registration) into C_S_FSS_PTY and C_S_FSS_PTY_RLE (both
--- truncated first) and logs demographic exceptions:
+-- insert only, never truncated) and logs demographic exceptions:
 --   -> Flt_Remove_Inactive: party not in STG_FSS_PTY_INACTIVE_STS
 --   -> name standardization (with the source suffix), gender, birth date, ethnicity (CD_HISPANIC), race
 --      indicators, language, rule_Suffix_Std
@@ -24,8 +24,7 @@ IS
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime
     l_sysdate  DATE := SYSDATE;
 BEGIN
-    sp_ors_helper01_common('C_S_FSS_PTY');
-    sp_ors_helper01_common('C_S_FSS_PTY_RLE');
+    -- Not performed: IDQ "truncate target table" of C_S_FSS_PTY, C_S_FSS_PTY_RLE. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Rtr_Exception.Valid_Party (TRUE) -> exp_Party_Consolidation -> Write_C_S_FSS_PTY

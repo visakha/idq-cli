@@ -96,7 +96,7 @@ public class WicAddressService {
         var routed = AddressPatterns.route(candidates, validator, ctx, WicTargets.Address::new);
         return MappingOutput.empty()
                 .load(TargetBatch.append(DqmAddress.class, routed.dqm()))
-                .load(TargetBatch.replaceAll(WicTargets.Address.class,
+                .load(TargetBatch.append(WicTargets.Address.class,
                         Rows.lastPerKey(routed.addresses(), WicTargets.Address::pkeySrcObject)))
                 .reject(routed.exceptions());
     }
@@ -105,7 +105,7 @@ public class WicAddressService {
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(DqmAddressRepository.TABLE, auditValidatedAddresses(output.rows(DqmAddress.class)));
-        loaded.put(WicAddressRepository.TABLE, replaceAddresses(output.rows(WicTargets.Address.class)));
+        loaded.put(WicAddressRepository.TABLE, insertAddresses(output.rows(WicTargets.Address.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
@@ -116,9 +116,7 @@ public class WicAddressService {
         return dqmAddresses.insertAll(rows).size();
     }
 
-    int replaceAddresses(List<WicTargets.Address> rows) {
-        settings.requireClearable(WicAddressRepository.TABLE);
-        addresses.deleteAll();
+    int insertAddresses(List<WicTargets.Address> rows) {
         return addresses.insertAll(rows).size();
     }
 }

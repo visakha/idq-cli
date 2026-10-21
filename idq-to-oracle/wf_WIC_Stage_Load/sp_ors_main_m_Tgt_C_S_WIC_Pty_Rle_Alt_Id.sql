@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_WIC_Pty_Rle_Alt_Id (workflow wf_WIC_Stage_Load).
 --
--- One alternate id per active WIC party into C_S_WIC_PTY_RLE_ALT_ID (truncated first): the WIC id padded to 12,
+-- One alternate id per active WIC party into C_S_WIC_PTY_RLE_ALT_ID (insert only, never truncated): the WIC id padded to 12,
 -- type '020' for SOURCE_TABLE 'CLIENT' and '021' otherwise.
 --   Read_V_WIC_ETL_SRC -> Filter: party not in STG_WIC_PTY_INACTIVE_STS -> target
 --
@@ -15,7 +15,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_WIC_Pty_Rle_Alt_Id';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime
 BEGIN
-    sp_ors_helper01_common('C_S_WIC_PTY_RLE_ALT_ID');
+    -- Not performed: IDQ "truncate target table" of C_S_WIC_PTY_RLE_ALT_ID. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT INTO C_S_WIC_PTY_RLE_ALT_ID
            (PKEY_SRC_OBJECT, SRC_ROWID, VERSION_SEQ, PTY_RLE_FK, ALT_ID_TP, ALT_ID_VAL, CREATE_DATE, LAST_UPDATE_DATE,

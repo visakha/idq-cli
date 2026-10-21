@@ -13,7 +13,6 @@ import com.idq.cli.core.exception.BadRecordRepository;
 import com.idq.cli.core.reference.LookupRows;
 import com.idq.cli.core.reference.MdmBaseTables;
 import com.idq.cli.core.rules.NameStandardization;
-import com.idq.cli.core.target.LoadMode;
 import com.idq.cli.domain.MappingInfo;
 import com.idq.cli.domain.SourceSystem;
 import com.idq.cli.source.eci.etldb.models.EciQueryRows.FamilyValidation;
@@ -126,15 +125,14 @@ public class EciPartyValidationService {
         return value != null && !value.stripTrailing().isEmpty();
     }
 
-    /// Log every change, remove the statuses of reactivated parties, record the new deactivations, then the
+    /// Log every change, record the new deactivations, then the
     /// exceptions.
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
         loaded.put(EciInactiveLogRepository.TABLE, logActivationChanges(output.rows(EciSources.InactiveLog.class)));
         for (var batch : output.batches(EciSources.InactiveStatus.class)) {
-            loaded.merge(EciInactiveStatusRepository.TABLE, batch.mode() instanceof LoadMode.DeleteByKey<?>
-                    ? removeReactivatedStatuses(batch.rows()) : recordNewDeactivations(batch.rows()), Integer::sum);
+            loaded.merge(EciInactiveStatusRepository.TABLE, recordNewDeactivations(batch.rows()), Integer::sum);
         }
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
@@ -144,11 +142,6 @@ public class EciPartyValidationService {
 
     int logActivationChanges(List<EciSources.InactiveLog> logs) {
         return inactiveLog.insertAll(logs).size();
-    }
-
-    int removeReactivatedStatuses(List<EciSources.InactiveStatus> reactivated) {
-        return reactivated.stream()
-                .mapToInt(s -> inactiveStatuses.deleteBySrcKeyAndRowidSystem(s.srcKey(), s.rowidSystem())).sum();
     }
 
     int recordNewDeactivations(List<EciSources.InactiveStatus> deactivated) {

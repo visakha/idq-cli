@@ -120,9 +120,9 @@ public class EciPhoneEmailService {
             }
         }
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(EciTargets.Phone.class,
+                .load(TargetBatch.append(EciTargets.Phone.class,
                         Rows.lastPerKey(phones, EciTargets.Phone::pkeySrcObject)))
-                .load(TargetBatch.replaceAll(EciTargets.Email.class,
+                .load(TargetBatch.append(EciTargets.Email.class,
                         Rows.lastPerKey(emails, EciTargets.Email::pkeySrcObject)))
                 .reject(bad);
     }
@@ -137,23 +137,19 @@ public class EciPhoneEmailService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(EciPhoneRepository.TABLE, replacePhones(output.rows(EciTargets.Phone.class)));
-        loaded.put(EciEmailRepository.TABLE, replaceEmails(output.rows(EciTargets.Email.class)));
+        loaded.put(EciPhoneRepository.TABLE, insertPhones(output.rows(EciTargets.Phone.class)));
+        loaded.put(EciEmailRepository.TABLE, insertEmails(output.rows(EciTargets.Email.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replacePhones(List<EciTargets.Phone> rows) {
-        settings.requireClearable(EciPhoneRepository.TABLE);
-        phones.deleteAll();
+    int insertPhones(List<EciTargets.Phone> rows) {
         return phones.insertAll(rows).size();
     }
 
-    int replaceEmails(List<EciTargets.Email> rows) {
-        settings.requireClearable(EciEmailRepository.TABLE);
-        emails.deleteAll();
+    int insertEmails(List<EciTargets.Email> rows) {
         return emails.insertAll(rows).size();
     }
 }

@@ -7,7 +7,6 @@ import com.idq.cli.config.EtlSettings;
 import com.idq.cli.core.MappingResult;
 import com.idq.cli.domain.SourceSystem;
 import java.nio.file.Path;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -16,8 +15,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 class OraSpRunnerTest {
 
     static OraSpRunner runner(boolean mock) {
-        return new OraSpRunner(null, new EtlSettings(EtlProcess.ORA_SP, true, mock, true, 20, "", true, Set.of(),
-                null, Path.of("idq-to-oracle")));
+        return new OraSpRunner(null, new EtlSettings(EtlProcess.ORA_SP, true, mock, true, 20, "", true, null,
+                Path.of("idq-to-oracle")));
     }
 
     @Test

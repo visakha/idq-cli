@@ -44,8 +44,8 @@ public class ViewMockData {
     /// Every third client is a registration, client 2 has no first name, every fourth an unknown suffix; every
     /// even client is related to the previous one as child and mother.
     void fss() {
-        tables.deleteRange("V_FSS_ETL_SRC", "ID_CLIENT", ID, ID + 999_999);
-        tables.deleteRange("V_FSS_ETL_SRC_RELATIONS", "ID_CLIENT", ID, ID + 999_999);
+        tables.skipIfPresent("V_FSS_ETL_SRC", "ID_CLIENT", ID, ID + 999_999);
+        tables.skipIfPresent("V_FSS_ETL_SRC_RELATIONS", "ID_CLIENT", ID, ID + 999_999);
         rows().forEach(i -> {
             long id = ID + i;
             tables.insert(FssSources.EtlSrc.builder()
@@ -104,7 +104,7 @@ public class ViewMockData {
 
     /// Client 2 has the junk first name `DECLINED` (never prefixed), every fourth phone is too short.
     void ttf() {
-        tables.deleteRange("V_TTF_ETL_SRC", "CLIENTS_ID", ID, ID + 999_999);
+        tables.skipIfPresent("V_TTF_ETL_SRC", "CLIENTS_ID", ID, ID + 999_999);
         rows().forEach(i -> {
             long id = ID + i;
             tables.insert(TtfSources.EtlSrc.builder()
@@ -126,7 +126,7 @@ public class ViewMockData {
 
     /// Alternating family and client rows; client 3 has no last name.
     void wic() {
-        tables.execute("DELETE FROM V_WIC_ETL_SRC WHERE ID LIKE '9100000___'", Map.of());
+        tables.skipIf("V_WIC_ETL_SRC", "ID LIKE '9100000___'", Map.of());
         rows().forEach(i -> {
             long id = ID + i;
             tables.insert(WicSources.EtlSrc.builder()

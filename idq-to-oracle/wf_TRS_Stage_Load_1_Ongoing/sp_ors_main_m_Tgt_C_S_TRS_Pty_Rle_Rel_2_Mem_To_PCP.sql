@@ -4,7 +4,7 @@
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP (workflow wf_TRS_Stage_Load_1_Ongoing).
 --
 -- Member-to-primary-care-provider relationships (STG_TRS_D_IN_MANAGED_CARE with a provider, one source key per
--- individual) into C_S_TRS_PTY_RLE_REL_PROV (truncated first):
+-- individual) into C_S_TRS_PTY_RLE_REL_PROV (insert only, never truncated):
 --   -> Filt_Numeric_Prov: IS_NUMBER(PROVIDER_NUM)
 --   -> Lookup_C_B_PTY_RLE_ALT_ID (custom lookup SQL: the TPI alternate id '006' of C21 in the MDM, latest source key
 --      per id) -> Exp_Build_FK: provider key = source key up to its second '|'; type 'Member PCO' when the key holds
@@ -31,7 +31,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime / systimestamp()
 BEGIN
-    sp_ors_helper01_common('C_S_TRS_PTY_RLE_REL_PROV');
+    -- Not performed: IDQ "truncate target table" of C_S_TRS_PTY_RLE_REL_PROV. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Rout_Valid_vs_Exceptions.Period_Start_Date_GT_Period_End_Date

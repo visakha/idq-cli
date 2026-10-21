@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_TTF_Pty_Rle_Phn (workflow wf_TTF_Stage_Load).
 --
--- One phone per active TTF client (V_TTF_ETL_SRC) into C_S_TTF_PTY_RLE_PHN (truncated first):
+-- One phone per active TTF client (V_TTF_ETL_SRC) into C_S_TTF_PTY_RLE_PHN (insert only, never truncated):
 --   -> fil_deactivated_status: party not in STG_TTF_PTY_INACTIVE_STS
 --   -> Filt_null_phone: PHONE not NULL
 --   -> rule_Phone_Std (usage 001 'Telephone', 'Primary') -> RTR_Valid_PhoneNumbers
@@ -21,7 +21,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TTF_Pty_Rle_Phn';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime / SYSTIMESTAMP()
 BEGIN
-    sp_ors_helper01_common('C_S_TTF_PTY_RLE_PHN');
+    -- Not performed: IDQ "truncate target table" of C_S_TTF_PTY_RLE_PHN. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- RTR_Valid_PhoneNumbers.Good_Records -> Write_C_S_TTF_PTY_RLE_PHN

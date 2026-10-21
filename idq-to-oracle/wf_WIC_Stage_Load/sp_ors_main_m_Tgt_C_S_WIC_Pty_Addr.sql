@@ -4,7 +4,7 @@
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_WIC_Pty_Addr (workflow wf_WIC_Stage_Load; copied from the ECI address
 -- mapping).
 --
--- Validates the WIC addresses (V_WIC_ETL_SRC) and loads the good ones into C_S_WIC_PTY_RLE_ADDR (truncated first):
+-- Validates the WIC addresses (V_WIC_ETL_SRC) and loads the good ones into C_S_WIC_PTY_RLE_ADDR (insert only, never truncated):
 --   -> Fil_Inactive_recs: party (PTY_SRC_KEY) not in STG_WIC_PTY_INACTIVE_STS
 --   -> mplt_Global_Addr_Validation (fn_dq_valid_global_addr) with state 'TX', country 'US', zip only
 --   -> Write_DQM_ADDRESS (every active address)
@@ -26,7 +26,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_WIC_Pty_Addr';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime
 BEGIN
-    sp_ors_helper01_common('C_S_WIC_PTY_RLE_ADDR');
+    -- Not performed: IDQ "truncate target table" of C_S_WIC_PTY_RLE_ADDR. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- Write_DQM_ADDRESS

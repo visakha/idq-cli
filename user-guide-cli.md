@@ -20,6 +20,7 @@ Contents
 12. [Configuration reference](#12-configuration-reference)
 13. [Troubleshooting](#13-troubleshooting)
 14. [Command quick reference](#14-command-quick-reference)
+15. [Task: compare ORA_SP with IDQ](#15-task-compare-ora_sp-with-idq)
 
 ---
 
@@ -49,10 +50,16 @@ The entity models behind the reports (all Spring Data JDBC records, no JPA):
 
 Safety rules that always apply:
 
-* No table is ever dropped. A mapping may empty (DELETE all rows of) a target table only if the table is listed in
-  `src/main/resources/db/clearable-tables.txt`.
-* Mock data only ever deletes rows in the mock id ranges (`9100000001...`, `9200000001...`) or rows marked
-  `IDQ_CLI_MOCK`, so rows you inserted yourself are left alone.
+* **Nothing is ever deleted, truncated or dropped**, so the CLI is safe to point at production data. This holds for
+  the whole code base: the Java mappings, the mock-data fills, `compare-etl-process` and the Oracle stored procedures
+  of `idq-to-oracle/` that `etl_process=ORA_SP` calls. Rows are only inserted; the only DDL is `CREATE TABLE` for
+  missing objects (`db/missing-objects.sql`, never `DROP` or `ALTER`).
+* Consequence: the IDQ *Truncate target table* option and the `DD_DELETE` update strategies are **not** reproduced.
+  A second run on the same source rows inserts the target rows again (or fails on a unique key). Empty the `C_S_*`
+  targets yourself, outside this tool, when you need a clean load. Reactivated parties keep their row in
+  `STG_<SRC>_PTY_INACTIVE_STS`, and `STG_TRS_VALID_MEMBERS` keeps deactivated members.
+* Mock data is generated once: when a table already holds mock rows (mock id ranges `9100000001...`,
+  `9200000001...` or rows marked `IDQ_CLI_MOCK`) they are kept and that table is not filled again.
 * Never run `docs/*_EXPORT_OCT_16.sql`: those exports start with `DROP TABLE`.
 
 ---
@@ -245,8 +252,10 @@ fill_sample_mock_data_m_Tgt_C_S_ECI_Pty_Rle_Rel: 20 rows per table generated
 * Requires `latch-mapping` and `mock_data=true` (otherwise it answers `mock_data=false: mock data generation is
   disabled`).
 * Calls `fill_sample_mock_data_<mapping>`: it first creates any missing source objects listed in
-  `db/missing-objects.sql` (CREATE only), seeds the lookup tables (code values, exception catalog, area codes), deletes
-  the previous mock rows of that mapping and inserts `idq.mock.rows-per-table` new rows per source table.
+  `db/missing-objects.sql` (CREATE only), seeds the lookup tables (code values, exception catalog, area codes) and inserts
+  `idq.mock.rows-per-table` rows per source table. A table that already holds mock rows from an earlier fill is left
+  as it is (nothing is deleted), so the mock rows stay the same from run to run. To get fresh mock rows, remove the
+  old ones yourself, outside this tool.
 * A few rows are invalid on purpose (missing first name, future birth date, unknown codes, malformed e-mail or phone)
   so that the bad-data paths to `EXC_STG_BAD_REC_MEMB` are exercised.
 
@@ -387,16 +396,14 @@ The statements that generated the mock data behind the report, in the order they
 ```sql
 -- Mock source data behind the C_S_ECI_PTY_RLE_REL report of the ECI Java run started 2026-10-19 10:58:34
 -- mock-data-pre-fix: Test_001
--- Replays the mock fills: earlier mock rows are deleted, then these rows inserted.
+-- Replays the mock fills: these rows are inserted (nothing is deleted).
 -- Run it in the OCI schema, then run-etl with mock_data=false to process exactly these rows.
 
 -- reference data (ReferenceMockData.seed)
-DELETE FROM LOOKUP_CODE_VALUE WHERE CREATED_BY = 'IDQ_CLI_MOCK';
 INSERT INTO LOOKUP_CODE_VALUE (...) VALUES (...);
 ...
 
 -- fill_sample_mock_data_m_Tgt_C_S_ECI_Pty_Rle_Rel
-DELETE FROM STG_ECI_D_FAMILY WHERE ID_FAMILY BETWEEN 9100000000 AND 9100999999;
 INSERT INTO STG_ECI_D_FAMILY (ID_FAMILY, ID_CHILD, FAMILY_CD, GENDER, FIRST_NAME, ...) VALUES (9100000001, 9100000001, 1, 'F', 'Test_001-Mia', ...);
 ...
 
@@ -406,7 +413,10 @@ COMMIT;
 * Written only when mock data was generated (by `run-etl` with `mock_data=true` or by `fill-sample-mock-data`) for
   at least one mapping of the report. Each mock fill is reported once: the next run without new mock data gets no
   `.sql`.
-* Replaying the script reproduces exactly the rows of that run: run it, then `run-etl` with `-Dmock_data=false`.
+* Replaying the script inserts exactly the rows of that run: run it in a schema that does not hold them yet, then
+  `run-etl` with `-Dmock_data=false`.
+* Only the rows actually inserted are in the script: a table whose mock rows already existed is not filled again and
+  does not appear.
 * The objects of `db/missing-objects.sql` must exist (the application creates them on its first mock fill).
 
 ---
@@ -469,6 +479,7 @@ REST shows up in the shell prompt and vice versa. Errors (missing latch, wrong n
 | `run-etl` | `POST /api/etl/run` |
 | (single mapping, REST only) | `POST /api/etl/run/mapping` |
 | `run-unit-tests` | `POST /api/etl/unit-tests` |
+| `compare-etl-process X` | `POST /api/etl/compare/X` (`X` = name or 1-5; returns the comparison as JSON) |
 
 Example session with curl:
 
@@ -541,6 +552,9 @@ under `EXC_STG_BAD_REC_MEMB`.
 
 ### 11.5 Compare with the Oracle stored procedures
 
+For ORA_SP against IDQ, use `compare-etl-process` (section 15): it runs both engines on the same data and writes
+the comparison for you. The steps below compare ORA_SP with the Java engine.
+
 1. Install the procedures in the OCI schema: `@install.sql` from `idq-to-oracle/` (see its README).
 2. Start with `-Detl_process=ORA_SP -Dmock_ora_sp=false`.
 3. `latch-source-system ECI`, `run-etl`: every `sp_ors_main_*` of `run_wf_ECI_Stage_Load.sql` runs in order; the
@@ -567,11 +581,11 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 | `idq.report.base-dir` | `.` | Directory that holds the `adhoc_runs_<SOURCE>` folders |
 | `idq.report.max-rows` | `200` | Rows shown per table in a report (at most 1000; totals are always given) |
 | `idq.bootstrap-missing-objects` | `true` | Create (never drop) the objects of `db/missing-objects.sql` that do not exist |
-| `idq.clearable-tables-file` | `classpath:db/clearable-tables.txt` | Whitelist of tables a mapping may empty before loading |
 | `idq.infacmd.script` | `docs/batch-script-windows.original.bat` | Script that calls `infacmd` (IDQ engine) |
 | `idq.infacmd.domain`, `.service`, `.application` | `Domain_Prod`, `DIS_DataQuality`, `App_ETL_Master` | `infacmd wfs startWorkflow` arguments |
 | `idq.wallet-dir` / `IDQ_WALLET_DIR` | `docs/wallet` | OCI wallet directory (TNS alias `oci4idq_low`) |
 | `IDQ_DB_USER`, `IDQ_DB_PASSWORD` | `ADMIN`, (set) | Database credentials |
+| `idq.compare.ignore-columns` | `ROWID_OBJECT,CREATE_DATE,LAST_UPDATE_DATE,CREATOR,UPDATED_BY,PERIOD_START_DATE,PERIOD_END_DATE` | `compare-etl-process`: columns left out of the target comparison |
 | `server.port` | `8085` | REST API port |
 
 ---
@@ -588,7 +602,9 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 | `Not possible: No enum constant ...SourceSystem.X` | Unknown source system; use `TRS`, `ECI`, `FSS`, `TTF` or `WIC`. |
 | `No source rows (try fill-sample-mock-data)` | The source tables are empty: generate mock data or insert rows. |
 | `mock_data=false: mock data generation is disabled` | Start with `-Dmock_data=true` to generate mock rows. |
-| A mapping shows `FAILED ... is not on the clearable-tables whitelist` | The mapping empties its target before loading; add the table to `db/clearable-tables.txt` if that is intended. |
+| A mapping or procedure fails with `ORA-00001: unique constraint` on a `C_S_*` table | The target still holds the rows of an earlier run: nothing is truncated any more. Empty the target yourself, outside this tool, if a reload is intended. |
+| The target holds every row twice after a second run | Same cause: loads only insert. Empty the targets yourself before a reload. |
+| `fill-sample-mock-data` / `run-etl` did not change the mock rows | Mock rows already present are kept, never deleted and regenerated. Remove them yourself to get fresh ones. |
 | A mapping shows `FAILED` with an `ORA-` error | Check the source objects exist (`idq.bootstrap-missing-objects=true` creates the missing ones on the next mock fill) and the wallet / network. |
 | `Cannot read the ORA_SP run script ...` | `etl_process=ORA_SP` needs `<idq.ora-sp.dir>/<workflow>/run_<workflow>.sql`; start the CLI from the project directory or set `-Didq.ora-sp.dir`. |
 | A procedure shows `FAILED ... PLS-00201` / `ORA-06550` | The procedure is not installed (or not valid) in the schema: run `@install.sql` from `idq-to-oracle/`. `ORA-20999` means the `fn_dq_*` contract stubs are installed instead of the real functions. |
@@ -596,6 +612,9 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 | A property seems ignored | Pass it before `-jar` (`java -Dname=value -jar ...`), not after. |
 | `type adhoc_runs_ECI\C_S_...$Java$...md` finds nothing | Quote the file name; the `$` signs are part of it. |
 | No `.sql` next to a report | No mock data was generated for those mappings since their last report (e.g. `mock_data=false`). |
+| `compare-etl-process` warns `mock_ora_sp=true` / `mock_infacmd=true` | One or both engines were only simulated, so the comparison means nothing. Start with `-Dmock_ora_sp=false -Dmock_infacmd=false`. |
+| `compare-etl-process` reports a source table `changed by ORA_SP` / `changed by IDQ` | That engine wrote to a table the workflow reads. Nothing is restored (the CLI never deletes); check whether the table should be a target. |
+| `compare-etl-process` target shows `ERROR` | The table could not be read after a run (missing table, privileges); the message is in the report. |
 | `run-unit-tests` exit code not 0 | Read the printed Maven output; start the CLI from the project directory so `mvnw` is found. |
 
 ---
@@ -624,4 +643,108 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 | `fill-sample-real-data` | | mapping | Placeholder for real sample rows |
 | `run-etl` | | source | Mock fill (if enabled), run the workflow, write the audit reports |
 | `run-unit-tests` | | mapping | PKEY unit test of the mapping |
+| `compare-etl-process` | `[TRS\|ECI\|FSS\|TTF\|WIC\|1-5]` (prompted when omitted) | | Run ORA_SP then IDQ on the same source data, compare the target tables, write `compare_runs_<SOURCE>/*.md` |
 | `exit` | | | Leave the shell and stop the REST API |
+
+---
+
+## 15. Task: compare ORA_SP with IDQ
+
+`compare-etl-process` answers one question: given the same source rows, do the Oracle stored procedures
+(`etl_process=ORA_SP`) and the Informatica workflow (`etl_process=IDQ`) leave the same rows in the target tables?
+
+### 15.1 Run it
+
+Start the CLI with both engines live (otherwise the comparison only compares two simulations and says so in a
+warning):
+
+```bat
+java -Dmock_ora_sp=false -Dmock_infacmd=false -jar target\cli-0.0.1-SNAPSHOT.jar
+```
+
+Then run the command. Without an argument it lists the source systems and asks which one to compare:
+
+```text
+idq (no context)> compare-etl-process
+Compare etl-process ORA_SP vs IDQ (no mock data; the source tables are left unchanged).
+Source systems:
+  1) TRS  wf_TRS_Stage_Load_1_Ongoing (TIERS eligibility system)
+  2) ECI  wf_ECI_Stage_Load (ECI child and family system)
+  3) FSS  wf_FSS_Stage_Load (FSS source system)
+  4) TTF  wf_TTF_Stage_Load (TTF source system)
+  5) WIC  wf_WIC_Stage_Load (Women, Infants and Children)
+Choose a source system [1-5]: 2
+ORA_SP vs IDQ for ECI (wf_ECI_Stage_Load): target tables DIFFER
+  C_S_ECI_PTY                  SAME ORA_SP=39 IDQ=39 matched=39 onlyORA_SP=0 onlyIDQ=0 changed=0
+  C_S_ECI_PTY_RLE_ADDR         DIFF ORA_SP=31 IDQ=30 matched=28 onlyORA_SP=1 onlyIDQ=0 changed=2
+  ...
+Comparison report: C:\Users\vamsi\wrk-java\idq-cli\compare_runs_ECI\ECI_ORA_SP_vs_IDQ_21_10_2026_9_05_AM.md
+```
+
+* Answer with the number or the name (`2` or `ECI`). If a source system is latched, Enter picks it.
+* Skip the prompt by giving the source directly: `compare-etl-process ECI` (or `compare-etl-process 2`). Use this form
+  in scripts piped into the shell.
+* No latch is needed, and no latch is changed.
+* Over REST: `POST /api/etl/compare/ECI` returns the same comparison as JSON.
+
+### 15.2 What it does
+
+1. **No mock data.** Unlike `run-etl`, nothing is generated: both engines read the source tables as they are. Load
+   the rows you want to compare first (section 6.3).
+2. **Snapshot.** Every table the workflow reads (the source tables listed by `show-sources` and the tables and
+   views each mapping reads, including the `C_B_*` and lookup tables) and every table it loads is read in full.
+3. **ORA_SP.** The `sp_ors_main_*` procedures run in the order of `run_<workflow>.sql`, exactly as `run-etl` does
+   with `etl_process=ORA_SP` (the first failure stops the procedures that follow). The target tables are read
+   in full again. The **ORA_SP result** of a table is the rows added since step 2 (the procedures only insert).
+4. **IDQ.** The Informatica workflow is started through `idq.infacmd.script`, as `run-etl` does with
+   `etl_process=IDQ`. The script polls `getWorkflowStatus` and returns only when the workflow has finished, so the
+   command waits for it. The target tables are read in full again. The **IDQ result** is the rows added since step
+   3. If rows that were there after step 3 are gone, the Informatica target is set to *Truncate target table*
+   (Informatica does that itself; this tool never does); the whole table is then the IDQ result, and the report
+   notes it.
+5. **Source check.** The source tables are compared with the step-2 snapshot: the report shows, per table, whether
+   either engine changed it. Nothing is ever put back: the command only reads (`SELECT`), it never deletes.
+6. **Compare and report.** Each target table is compared (section 15.3) and the report is written.
+
+Both runs also write their usual audit reports (`adhoc_runs_<SOURCE>/..._$ORA_SP$_...` and `..._$IDQ$_...`, section
+8).
+
+Be aware:
+
+* The command needs the procedures installed (`@install.sql` in `idq-to-oracle/`) and a machine where `infacmd`
+  works (`idq.infacmd.*`).
+* Tables are held in memory while the command runs. Very large source tables (e.g. a full `C_B_PTY_XREF`) make it slow
+  and memory hungry.
+* Both engines read the same source rows because neither the command nor the procedures change the source
+  tables. The source-table check in the report confirms it for each run.
+* Both engines write into the same target tables, one after the other. Because nothing is truncated, a unique key on
+  a `C_S_*` table can make the second engine fail when it inserts the same keys. Empty the targets yourself before the
+  command if that happens.
+
+### 15.3 How rows are compared
+
+* All columns take part except `idq.compare.ignore-columns` (default: `ROWID_OBJECT`, `CREATE_DATE`,
+  `LAST_UPDATE_DATE`, `CREATOR`, `UPDATED_BY`, `PERIOD_START_DATE`, `PERIOD_END_DATE`), which differ on every run.
+* Values are normalised before comparing: numbers without trailing zeros (`1.50` = `1.5`), dates and timestamps to the
+  second, `NULL` as empty.
+* Rows are matched as a multiset: a row identical in both results counts as *matched*, duplicates included.
+* In tables with `PKEY_SRC_OBJECT`, an unmatched ORA_SP row and an unmatched IDQ row with the same key are a
+  *changed* row; the report lists every column whose value differs. The remaining unmatched rows are *only in ORA_SP*
+  or *only in IDQ*.
+* A table is `SAME` when both results hold the same number of rows and every row is matched.
+
+### 15.4 The report
+
+`<idq.report.base-dir>/compare_runs_<SOURCE>/<SOURCE>_ORA_SP_vs_IDQ_<dd_MM_yyyy_h_mm_AM|PM>.md` (a second run in the
+same minute adds `_2`, `_3`, ...). It contains:
+
+1. Header: source and workflow, start time, overall result (`target tables MATCH` / `target tables DIFFER`), the
+   mock switches, how each result is taken, the ignored columns.
+2. Warnings: simulated engines, a failed procedure, a source table that changed.
+3. **Target tables**: one line per table with the row counts of each engine, matched, only-ORA_SP, only-IDQ and
+   changed keys, and `SAME` / `DIFF` / `ERROR`.
+4. **Source tables (must be unchanged)**: rows before, after ORA_SP and after IDQ, and whether the table changed;
+   then **Notes**: the tables whose IDQ (or ORA_SP) result is the whole table because that engine emptied it.
+5. **Runs**: the output of the ORA_SP run (one line per procedure) and of the IDQ run (the `infacmd` output).
+6. One section per table that differs: the changed rows (key, column, ORA_SP value, IDQ value), then the rows only in
+   ORA_SP and the rows only in IDQ, up to `idq.report.max-rows` rows each.

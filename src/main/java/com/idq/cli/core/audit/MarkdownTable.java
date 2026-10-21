@@ -65,7 +65,7 @@ public final class MarkdownTable {
     }
 
     /// Plain ASCII only: pipes escaped, line breaks flattened, anything else outside printable ASCII becomes `?`.
-    static String format(Object value) {
+    public static String format(Object value) {
         var text = switch (value) {
             case null -> "";
             case LocalDateTime time -> time.format(TIMESTAMP);

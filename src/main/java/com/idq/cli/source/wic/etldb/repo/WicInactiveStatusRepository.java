@@ -4,10 +4,8 @@ import com.idq.cli.core.reference.LookupRows.KeyValue;
 import com.idq.cli.core.repo.InsertRepository;
 import com.idq.cli.source.wic.etldb.models.WicSources;
 import java.util.List;
-import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.Repository;
-import org.springframework.data.repository.query.Param;
 
 /// `STG_WIC_PTY_INACTIVE_STS` - the parties currently deactivated. Written by the WIC validation mapping, read by every
 /// later mapping of the workflow to drop deactivated parties.
@@ -23,8 +21,4 @@ public interface WicInactiveStatusRepository extends Repository<WicSources.Inact
             """)
     List<KeyValue> fetchInactiveStatuses();
 
-    /// Reactivation: the party's status row is removed (IDQ update strategy `DD_DELETE`).
-    @Modifying
-    @Query("DELETE FROM STG_WIC_PTY_INACTIVE_STS WHERE SRC_KEY = :srcKey AND ROWID_SYSTEM = :rowidSystem")
-    int deleteBySrcKeyAndRowidSystem(@Param("srcKey") String srcKey, @Param("rowidSystem") String rowidSystem);
 }

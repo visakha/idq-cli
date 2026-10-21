@@ -110,9 +110,9 @@ public class TtfPartyService {
                     new Columns.PartyRole(key, EtlPatterns.MEMBER)));
         }
         return MappingOutput.empty()
-                .load(TargetBatch.replaceAll(TtfTargets.Party.class,
+                .load(TargetBatch.append(TtfTargets.Party.class,
                         Rows.lastPerKey(parties, TtfTargets.Party::pkeySrcObject)))
-                .load(TargetBatch.replaceAll(TtfTargets.PartyRole.class,
+                .load(TargetBatch.append(TtfTargets.PartyRole.class,
                         Rows.lastPerKey(roles, TtfTargets.PartyRole::pkeySrcObject)))
                 .reject(bad);
     }
@@ -120,23 +120,19 @@ public class TtfPartyService {
     @Transactional
     public Map<String, Integer> load(MappingOutput output) {
         var loaded = new LinkedHashMap<String, Integer>();
-        loaded.put(TtfPartyRepository.TABLE, replaceParties(output.rows(TtfTargets.Party.class)));
-        loaded.put(TtfPartyRoleRepository.TABLE, replacePartyRoles(output.rows(TtfTargets.PartyRole.class)));
+        loaded.put(TtfPartyRepository.TABLE, insertParties(output.rows(TtfTargets.Party.class)));
+        loaded.put(TtfPartyRoleRepository.TABLE, insertPartyRoles(output.rows(TtfTargets.PartyRole.class)));
         if (!output.badRecords().isEmpty()) {
             loaded.put(BadRecordRepository.TABLE, badRecords.insertAll(output.badRecords()).size());
         }
         return loaded;
     }
 
-    int replaceParties(List<TtfTargets.Party> rows) {
-        settings.requireClearable(TtfPartyRepository.TABLE);
-        parties.deleteAll();
+    int insertParties(List<TtfTargets.Party> rows) {
         return parties.insertAll(rows).size();
     }
 
-    int replacePartyRoles(List<TtfTargets.PartyRole> rows) {
-        settings.requireClearable(TtfPartyRoleRepository.TABLE);
-        partyRoles.deleteAll();
+    int insertPartyRoles(List<TtfTargets.PartyRole> rows) {
         return partyRoles.insertAll(rows).size();
     }
 }

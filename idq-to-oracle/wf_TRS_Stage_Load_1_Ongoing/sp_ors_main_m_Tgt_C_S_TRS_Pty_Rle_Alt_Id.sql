@@ -3,7 +3,7 @@
 --
 -- Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Alt_Id (workflow wf_TRS_Stage_Load_1_Ongoing).
 --
--- Alternate ids of valid TIERS members into C_S_TRS_PTY_RLE_ALT_ID (truncated first):
+-- Alternate ids of valid TIERS members into C_S_TRS_PTY_RLE_ALT_ID (insert only, never truncated):
 --   Read_STG_TRS_D_DC_INDV (custom SQL: MCI, DC_INDV and merged-individual keys of valid members, one row per key
 --     keeping the longest, latest SSN)
 --   -> lkp_Valid_SSN: the SSN is used only when STG_TRS_H_DC_INDV has it SSA-validated for the individual
@@ -25,7 +25,7 @@ IS
     c_mapping  CONSTANT VARCHAR2(100) := 'm_Tgt_C_S_TRS_Pty_Rle_Alt_Id';
     l_run_ts   TIMESTAMP := SYSTIMESTAMP;   -- $sys.MappingRunStartTime
 BEGIN
-    sp_ors_helper01_common('C_S_TRS_PTY_RLE_ALT_ID');
+    -- Not performed: IDQ "truncate target table" of C_S_TRS_PTY_RLE_ALT_ID. This code base never deletes, truncates or drops (rows are only inserted).
 
     INSERT ALL
         -- RTR_Invalid_Alt_Ids.Valid_Alt_ID -> srtr_Pkey -> exp_Rank -> fltr_Rank -> exp_Safe_C_S_TRS_Pty_Rle_Alt_Id

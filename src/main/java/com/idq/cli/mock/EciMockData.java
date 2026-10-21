@@ -43,9 +43,9 @@ public class EciMockData {
     /// Every fourth child has the dummy SSN `000123456`, child 2 a blank first name (a space: the `ADMIN` schema's
     /// `FIRST_NAME` is `NOT NULL`, and Oracle stores `''` as `NULL`), every fifth an unknown language.
     private void childrenAndFamilies() {
-        tables.deleteRange("STG_ECI_D_CHILD", "ID_CHILD", ID, ID + 999_999);
-        tables.deleteRange("STG_ECI_D_FAMILY", "ID_FAMILY", ID, ID + 999_999);
-        tables.deleteRange("STG_ECI_SN_CHILD", "ID_CHILD", ID, ID + 999_999);
+        tables.skipIfPresent("STG_ECI_D_CHILD", "ID_CHILD", ID, ID + 999_999);
+        tables.skipIfPresent("STG_ECI_D_FAMILY", "ID_FAMILY", ID, ID + 999_999);
+        tables.skipIfPresent("STG_ECI_SN_CHILD", "ID_CHILD", ID, ID + 999_999);
         for (var id : ids()) {
             int i = (int) (id - ID);
             var gender = faker.options().option("M", "F");
@@ -100,7 +100,7 @@ public class EciMockData {
 
     /// Every sixth address has the unknown address code `9`.
     public void fill_sample_mock_data_m_Tgt_C_S_ECI_Pty_Addr() {
-        tables.deleteRange("V_ECI_ETL_SRC_FAMILY_ADDRESS", "ID", ID, ID + 999_999);
+        tables.skipIfPresent("V_ECI_ETL_SRC_FAMILY_ADDRESS", "ID", ID, ID + 999_999);
         for (var id : ids()) {
             int i = (int) (id - ID);
             tables.insert(EtlSrcFamilyAddress.builder()
@@ -123,8 +123,8 @@ public class EciMockData {
     /// Every fourth Medicaid number is malformed (`12-34`).
     public void fill_sample_mock_data_m_Tgt_C_S_ECI_Pty_Rle_Alt_Id() {
         childrenAndFamilies();
-        tables.deleteRange("STG_ECI_D_MEDICAID", "ID_CASE", ID, ID + 999_999);
-        tables.deleteRange("STG_ECI_SN_CASE", "ID_CASE", ID, ID + 999_999);
+        tables.skipIfPresent("STG_ECI_D_MEDICAID", "ID_CASE", ID, ID + 999_999);
+        tables.skipIfPresent("STG_ECI_SN_CASE", "ID_CASE", ID, ID + 999_999);
         for (var id : ids()) {
             int i = (int) (id - ID);
             tables.insert(SnCase.builder()
@@ -145,7 +145,7 @@ public class EciMockData {
 
     /// One phone and one e-mail per party; every fourth phone has no area code, every fifth e-mail is broken.
     public void fill_sample_mock_data_m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr() {
-        tables.execute("DELETE FROM V_ECI_ETL_SRC_FAMILY_PHONE WHERE ID LIKE '9100000___'", Map.of());
+        tables.skipIf("V_ECI_ETL_SRC_FAMILY_PHONE", "ID LIKE '9100000___'", Map.of());
         for (var id : ids()) {
             int i = (int) (id - ID);
             var periodStart = past(1);

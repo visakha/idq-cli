@@ -47,16 +47,7 @@ BEGIN
     sp_ors_helper02_common(c_mapping, 'insert STG_TRS_DEACTIVED_MEMBERS', SQL%ROWCOUNT);
 
     -- Delete_Valid_Stage (DD_DELETE) -> Write_STG_TRS_VALID_MEMBERS (key PTY_PK)
-    DELETE FROM STG_TRS_VALID_MEMBERS t
-     WHERE t.PTY_PK IN (
-            SELECT vm.PTY_PK
-              FROM STG_TRS_VALID_MEMBERS vm
-             WHERE vm.INDV_ID IN (SELECT indv_id FROM STG_TRS_D_DC_INDV
-                                   WHERE inactive_ind = 'Y' OR delete_sw = 'Y'
-                                  UNION
-                                  SELECT indv_id FROM STG_TRS_D_CV_DC_MCI_INDV
-                                   WHERE inactive_ind = 'Y'));
-    sp_ors_helper02_common(c_mapping, 'delete STG_TRS_VALID_MEMBERS', SQL%ROWCOUNT);
+    -- Not performed: the IDQ DD_DELETE of STG_TRS_VALID_MEMBERS. This code base never deletes, truncates or drops (rows are only inserted).
     COMMIT;
 EXCEPTION
     WHEN OTHERS THEN
