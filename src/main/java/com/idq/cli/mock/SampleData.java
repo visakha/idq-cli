@@ -82,7 +82,7 @@ public class SampleData {
     private void recorded(String group, Runnable fill) {
         events.publishEvent(new MockDataGenerated(group, settings.mockDataPrefix(), tables.record(fill)));
     }
-
+    // todo:comments
     private Optional<Method> find(String function) {
         return generators.stream().flatMap(g -> Stream.of(g.getClass().getMethods()))
                 .filter(m -> m.getName().equals(function) && m.getParameterCount() == 0).findFirst();

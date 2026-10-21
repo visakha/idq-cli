@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TTF |
 | Sub-domain | Phone-email |
+| Sources | `V_TTF_ETL_SRC`, `STG_TTF_PTY_INACTIVE_STS` |
 | Targets | `C_S_TTF_PTY_RLE_PHN`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.ttf.TtfPhone` |
 

@@ -42,7 +42,7 @@ The entity models behind the reports (all Spring Data JDBC records, no JPA):
 | Kind | Class | Example |
 |---|---|---|
 | IdqMapInitQuery rows | records in `<Src>Queries` | `EciQueries.FamilyRelation` |
-| Source tables and views | `<Src>Sources` | `EciSources.DFamily` (`STG_ECI_D_FAMILY`) |
+| Source tables and views | `<Src>Sources` | `EciSources.FamilyDelta` (`STG_ECI_D_FAMILY`) |
 | Target tables | `<Src>Targets` | `EciTargets.Relationship` (`C_S_ECI_PTY_RLE_REL`) |
 | MDM base tables | `MdmBaseTables` | `MdmBaseTables.PartyXref` (`C_B_PTY_XREF`) |
 | Lookup / reference tables | `ReferenceTables` | `ReferenceTables.CodeValue` (`LOOKUP_CODE_VALUE`) |
@@ -361,7 +361,7 @@ adhoc_runs_ECI\C_S_ECI_PTY_RLE_REL_$Java$_19_10_2026_10_58_AM.sql    mock data o
    message.
 3. Per mapping:
    * **Source tables** - each table or view the mapping reads, as captured just before it ran, through its source
-     entity (e.g. `EciSources.DFamily`): total rows and the first `idq.report.max-rows` rows.
+     entity (e.g. `EciSources.FamilyDelta`): total rows and the first `idq.report.max-rows` rows.
    * **IdqMapInitQuery** - the rows the mapping's first SQL returned, through its record (e.g.
      `EciQueries.FamilyRelation`).
    * **Target** - the rows this run loaded into the table, read back from Oracle by `PKEY_SRC_OBJECT` through the

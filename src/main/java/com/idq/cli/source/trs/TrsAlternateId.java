@@ -34,8 +34,8 @@ public class TrsAlternateId extends SourceMapping<MemberIdentifiers, TrsAlternat
         implements MemberMapping.AlternateId<MemberIdentifiers, TrsAlternateId.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("004", "m_Tgt_C_S_TRS_Pty_Rle_Alt_Id", SourceSystem.TRS,
-            List.of("C_S_TRS_PTY_RLE_ALT_ID"), List.of(TrsSources.DCvDcMciIndv.class, TrsSources.DDcIndv.class,
-            TrsSources.DCvDcMrgSprtIndv.class, TrsTargets.ValidMember.class, TrsSources.HDcIndv.class));
+            List.of("C_S_TRS_PTY_RLE_ALT_ID"), List.of(TrsSources.CvDcMciIndvDelta.class, TrsSources.DcIndvDelta.class,
+            TrsSources.CvDcMrgSprtIndvDelta.class, TrsTargets.ValidMember.class, TrsSources.DcIndvHist.class));
 
     public static final String MEDICAID_ID = "002";
     public static final String SSN = "004";

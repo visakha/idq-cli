@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TTF, after 025 |
 | Sub-domain | Demographics (plus Role) |
+| Sources | `V_TTF_ETL_SRC`, `STG_TTF_PTY_INACTIVE_STS` |
 | Targets | `C_S_TTF_PTY`, `C_S_TTF_PTY_RLE`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.ttf.TtfParty` |
 

@@ -32,8 +32,8 @@ public class EciPartyValidation extends SourceMapping<PartyName, EciPartyValidat
         implements MemberMapping.Demographics<PartyName, EciPartyValidation.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("013", "m_Tgt_C_S_ECI_Pty_Validation", SourceSystem.ECI,
-            List.of("STG_ECI_PTY_INACTIVE_STS", "STG_ECI_PTY_INACTIVE_LOG"), List.of(EciSources.DChild.class,
-            EciSources.DFamily.class, MdmBaseTables.PartyXref.class, EciTargets.InactiveStatus.class,
+            List.of("STG_ECI_PTY_INACTIVE_STS", "STG_ECI_PTY_INACTIVE_LOG"), List.of(EciSources.ChildDelta.class,
+            EciSources.FamilyDelta.class, MdmBaseTables.PartyXref.class, EciTargets.InactiveStatus.class,
             EciSources.EtlLuDupCases.class, EciSources.EtlLuFamilyValidation.class));
 
     /// @param duplicateCases `<source table>|<id>` of parties whose every case is a duplicate (reason 8)

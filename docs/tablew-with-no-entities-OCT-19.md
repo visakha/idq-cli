@@ -323,29 +323,29 @@ Static reference lists. `STG_REF_PHN_AREA_CD_TEST` looks like a test copy of `RE
 | `EXC_LOOKUP_CODE_VALUE` | `ReferenceTables.ExceptionCode` | EXC_LOOKUP_CODE_VALUE_ID |
 | `EXC_STG_BAD_REC_MEMB` | `BadRecord` | unique: SRC_SYS, SRC_SYS_ID_1, SRC_SYS_ID_2, SRC_SYS_ID_3, EXCEPTION_TYPE, EXCEPTION_CODE, RUN_DATE |
 | `LOOKUP_CODE_VALUE` | `ReferenceTables.CodeValue` | CODE_TYPE, SRC_CODE_VALUE, SRC_SYS |
-| `STG_ECI_D_CHILD` | `EciSources.DChild` | ID_CHILD |
-| `STG_ECI_D_FAMILY` | `EciSources.DFamily` | ID_FAMILY |
-| `STG_ECI_D_MEDICAID` | `EciSources.DMedicaid` | ID_MEDICAID |
+| `STG_ECI_D_CHILD` | `EciSources.ChildDelta` | ID_CHILD |
+| `STG_ECI_D_FAMILY` | `EciSources.FamilyDelta` | ID_FAMILY |
+| `STG_ECI_D_MEDICAID` | `EciSources.MedicaidDelta` | ID_MEDICAID |
 | `STG_TRS_CD_REF` | `TrsSources.CdRef` | REF_ID |
 | `STG_TRS_CV_ED_MCI_EDG_INDV` | `TrsSources.CvEdMciEdgIndv` | INDV_ID |
 | `STG_TRS_DC_CASES` | `TrsSources.DcCases` | CASE_NUM |
 | `STG_TRS_DC_CASE_INDV` | `TrsSources.DcCaseIndv` | INDV_ID |
 | `STG_TRS_DC_PRIMARY_PAYEE` | `TrsSources.DcPrimaryPayee` | CASE_NUM |
 | `STG_TRS_DEACTIVED_MEMBERS` | `TrsSources.DeactivedMembers` | INDV_ID |
-| `STG_TRS_D_CV_DC_MCI_ALIAS` | `TrsSources.DCvDcMciAlias` | INDV_ID |
-| `STG_TRS_D_CV_DC_MCI_INDV` | `TrsSources.DCvDcMciIndv` | INDV_ID |
-| `STG_TRS_D_CV_DC_MRG_SPRT_INDV` | `TrsSources.DCvDcMrgSprtIndv` | INDV_ID |
-| `STG_TRS_D_CV_ED_MCI_EDG_INDV` | `TrsSources.DCvEdMciEdgIndv` | INDV_ID |
-| `STG_TRS_D_CV_MCI_EDG_INDV_TOA` | `TrsSources.DCvMciEdgIndvToa` | INDV_ID |
-| `STG_TRS_D_DC_ALIAS` | `TrsSources.DDcAlias` | INDV_ID |
-| `STG_TRS_D_DC_CASES` | `TrsSources.DDcCases` | CASE_NUM |
-| `STG_TRS_D_DC_INDV` | `TrsSources.DDcIndv` | INDV_ID |
-| `STG_TRS_D_DC_PRIMARY_PAYEE` | `TrsSources.DDcPrimaryPayee` | CASE_NUM |
-| `STG_TRS_D_DC_RELATIONSHIPS` | `TrsSources.DDcRelationships` | INDV_ID |
-| `STG_TRS_D_INDV_ADDR` | `TrsSources.DIndvAddr` | INDV_ID |
-| `STG_TRS_D_IN_MANAGED_CARE` | `TrsSources.DInManagedCare` | INDV_ID |
-| `STG_TRS_D_UNQ_ADDR` | `TrsTargets.UniqueAddress` | ADDR_ID |
-| `STG_TRS_H_DC_INDV` | `TrsSources.HDcIndv` | INDV_ID |
+| `STG_TRS_D_CV_DC_MCI_ALIAS` | `TrsSources.CvDcMciAliasDelta` | INDV_ID |
+| `STG_TRS_D_CV_DC_MCI_INDV` | `TrsSources.CvDcMciIndvDelta` | INDV_ID |
+| `STG_TRS_D_CV_DC_MRG_SPRT_INDV` | `TrsSources.CvDcMrgSprtIndvDelta` | INDV_ID |
+| `STG_TRS_D_CV_ED_MCI_EDG_INDV` | `TrsSources.CvEdMciEdgIndvDelta` | INDV_ID |
+| `STG_TRS_D_CV_MCI_EDG_INDV_TOA` | `TrsSources.CvMciEdgIndvToaDelta` | INDV_ID |
+| `STG_TRS_D_DC_ALIAS` | `TrsSources.DcAliasDelta` | INDV_ID |
+| `STG_TRS_D_DC_CASES` | `TrsSources.DcCasesDelta` | CASE_NUM |
+| `STG_TRS_D_DC_INDV` | `TrsSources.DcIndvDelta` | INDV_ID |
+| `STG_TRS_D_DC_PRIMARY_PAYEE` | `TrsSources.DcPrimaryPayeeDelta` | CASE_NUM |
+| `STG_TRS_D_DC_RELATIONSHIPS` | `TrsSources.DcRelationshipsDelta` | INDV_ID |
+| `STG_TRS_D_INDV_ADDR` | `TrsSources.IndvAddrDelta` | INDV_ID |
+| `STG_TRS_D_IN_MANAGED_CARE` | `TrsSources.InManagedCareDelta` | INDV_ID |
+| `STG_TRS_D_UNQ_ADDR` | `TrsTargets.UniqueAddressDelta` | ADDR_ID |
+| `STG_TRS_H_DC_INDV` | `TrsSources.DcIndvHist` | INDV_ID |
 | `STG_TRS_VALID_MEMBERS` | `TrsTargets.ValidMember` | PTY_PK |
 
 Unique keys (not primary keys): `EXC_STG_BAD_REC_MEMB` and `DQM_ADDRESS` carry composite UNIQUE constraints

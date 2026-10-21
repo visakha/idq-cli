@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TRS |
 | Sub-domain | Role |
+| Sources | `STG_TRS_D_CV_MCI_EDG_INDV_TOA`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_RLE_TOA`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.trs.TrsTypeOfAssistance` |
 
@@ -81,5 +82,5 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_TOA_pkey_test`.
 
 * `TrsTypeOfAssistance.transform` with `segmentKey`, `toaSource`, `pkey`; entity `TrsTargets.TypeOfAssistance`
   (`Columns.TypeOfAssistance`).
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DCvMciEdgIndvToa`
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.CvMciEdgIndvToaDelta`
   (`STG_TRS_D_CV_MCI_EDG_INDV_TOA`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`).

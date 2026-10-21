@@ -31,7 +31,7 @@ public class EciParty extends SourceMapping<PartyDemographics, InactiveStatus.Lo
         implements MemberMapping.Demographics<PartyDemographics, InactiveStatus.Lookup> {
 
     public static final MappingInfo INFO = MappingInfo.of("014", "m_Tgt_C_S_ECI_Pty", SourceSystem.ECI,
-            List.of("C_S_ECI_PTY", "C_S_ECI_PTY_RLE"), List.of(EciSources.DChild.class, EciSources.DFamily.class,
+            List.of("C_S_ECI_PTY", "C_S_ECI_PTY_RLE"), List.of(EciSources.ChildDelta.class, EciSources.FamilyDelta.class,
             EciTargets.InactiveStatus.class));
 
     /// Ethnicity, race and language exceptions are only raised for children.

@@ -4,6 +4,7 @@
 |---|---|
 | Source system | ECI |
 | Sub-domain | Address |
+| Sources | `V_ECI_ETL_SRC_FAMILY_ADDRESS`, `STG_ECI_PTY_INACTIVE_STS` |
 | Targets | `C_S_ECI_PTY_RLE_ADDR`, `DQM_ADDRESS`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.eci.EciAddress` |
 

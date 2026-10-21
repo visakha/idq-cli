@@ -4,6 +4,7 @@
 |---|---|
 | Source system | FSS, workflow `wf_FSS_Stage_Load`, first mapping |
 | Sub-domain | Demographics (party activation status) |
+| Sources | `V_FSS_ETL_SRC`, `C_B_PTY_XREF`, `STG_FSS_PTY_INACTIVE_STS` |
 | Targets | `STG_FSS_PTY_INACTIVE_STS`, `STG_FSS_PTY_INACTIVE_LOG`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.fss.FssPartyValidation` |
 

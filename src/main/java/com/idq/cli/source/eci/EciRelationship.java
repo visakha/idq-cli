@@ -11,7 +11,6 @@ import com.idq.cli.core.Rows;
 import com.idq.cli.core.exception.BadRecord;
 import com.idq.cli.core.reference.LookupRows;
 import com.idq.cli.core.reference.ReferenceData;
-import com.idq.cli.core.target.Columns;
 import com.idq.cli.core.target.MdmAudit;
 import com.idq.cli.core.target.TargetBatch;
 import com.idq.cli.domain.MappingInfo;
@@ -32,7 +31,7 @@ public class EciRelationship extends SourceMapping<FamilyRelation, EciRelationsh
         implements MemberMapping.Role<FamilyRelation, EciRelationship.Lookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("018", "m_Tgt_C_S_ECI_Pty_Rle_Rel", SourceSystem.ECI,
-            List.of("C_S_ECI_PTY_RLE_REL"), List.of(EciSources.DFamily.class, EciSources.SnChild.class,
+            List.of("C_S_ECI_PTY_RLE_REL"), List.of(EciSources.FamilyDelta.class, EciSources.SnChild.class,
             EciTargets.InactiveStatus.class));
 
     public record Lookups(InactiveStatus.Lookup inactive, Map<String, String> childGender) {}
@@ -98,8 +97,15 @@ public class EciRelationship extends SourceMapping<FamilyRelation, EciRelationsh
                     var audit = MdmAudit.srcRowid(key).periodStart(r.dateCreated()).lastUpdated(ctx.runStart())
                             .created(r.dateModified()).by(ctx.mappingName(), ctx.mappingName()).hubState(1)
                             .sourceUpdated(r.dateModified());
-                    relationships.add(new EciTargets.Relationship(key, audit, new Columns.Relationship(fromRole(r),
-                            toRole(r), "Member Relationship", "Member", type)));
+                    relationships.add(EciTargets.Relationship.builder()
+                            .pkeySrcObject(key)
+                            .audit(audit)
+                            .ptyRleFk1(fromRole(r))
+                            .ptyRleFk2(toRole(r))
+                            .relTypeCode("Member Relationship")
+                            .hierarchyCode("Member")
+                            .relTp(type)
+                            .build());
                 });
         return MappingOutput.empty().load(TargetBatch.replaceAll(EciTargets.Relationship.class,
                 Rows.lastPerKey(relationships, EciTargets.Relationship::pkeySrcObject))).reject(bad);

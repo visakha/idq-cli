@@ -70,7 +70,7 @@ public final class TrsTargets {
 
     /// `STG_TRS_D_UNQ_ADDR`: each distinct TIERS address validated once by `m_Tgt_C_S_TRS_Addr_1`.
     @Table("STG_TRS_D_UNQ_ADDR")
-    public record UniqueAddress(
+    public record UniqueAddressDelta(
             @Id String addrId,
             @Column("ADDR_LN_1") String addrLn1, @Column("ADDR_LN_2") String addrLn2, String bldngNm,
             String flrNum, String city, String county, String state, String cntryCd, String pstlCd,

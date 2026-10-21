@@ -30,7 +30,7 @@ public class TrsMemberRelationship extends SourceMapping<MemberRelationship, NoL
         implements MemberMapping.Role<MemberRelationship, NoLookups> {
 
     public static final MappingInfo INFO = MappingInfo.of("009", "m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem",
-            SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL"), List.of(TrsSources.DDcRelationships.class,
+            SourceSystem.TRS, List.of("C_S_TRS_PTY_RLE_REL"), List.of(TrsSources.DcRelationshipsDelta.class,
             TrsTargets.ValidMember.class));
 
     public TrsMemberRelationship(TrsQueries queries) {

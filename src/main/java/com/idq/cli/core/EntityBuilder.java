@@ -15,16 +15,16 @@ import java.util.function.Function;
 /// by the compiler and there are no column-name strings:
 ///
 /// ```java
-/// entity(EciSources.DChild.class)
-///         .with(DChild::idChild, id)
-///         .with(DChild::firstName, "Mia")
+/// entity(EciSources.ChildDelta.class)
+///         .with(ChildDelta::idChild, id)
+///         .with(ChildDelta::firstName, "Mia")
 ///         .build();
 /// ```
 ///
 /// Components that are not set are `null`.
 public final class EntityBuilder<R extends Record> {
 
-    /// An accessor method reference such as `DChild::firstName`.
+    /// An accessor method reference such as `ChildDelta::firstName`.
     @FunctionalInterface
     public interface Component<R, V> extends Function<R, V>, Serializable {}
 
@@ -93,7 +93,7 @@ public final class EntityBuilder<R extends Record> {
                 writeReplace.setAccessible(true);
                 return ((SerializedLambda) writeReplace.invoke(component)).getImplMethodName();
             } catch (ReflectiveOperationException e) {
-                throw new IllegalArgumentException("Pass an accessor method reference such as DChild::firstName", e);
+                throw new IllegalArgumentException("Pass an accessor method reference such as ChildDelta::firstName", e);
             }
         });
     }

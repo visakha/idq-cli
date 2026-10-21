@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TRS |
 | Sub-domain | Role |
+| Sources | `STG_TRS_D_IN_MANAGED_CARE`, `STG_TRS_VALID_MEMBERS` |
 | Targets | `C_S_TRS_PTY_RLE_PLN`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.trs.TrsPlan` |
 
@@ -64,5 +65,5 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Pln_pkey_test`.
 
 * `TrsPlan.transform`: `master()` = the lookup, `Rows.firstPerKey` for the exceptions, sort + `Rows.lastPerKey` for
   `agg_Dedup_Rec`; entity `TrsTargets.Plan` (`Columns.Plan`).
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DInManagedCare`
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.InManagedCareDelta`
   (`STG_TRS_D_IN_MANAGED_CARE`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`).

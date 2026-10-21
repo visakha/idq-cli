@@ -4,6 +4,7 @@
 |---|---|
 | Source system | TRS |
 | Sub-domain | Role |
+| Sources | `STG_TRS_D_IN_MANAGED_CARE`, `STG_TRS_VALID_MEMBERS`, `C_B_PTY_RLE_ALT_ID`, `C_B_PTY_RLE_ALT_ID_XREF` |
 | Targets | `C_S_TRS_PTY_RLE_REL_PROV`, `EXC_STG_BAD_REC_MEMB` |
 | Java | `com.idq.cli.source.trs.TrsPrimaryCareProvider` |
 
@@ -91,6 +92,6 @@ Unit test: `TrsPkeyTest#m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP_pkey_test`.
 
 * `TrsPrimaryCareProvider.transform`, `providerRoleKey`, `pkey`; `Lookups(providerKeyByTpi)`;
   `Rows.currentSegmentPerKey`; entity `TrsTargets.ProviderRelationship`.
-* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.DInManagedCare`
+* Source entities (raw source tables, captured in the `adhoc_runs_*` audit reports): `TrsSources.InManagedCareDelta`
   (`STG_TRS_D_IN_MANAGED_CARE`), `TrsTargets.ValidMember` (`STG_TRS_VALID_MEMBERS`), `MdmBaseTables.PartyRoleAltId`
   (`C_B_PTY_RLE_ALT_ID`), `MdmBaseTables.PartyRoleAltIdXref` (`C_B_PTY_RLE_ALT_ID_XREF`).
