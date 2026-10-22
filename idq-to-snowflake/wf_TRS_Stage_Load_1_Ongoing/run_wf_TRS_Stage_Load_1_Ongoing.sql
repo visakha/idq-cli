@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------------------------------------------
 -- run_wf_TRS_Stage_Load_1_Ongoing.sql - runs the Snowflake procedures that replace IDQ workflow
--- wf_TRS_Stage_Load_1_Ongoing, in taskflow order (idmc/wf_TRS_Stage_Load_1_Ongoing/taskflow.md). Parallel paths of
+-- wf_TRS_Stage_Load_1_Ongoing, in taskflow order (docs-from-idq-exports/wf_TRS_Stage_Load_1_Ongoing/taskflow.md). Parallel paths of
 -- the IDQ workflow run one after another here, keeping every dependency:
 --   * m_Tgt_C_S_TRS_Pty_OnGoing first (it builds STG_TRS_VALID_MEMBERS, which every later mapping joins to);
 --   * m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw before m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing (the second appends to the

@@ -1,13 +1,13 @@
-"""Generate idmc-snowflake/: one page per Snowflake stored procedure of idq-to-snowflake/.
+"""Generate docs-from-snowflake-db-scripts/: one page per Snowflake stored procedure of idq-to-snowflake/.
 
     python -I ext-tools/snowflake_spec.py
 
 Reads only the SQL of idq-to-snowflake/ (procedure headers, signatures, INSERT targets, functions called, run
-scripts) and the file names of idmc/ and docs/mappings/ for the links. Writes:
+scripts) and the file names of docs-from-idq-exports/ and docs/mappings/ for the links. Writes:
 
-    idmc-snowflake/README.md                       overview, shared functions, every workflow
-    idmc-snowflake/<workflow>/README.md            the procedures in run order
-    idmc-snowflake/<workflow>/mappings/<m>.md      one page per mapping / procedure
+    docs-from-snowflake-db-scripts/README.md                       overview, shared functions, every workflow
+    docs-from-snowflake-db-scripts/<workflow>/README.md            the procedures in run order
+    docs-from-snowflake-db-scripts/<workflow>/mappings/<m>.md      one page per mapping / procedure
 
 Regenerate after changing a procedure header; do not edit the generated pages.
 """
@@ -16,8 +16,8 @@ import re
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
 SQL_DIR = os.path.join(ROOT, 'idq-to-snowflake')
-OUT_DIR = os.path.join(ROOT, 'idmc-snowflake')
-IDMC_DIR = os.path.join(ROOT, 'idmc')
+OUT_DIR = os.path.join(ROOT, 'docs-from-snowflake-db-scripts')
+IDMC_DIR = os.path.join(ROOT, 'docs-from-idq-exports')
 DOCS_DIR = os.path.join(ROOT, 'docs', 'mappings')
 WORKFLOWS = ['wf_ECI_Stage_Load', 'wf_FSS_Stage_Load', 'wf_TTF_Stage_Load', 'wf_WIC_Stage_Load',
              'wf_TRS_Stage_Load_1_Ongoing', 'wf_CRE_Stage_Load_Ongoing']
@@ -164,7 +164,7 @@ def mapping_page(wf, proc, position, total, reg):
     out = [f'# {mapping} &rarr; Snowflake `{proc}`', '']
     links = [f'procedure [`{proc}.sql`](../../../idq-to-snowflake/{wf}/{proc}.sql)']
     if os.path.exists(os.path.join(IDMC_DIR, wf, 'mappings', mapping + '.md')):
-        links.append(f'IDQ / CDI spec [`idmc/{wf}/mappings/{mapping}.md`](../../../idmc/{wf}/mappings/{mapping}.md)')
+        links.append(f'IDQ / CDI spec [`docs-from-idq-exports/{wf}/mappings/{mapping}.md`](../../../docs-from-idq-exports/{wf}/mappings/{mapping}.md)')
     d = doc_link(mapping)
     if d:
         links.append(f'business description [`docs/mappings/{d}`](../../../docs/mappings/{d})')
@@ -208,7 +208,7 @@ def workflow_readme(wf, procs):
     out = [f'# {wf} &rarr; Snowflake', '',
            f'The Snowflake stored procedures that replace the IDQ workflow `docs/{wf}.xml`, in the order of '
            f'[`run_{wf}.sql`](../../idq-to-snowflake/{wf}/run_{wf}.sql) (the taskflow order of '
-           f'[`idmc/{wf}/taskflow.md`](../../idmc/{wf}/taskflow.md); parallel IDQ paths run one after another).', '',
+           f'[`docs-from-idq-exports/{wf}/taskflow.md`](../../docs-from-idq-exports/{wf}/taskflow.md); parallel IDQ paths run one after another).', '',
            '| Step | Mapping | Procedure |', '|---|---|---|']
     for i, p in enumerate(procs, 1):
         m = p[len('sp_snow_main_'):]
@@ -228,7 +228,7 @@ def top_readme(counts, reg):
            'by `ext-tools/snowflake_spec.py` from the procedure headers. Each page says what the procedure does, its '
            'validations, its bad-data handling and its MDM timeline logic (all in scope for this port), its '
            'parameters, the tables it writes and the shared functions it calls. The IDQ / CDI specification of the '
-           'same mapping is in [`idmc/`](../idmc/).', '',
+           'same mapping is in [`docs-from-idq-exports/`](../docs-from-idq-exports/).', '',
            '| Workflow | Procedures |', '|---|---|']
     out += [f'| [`{wf}`]({wf}/README.md) | {n} |' for wf, n in counts]
     out += ['', '## Shared functions', '',

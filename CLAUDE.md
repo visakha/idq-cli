@@ -25,7 +25,7 @@ Working from another machine (Azure VM, GitHub `@claude`): see getting-started-z
   SNOWFLAKE_SP (idq-to-snowflake, sp_snow_main_<mapping>; nothing assumed: mapplets/rules are fn_snow_helperNN_common,
   mapping-only helpers fn_snow_helperNN_<mapping>). Each engine has run_<workflow>.sql scripts the CLI reads.
 - Snowflake does not enforce UNIQUE/PK: the Snowflake procedures emulate the Oracle keys IDQ relies on (uq_* flags).
-- idmc-snowflake/ is generated from the idq-to-snowflake headers by ext-tools/snowflake_spec.py: edit the headers,
+- docs-from-snowflake-db-scripts/ is generated from the idq-to-snowflake headers by ext-tools/snowflake_spec.py: edit the headers,
   regenerate, never edit the pages.
 - New non-obvious IDQ behaviour (quirks/defects) goes into docs/common_insights.md and is called out in the reply.
 - Mapping docs (docs/mappings/*.md) were generated; edit them directly now and keep SQL in sync with *Queries classes.

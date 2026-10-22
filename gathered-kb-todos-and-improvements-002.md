@@ -158,7 +158,7 @@ keeps both the old status and the *Reactivation* row.
 
 **ext-tools**
 
-- `idmc_spec.py` generates the *Oracle stored procedure* sections from the procedure headers. Regenerate `idmc/`:
+- `idmc_spec.py` generates the *Oracle stored procedure* sections from the procedure headers. Regenerate `docs-from-idq-exports/`:
   28 places there still say "truncated first", but the headers were reworded in #20.
 
 ## 7. Knowledge map: what moved

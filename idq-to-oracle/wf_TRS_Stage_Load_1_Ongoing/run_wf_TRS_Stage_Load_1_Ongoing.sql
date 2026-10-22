@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------------------------------------------
 -- run_wf_TRS_Stage_Load_1_Ongoing.sql - runs the procedures that replace IDQ workflow wf_TRS_Stage_Load_1_Ongoing, in taskflow order
--- (idmc/wf_TRS_Stage_Load_1_Ongoing/taskflow.md). The IDQ workflow runs some mappings in parallel; here they run one after another,
+-- (docs-from-idq-exports/wf_TRS_Stage_Load_1_Ongoing/taskflow.md). The IDQ workflow runs some mappings in parallel; here they run one after another,
 -- keeping every dependency of the taskflow (paths of a parallel step run one path after another). Each procedure commits;
 -- WHENEVER SQLERROR stops the run at the first failure, as the IDQ workflow does.
 -- The IDQ command task (touch ${var:sys.WorkflowName}.ind on the DIS host) is not part of the database run: create the
