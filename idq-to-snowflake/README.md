@@ -13,7 +13,7 @@ port in [`idq-to-oracle/`](../idq-to-oracle/README.md), **nothing is assumed to 
 | `docs/wf_TRS_Stage_Load_1_Ongoing.xml` | 14 | [wf_TRS_Stage_Load_1_Ongoing](wf_TRS_Stage_Load_1_Ongoing/) | [run_wf_TRS_Stage_Load_1_Ongoing.sql](wf_TRS_Stage_Load_1_Ongoing/run_wf_TRS_Stage_Load_1_Ongoing.sql) |
 | `docs/wf_CRE_Stage_Load_Ongoing.xml` | 1 | [wf_CRE_Stage_Load_Ongoing](wf_CRE_Stage_Load_Ongoing/) | [run_wf_CRE_Stage_Load_Ongoing.sql](wf_CRE_Stage_Load_Ongoing/run_wf_CRE_Stage_Load_Ongoing.sql) |
 
-Each procedure is documented, one page per mapping, in [`idmc-snowflake/`](../idmc-snowflake/README.md). Those pages
+Each procedure is documented, one page per mapping, in [`docs-from-snowflake-db-scripts/`](../docs-from-snowflake-db-scripts/README.md). Those pages
 are generated from the procedure headers here by `ext-tools/snowflake_spec.py`; after changing a header, regenerate:
 
 ```sh
@@ -184,7 +184,7 @@ procedures.
 
 Run a whole workflow with `snowsql -f <workflow>/run_<workflow>.sql`, or one procedure with
 `CALL sp_snow_main_m_Tgt_C_S_ECI_Pty();`. Each procedure returns its run log line (mapping, step, rows). The run
-scripts follow the taskflow order of `idmc/<workflow>/taskflow.md`; parallel IDQ paths run one after another, keeping
+scripts follow the taskflow order of `docs-from-idq-exports/<workflow>/taskflow.md`; parallel IDQ paths run one after another, keeping
 every dependency. The IDQ command task (`touch <workflow>.ind`) is left to the scheduler. A Snowflake task graph
 (`CREATE TASK ... AFTER ...`) can replace the script one procedure per task.
 

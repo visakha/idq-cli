@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------------------------------------------
 -- run_wf_ECI_Stage_Load.sql - runs the Snowflake procedures that replace IDQ workflow wf_ECI_Stage_Load, in taskflow
--- order (idmc/wf_ECI_Stage_Load/taskflow.md). The IDQ workflow runs some mappings in parallel; here they run one after
+-- order (docs-from-idq-exports/wf_ECI_Stage_Load/taskflow.md). The IDQ workflow runs some mappings in parallel; here they run one after
 -- another, keeping every dependency of the taskflow. Each procedure is one transaction (COMMIT at the end, ROLLBACK
 -- and re-raise on error); exit_on_error stops the run at the first failure, as the IDQ workflow does.
 -- The IDQ command task (touch ${var:sys.WorkflowName}.ind on the DIS host) is not part of the database run: create

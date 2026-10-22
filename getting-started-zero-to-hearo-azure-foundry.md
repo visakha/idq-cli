@@ -447,7 +447,7 @@ Before bed: push, update the PR's Handoff section, merge what is finished. Tomor
 |---|---|---|---|
 | Java code, services, mock data, unit tests (`./mvnw test`, 47 tests) | ✅ | ✅ | |
 | Mapping docs, `common_insights.md`, parking notes, user guide | ✅ | ✅ | |
-| `ext-tools` Python (lookups, `idmc_spec.py` regeneration of `idmc/`) | ✅ | ✅ | |
+| `ext-tools` Python (lookups, `idmc_spec.py` regeneration of `docs-from-idq-exports/`) | ✅ | ✅ | |
 | `idq-to-oracle` procedure edits | ✅ | ✅ | |
 | Compile / install procedures on OCI (N1), `OracleWorkflowIT`, `SourceEntitiesIT` | ✅ (wallet on VM) | ❌ | |
 | `run-etl` with `etl_process=JAVA` or `ORA_SP` against OCI | ✅ | ❌ | |

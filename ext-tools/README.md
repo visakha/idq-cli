@@ -26,7 +26,7 @@ tasks, mappings, mapplets) and Cloud Data Quality (Cleanse / Labeler / Verifier 
 repository root:
 
 ```sh
-python -I ext-tools/idmc_spec.py docs/wf_ECI_Stage_Load.xml idmc/wf_ECI_Stage_Load
+python -I ext-tools/idmc_spec.py docs/wf_ECI_Stage_Load.xml docs-from-idq-exports/wf_ECI_Stage_Load
 ```
 
 * `README.md`: asset inventory, connections, build order, translation rules and open items.

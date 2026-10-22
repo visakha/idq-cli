@@ -32,7 +32,7 @@ convention for the scripts in this repository.
 The script prints one line when it finishes:
 
 ```
-9 mappings, 16 mapplets -> idmc/wf_ECI_Stage_Load
+9 mappings, 16 mapplets -> docs-from-idq-exports/wf_ECI_Stage_Load
 ```
 
 ### Examples
@@ -40,14 +40,14 @@ The script prints one line when it finishes:
 One workflow:
 
 ```sh
-python -I ext-tools/idmc_spec.py docs/wf_ECI_Stage_Load.xml idmc/wf_ECI_Stage_Load
+python -I ext-tools/idmc_spec.py docs/wf_ECI_Stage_Load.xml docs-from-idq-exports/wf_ECI_Stage_Load
 ```
 
 All six workflows (Git Bash):
 
 ```sh
 for f in docs/wf_*.xml; do
-  python -I ext-tools/idmc_spec.py "$f" "idmc/$(basename "$f" .xml)"
+  python -I ext-tools/idmc_spec.py "$f" "docs-from-idq-exports/$(basename "$f" .xml)"
 done
 ```
 
