@@ -94,7 +94,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Mng_Attr_Auth_Rep_Ongoing (workflow
 wf_TRS_Stage_Load_1_Ongoing). Runs after m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw and APPENDS to C_S_TRS_PTY_MNG_ATTR (no
-truncate).
+delete or truncate).
 
 Authorized-representative flag ('Auth_Rep_Flag' = 'Y') of valid TIERS members whose case has a verified,
 sent authorized representative (custom SQL: six union branches over the payee / case / EDG delta tables):

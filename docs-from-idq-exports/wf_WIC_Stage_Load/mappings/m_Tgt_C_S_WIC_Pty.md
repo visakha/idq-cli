@@ -173,7 +173,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_WIC_Pty`](../../../idq-to
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_WIC_Pty (workflow wf_WIC_Stage_Load).
 
-Loads the WIC parties (V_WIC_ETL_SRC) into C_S_WIC_PTY and C_S_WIC_PTY_RLE (both truncated first) and logs
+Loads the WIC parties (V_WIC_ETL_SRC) into C_S_WIC_PTY and C_S_WIC_PTY_RLE (both insert only, never truncated) and logs
 demographic exceptions:
   -> Flt_Remove_Inactive: party not in STG_WIC_PTY_INACTIVE_STS
   -> name standardization, gender, birth date, ethnicity, race indicators, language
@@ -196,8 +196,8 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_WIC_PTY` | truncate, insert |
-| `C_S_WIC_PTY_RLE` | truncate, insert |
+| `C_S_WIC_PTY` | insert |
+| `C_S_WIC_PTY_RLE` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -210,7 +210,6 @@ Shared functions and procedures called:
 | `fn_dq_valid_gender` | replaces `mplt_Gender_Validation`, returns `t_dq_gender` |
 | `fn_dq_valid_language` | replaces `mplt_Language_Validation`, returns `t_dq_code_check` |
 | `fn_dq_valid_race_ind` | replaces `mplt_Race_Ind_Validation`, returns `t_dq_race_ind` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

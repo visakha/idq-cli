@@ -83,7 +83,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw`](../
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Mng_Attr_Sw (workflow wf_TRS_Stage_Load_1_Ongoing).
 
-Managed attributes ("switches") of the valid TIERS members into C_S_TRS_PTY_MNG_ATTR (truncated first):
+Managed attributes ("switches") of the valid TIERS members into C_S_TRS_PTY_MNG_ATTR (insert only, never truncated):
   Read_Stg_TRS_D_DC_Indv (custom SQL: latest DC_INDV / MCI row per individual joined to STG_TRS_VALID_MEMBERS)
   -> exp_Attr_Type + nrm_Attribute_Types: one row per attribute (UNPIVOT here)
        File_Clearance_SW = FILE_CLEARANCE_SW, SSA_Validation_SW = SSA_VALIDATION_SW, TW_Convert_Ind,
@@ -102,13 +102,12 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TRS_PTY_MNG_ATTR` | truncate, insert |
+| `C_S_TRS_PTY_MNG_ATTR` | insert |
 
 Shared functions and procedures called:
 
 | Object | Does |
 |---|---|
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

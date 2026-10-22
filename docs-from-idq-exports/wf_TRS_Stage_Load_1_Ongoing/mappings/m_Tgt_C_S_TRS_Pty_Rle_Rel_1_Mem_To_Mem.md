@@ -154,7 +154,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Rel_1_Mem_To_Mem (workflow wf_TRS_Stage_Load_1_Ongoing).
 
 Member-to-member relationships (STG_TRS_D_DC_RELATIONSHIPS; both sides valid members, one source key per
-individual, MCI preferred) into C_S_TRS_PTY_RLE_REL (truncated first):
+individual, MCI preferred) into C_S_TRS_PTY_RLE_REL (insert only, never truncated):
   -> Lookup_V_LOOKUP_CODE_VALUE (code type PTY_REL, 'TRS') + exp_Build_FK -> rtr_AltId_Exp
        Invalid_Main_Alt_Id (no main party key)  -> EXC_STG_BAD_REC_MEMB ('Invalid_Member')
        Invalid_Ref_Alt_Id  (no related key)     -> EXC_STG_BAD_REC_MEMB ('Invalid_Ref_Member')
@@ -194,8 +194,8 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TRS_PTY_RLE_REL` | truncate, insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
+| `C_S_TRS_PTY_RLE_REL` | insert |
 
 Shared functions and procedures called:
 
@@ -206,7 +206,6 @@ Shared functions and procedures called:
 | `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
 | `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
 | `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

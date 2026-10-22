@@ -156,7 +156,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Alt_Id`](../.
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Rle_Alt_Id (workflow wf_ECI_Stage_Load).
 
-Alternate ids of the ECI parties into C_S_ECI_PTY_RLE_ALT_ID (truncated first):
+Alternate ids of the ECI parties into C_S_ECI_PTY_RLE_ALT_ID (insert only, never truncated):
   Read_STG_ECI_D_CHILD (custom SQL: child ECI id 018, child SSN 004, Medicaid number 002 via STG_ECI_SN_CASE,
                         family ECI id 019)
     -> Filter: party (first 11 characters of the role key, '|' trimmed) not in STG_ECI_PTY_INACTIVE_STS
@@ -182,7 +182,7 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_ECI_PTY_RLE_ALT_ID` | truncate, insert |
+| `C_S_ECI_PTY_RLE_ALT_ID` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -194,7 +194,6 @@ Shared functions and procedures called:
 | `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
 | `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
 | `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

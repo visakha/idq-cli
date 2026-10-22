@@ -113,7 +113,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Phn`](../../.
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TTF_Pty_Rle_Phn (workflow wf_TTF_Stage_Load).
 
-One phone per active TTF client (V_TTF_ETL_SRC) into C_S_TTF_PTY_RLE_PHN (truncated first):
+One phone per active TTF client (V_TTF_ETL_SRC) into C_S_TTF_PTY_RLE_PHN (insert only, never truncated):
   -> fil_deactivated_status: party not in STG_TTF_PTY_INACTIVE_STS
   -> Filt_null_phone: PHONE not NULL
   -> rule_Phone_Std (usage 001 'Telephone', 'Primary') -> RTR_Valid_PhoneNumbers
@@ -131,7 +131,7 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TTF_PTY_RLE_PHN` | truncate, insert |
+| `C_S_TTF_PTY_RLE_PHN` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -139,7 +139,6 @@ Shared functions and procedures called:
 | Object | Does |
 |---|---|
 | `fn_dq_std_phone` | replaces `rule_Phone_Std`, returns `t_dq_phone` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

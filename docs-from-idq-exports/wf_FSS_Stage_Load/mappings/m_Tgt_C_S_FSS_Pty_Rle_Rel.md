@@ -108,7 +108,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_FSS_Pty_Rle_Rel`](../../.
 Drop-in replacement of IDQ mapping m_Tgt_C_S_FSS_Pty_Rle_Rel (workflow wf_FSS_Stage_Load).
 
 Relationships between FSS clients (V_FSS_ETL_SRC_RELATIONS, one row per direction) into C_S_FSS_PTY_RLE_REL
-(truncated first):
+(insert only, never truncated):
   -> Filter_Fam_Child_Valid: neither PTY_SRC_KEY nor RELN_PTY_SRC_KEY is in STG_FSS_PTY_INACTIVE_STS
   -> Exp_Map_Code_Val_and_Gender: relation code (CAREGIVER when missing) || '|' || gender of the related party
      ('To Child': RELN_CD_GENDER with code type REL_TP; otherwise CD_GENDER with code type INVERSE_REL)
@@ -124,7 +124,7 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_FSS_PTY_RLE_REL` | truncate, insert |
+| `C_S_FSS_PTY_RLE_REL` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -134,7 +134,6 @@ Shared functions and procedures called:
 | `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
 | `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
 | `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

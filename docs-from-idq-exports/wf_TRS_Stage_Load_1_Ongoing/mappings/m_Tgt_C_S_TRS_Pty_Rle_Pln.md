@@ -109,7 +109,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Pln`](../../.
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Pln (workflow wf_TRS_Stage_Load_1_Ongoing).
 
 Managed-care plans of valid MCI members (STG_TRS_D_IN_MANAGED_CARE, plan present, begin before end or open) into
-C_S_TRS_PTY_RLE_PLN (truncated first):
+C_S_TRS_PTY_RLE_PLN (insert only, never truncated):
   -> lkp_Plan_Cd (V_LOOKUP_CODE_VALUE, code type PLAN_CD, source system 'MAX') -> rtr_Invalid_Plan_Cd
        VALID (plan translates) -> srtr_Pkey -> agg_Dedup_Rec (one row per INDV_ID|Member|plan) -> target
        Default                 -> exp_Rank + fltr_Rank: the FIRST invalid row per individual (source order
@@ -128,7 +128,7 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TRS_PTY_RLE_PLN` | truncate, insert |
+| `C_S_TRS_PTY_RLE_PLN` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -137,7 +137,6 @@ Shared functions and procedures called:
 |---|---|
 | `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
 | `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

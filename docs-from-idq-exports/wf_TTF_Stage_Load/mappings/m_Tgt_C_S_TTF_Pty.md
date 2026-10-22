@@ -163,7 +163,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TTF_Pty`](../../../idq-to
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TTF_Pty (workflow wf_TTF_Stage_Load).
 
-Loads the TTF clients (V_TTF_ETL_SRC) into C_S_TTF_PTY and C_S_TTF_PTY_RLE (both truncated first) and logs
+Loads the TTF clients (V_TTF_ETL_SRC) into C_S_TTF_PTY and C_S_TTF_PTY_RLE (both insert only, never truncated) and logs
 demographic exceptions:
   -> Flt_Remove_Inactive: party (PTY_SRC_KEY) not in STG_TTF_PTY_INACTIVE_STS
   -> Expression: gender from SEXID (33 -> F, 34 -> M, else U); ethnicity = '55' when RACEETHNICITYID = '55'
@@ -188,8 +188,8 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TTF_PTY` | truncate, insert |
-| `C_S_TTF_PTY_RLE` | truncate, insert |
+| `C_S_TTF_PTY` | insert |
+| `C_S_TTF_PTY_RLE` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -201,7 +201,6 @@ Shared functions and procedures called:
 | `fn_dq_valid_ethnicity` | replaces `mplt_Ethnicity_Validation`, returns `t_dq_code_check` |
 | `fn_dq_valid_gender` | replaces `mplt_Gender_Validation`, returns `t_dq_gender` |
 | `fn_dq_valid_race` | replaces `mplt_Race_Validation`, returns `t_dq_code_check` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

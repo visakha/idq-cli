@@ -107,7 +107,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Rel`](../../.
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Rle_Rel (workflow wf_ECI_Stage_Load).
 
-Family <-> child relationships into C_S_ECI_PTY_RLE_REL (truncated first). Every STG_ECI_D_FAMILY row is read
+Family <-> child relationships into C_S_ECI_PTY_RLE_REL (insert only, never truncated). Every STG_ECI_D_FAMILY row is read
 twice (custom SQL, 'To Child' and 'From Child'):
   * To Child  : family -> child, relationship code = FAMILY_CD
   * From Child: child -> family, relationship code = FAMILY_CD || '|' || child gender (STG_ECI_SN_CHILD.GENDER)
@@ -126,7 +126,7 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_ECI_PTY_RLE_REL` | truncate, insert |
+| `C_S_ECI_PTY_RLE_REL` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -136,7 +136,6 @@ Shared functions and procedures called:
 | `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
 | `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
 | `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

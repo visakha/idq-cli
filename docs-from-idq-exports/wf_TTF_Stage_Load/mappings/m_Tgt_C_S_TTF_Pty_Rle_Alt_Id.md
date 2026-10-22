@@ -77,7 +77,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TTF_Pty_Rle_Alt_Id`](../.
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TTF_Pty_Rle_Alt_Id (workflow wf_TTF_Stage_Load).
 
-One alternate id per active TTF client into C_S_TTF_PTY_RLE_ALT_ID (truncated first): the party key itself,
+One alternate id per active TTF client into C_S_TTF_PTY_RLE_ALT_ID (insert only, never truncated): the party key itself,
 type '024'.
   Read_V_TTF_ETL_SRC -> Filter: party not in STG_TTF_PTY_INACTIVE_STS -> target
 The source read stores a SQL text that is only a WHERE fragment (test client ids) and is not in custom-query mode:
@@ -90,13 +90,12 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TTF_PTY_RLE_ALT_ID` | truncate, insert |
+| `C_S_TTF_PTY_RLE_ALT_ID` | insert |
 
 Shared functions and procedures called:
 
 | Object | Does |
 |---|---|
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

@@ -150,7 +150,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr (workflow wf_TRS_Stage_Load_1_Ongoing).
 
 Phones and e-mail of the TIERS case delta (STG_TRS_D_DC_CASES x STG_TRS_DC_CASE_INDV, valid members only) into
-C_S_TRS_PTY_RLE_PHN and C_S_TRS_PTY_RLE_EADDR (both truncated first):
+C_S_TRS_PTY_RLE_PHN and C_S_TRS_PTY_RLE_EADDR (both insert only, never truncated):
   -> fltr_Hold (TRUE)
   phones: mplt_Phone_Normalization (TABLE(fn_dq_norm_member_phn(...))): main PH_NUM (001), work
           WORK_PH_NUM || ' ' || WORK_PH_NUM_EXT (002), other OTHER_PH_NUM (003); each through rule_Phone_Std
@@ -181,9 +181,9 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TRS_PTY_RLE_PHN` | truncate, insert |
-| `C_S_TRS_PTY_RLE_EADDR` | truncate, insert |
+| `C_S_TRS_PTY_RLE_PHN` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
+| `C_S_TRS_PTY_RLE_EADDR` | insert |
 
 Shared functions and procedures called:
 
@@ -191,7 +191,6 @@ Shared functions and procedures called:
 |---|---|
 | `fn_dq_norm_member_phn` | replaces `mplt_Member_Pty_Rle_Phn_Normalization (TRS)`, returns `t_dq_member_phn_tab (pipelined)` |
 | `fn_dq_valid_email` | replaces `rule_email_validation_v01 (+ local part / domain)`, returns `t_dq_email` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

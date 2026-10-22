@@ -101,7 +101,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Alt_Id`](../.
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Alt_Id (workflow wf_TRS_Stage_Load_1_Ongoing).
 
-Alternate ids of valid TIERS members into C_S_TRS_PTY_RLE_ALT_ID (truncated first):
+Alternate ids of valid TIERS members into C_S_TRS_PTY_RLE_ALT_ID (insert only, never truncated):
   Read_STG_TRS_D_DC_INDV (custom SQL: MCI, DC_INDV and merged-individual keys of valid members, one row per key
     keeping the longest, latest SSN)
   -> lkp_Valid_SSN: the SSN is used only when STG_TRS_H_DC_INDV has it SSA-validated for the individual
@@ -123,7 +123,7 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TRS_PTY_RLE_ALT_ID` | truncate, insert |
+| `C_S_TRS_PTY_RLE_ALT_ID` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -132,7 +132,6 @@ Shared functions and procedures called:
 |---|---|
 | `fn_dq_norm_trs_alt_id` | replaces `mplt_TRS_Pty_Rle_Alt_Id_Normalization (TRS)`, returns `t_dq_trs_alt_id_tab (pipelined)` |
 | `fn_ors_helper07_common` | IDQ TO_DECIMAL(value, scale): non-numeric -> 0, NULL -> NULL |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

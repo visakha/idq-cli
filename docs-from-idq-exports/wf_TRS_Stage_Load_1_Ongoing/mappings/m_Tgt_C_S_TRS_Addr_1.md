@@ -87,7 +87,7 @@ Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Addr_1 (workflow wf_TRS_Stage_L
 
 Part 1 of the TIERS address load: every UNIQUE address of the daily extract (STG_TRS_D_INDV_ADDR, distinct on the
 address parts) goes through the address validator once (about a tenth of the volume), and every result, good or
-bad, is written to the intermediate table STG_TRS_D_UNQ_ADDR (truncated first). m_Tgt_C_S_TRS_Addr_2 joins it back
+bad, is written to the intermediate table STG_TRS_D_UNQ_ADDR (insert only, never truncated). m_Tgt_C_S_TRS_Addr_2 joins it back
 to the individuals.
   -> lkp_Addr_Street_Type (STG_TRS_CD_REF) + exp_TRS_Addr_Derivation:
        line 1 = street number, fraction, direction (EA/NO/SO/WE abbreviated to the first letter, any case), street
@@ -103,14 +103,13 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `STG_TRS_D_UNQ_ADDR` | truncate, insert |
+| `STG_TRS_D_UNQ_ADDR` | insert |
 
 Shared functions and procedures called:
 
 | Object | Does |
 |---|---|
 | `fn_dq_valid_global_addr` | replaces `mplt_Global_Addr_Validation (+ rule_Addr_Line_*)`, returns `t_dq_address` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

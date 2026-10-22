@@ -143,7 +143,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Rle_Rel_2_Mem_To_PCP (workflow wf_TRS_Stage_Load_1_Ongoing).
 
 Member-to-primary-care-provider relationships (STG_TRS_D_IN_MANAGED_CARE with a provider, one source key per
-individual) into C_S_TRS_PTY_RLE_REL_PROV (truncated first):
+individual) into C_S_TRS_PTY_RLE_REL_PROV (insert only, never truncated):
   -> Filt_Numeric_Prov: IS_NUMBER(PROVIDER_NUM)
   -> Lookup_C_B_PTY_RLE_ALT_ID (custom lookup SQL: the TPI alternate id '006' of C21 in the MDM, latest source key
      per id) -> Exp_Build_FK: provider key = source key up to its second '|'; type 'Member PCO' when the key holds
@@ -174,8 +174,8 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TRS_PTY_RLE_REL_PROV` | truncate, insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
+| `C_S_TRS_PTY_RLE_REL_PROV` | insert |
 
 Shared functions and procedures called:
 
@@ -185,7 +185,6 @@ Shared functions and procedures called:
 | `fn_ors_helper01_common` | IDQ IS_NUMBER(): 1 when the string is a number, else 0 |
 | `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
 | `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

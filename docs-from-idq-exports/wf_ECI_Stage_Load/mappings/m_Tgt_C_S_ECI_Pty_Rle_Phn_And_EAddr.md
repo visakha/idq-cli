@@ -136,7 +136,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr
 Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty_Rle_Phn_And_EAddr (workflow wf_ECI_Stage_Load).
 
 Phones and e-mail addresses of the ECI parties (V_ECI_ETL_SRC_FAMILY_PHONE) into C_S_ECI_PTY_RLE_PHN and
-C_S_ECI_PTY_RLE_EADDR (both truncated first):
+C_S_ECI_PTY_RLE_EADDR (both insert only, never truncated):
   -> fil_deactivated_status: party not in STG_ECI_PTY_INACTIVE_STS
   -> rtr_Phone_Email
        Email_Group (PHONE_EMAIL_TYPE = 'EADDRESS') -> rule_email_validation_v01 -> rtr_Valid_EAddr_Records
@@ -159,9 +159,9 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_ECI_PTY_RLE_PHN` | truncate, insert |
-| `C_S_ECI_PTY_RLE_EADDR` | truncate, insert |
+| `C_S_ECI_PTY_RLE_PHN` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
+| `C_S_ECI_PTY_RLE_EADDR` | insert |
 
 Shared functions and procedures called:
 
@@ -169,7 +169,6 @@ Shared functions and procedures called:
 |---|---|
 | `fn_dq_std_phone` | replaces `rule_Phone_Std`, returns `t_dq_phone` |
 | `fn_dq_valid_email` | replaces `rule_email_validation_v01 (+ local part / domain)`, returns `t_dq_email` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

@@ -244,8 +244,8 @@ individuals plus the existing valid members, minus today's inactivations and ear
        Invalid_BirthDate                                           -> EXC_STG_BAD_REC_MEMB
        Valid_Party (first OR last name present)
          -> srtr_Dedup_Rec (distinct) -> fltr_Dups (TIMELINE, see below)
-            -> Sorter1 + Aggregator1 (one row per party key)      -> C_S_TRS_PTY        (truncated first)
-            -> Sorter  + Aggregator  (one row per role key)       -> C_S_TRS_PTY_RLE    (truncated first)
+            -> Sorter1 + Aggregator1 (one row per party key)      -> C_S_TRS_PTY        (insert only, never truncated)
+            -> Sorter  + Aggregator  (one row per role key)       -> C_S_TRS_PTY_RLE    (insert only, never truncated)
             -> lkp_Stg_TRS_Valid_Members + fltr_New_Valid_Members (key not yet valid)
                -> srtr_Pkey + agg_Valid_Members (one row per key)  -> STG_TRS_VALID_MEMBERS
             -> Fil_Race_Exceptions      (race code does not translate, configured) -> EXC_STG_BAD_REC_MEMB
@@ -285,9 +285,9 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TRS_PTY` | truncate, insert |
-| `C_S_TRS_PTY_RLE` | truncate, insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
+| `C_S_TRS_PTY` | insert |
+| `C_S_TRS_PTY_RLE` | insert |
 | `STG_TRS_VALID_MEMBERS` | insert |
 
 Shared functions and procedures called:
@@ -302,7 +302,6 @@ Shared functions and procedures called:
 | `fn_ors_helper04_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_DESC (any row) |
 | `fn_ors_helper05_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_TYPE (any row) |
 | `fn_ors_helper08_common` | EXC_LOOKUP_CODE_VALUE lookup: exception code -> EXCEPTION_CODE (the code when it is configured, else NULL) |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

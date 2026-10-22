@@ -157,7 +157,7 @@ Each FSS registration row (V_FSS_ETL_SRC, capture action not 'D') can give one e
           Bad_Phone_Records             -> EXC_STG_BAD_REC_MEMB ('Rejected Record')
           Bad_Phone_Ext__Records        -> EXC_STG_BAD_REC_MEMB ('Bad Value'); a row with a good phone and a bad
                                            extension is loaded AND logged
-Both C_S targets are truncated first.
+Both C_S targets are only inserted into; nothing is truncated.
 
 TIMELINE: VERSION_SEQ = '1' on both targets; PERIOD_START_DATE = DT_LAST_UPDATE.
 ```
@@ -166,9 +166,9 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_FSS_PTY_RLE_EADDR` | truncate, insert |
-| `C_S_FSS_PTY_RLE_PHN` | truncate, insert |
+| `C_S_FSS_PTY_RLE_EADDR` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
+| `C_S_FSS_PTY_RLE_PHN` | insert |
 
 Shared functions and procedures called:
 
@@ -177,7 +177,6 @@ Shared functions and procedures called:
 | `fn_dq_std_phone` | replaces `rule_Phone_Std`, returns `t_dq_phone` |
 | `fn_dq_std_phone_ext` | replaces `rule_Phone_Extension_Std`, returns `t_dq_phone_ext` |
 | `fn_dq_valid_email` | replaces `rule_email_validation_v01 (+ local part / domain)`, returns `t_dq_email` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

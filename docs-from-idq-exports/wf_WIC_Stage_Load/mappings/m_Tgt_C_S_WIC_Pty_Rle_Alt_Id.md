@@ -77,7 +77,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_WIC_Pty_Rle_Alt_Id`](../.
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_WIC_Pty_Rle_Alt_Id (workflow wf_WIC_Stage_Load).
 
-One alternate id per active WIC party into C_S_WIC_PTY_RLE_ALT_ID (truncated first): the WIC id padded to 12,
+One alternate id per active WIC party into C_S_WIC_PTY_RLE_ALT_ID (insert only, never truncated): the WIC id padded to 12,
 type '020' for SOURCE_TABLE 'CLIENT' and '021' otherwise.
   Read_V_WIC_ETL_SRC -> Filter: party not in STG_WIC_PTY_INACTIVE_STS -> target
 
@@ -89,13 +89,12 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_WIC_PTY_RLE_ALT_ID` | truncate, insert |
+| `C_S_WIC_PTY_RLE_ALT_ID` | insert |
 
 Shared functions and procedures called:
 
 | Object | Does |
 |---|---|
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

@@ -158,9 +158,9 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `STG_TTF_PTY_INACTIVE_STS` | delete, insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 | `STG_TTF_PTY_INACTIVE_LOG` | insert |
+| `STG_TTF_PTY_INACTIVE_STS` | insert |
 
 Shared functions and procedures called:
 
