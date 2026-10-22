@@ -21,6 +21,8 @@ public final class Fixtures {
     public static ReferenceSnapshot reference() {
         var ref = ReferenceSnapshot.empty()
                 .withCodeValue("TOA", "TRS", "A1", "100", "TOA 100")
+                .withCodeValue("TOA", "TRS", "C3", "0000000300X", "C3")
+                .withCodeValue("MEMBER_PRG", "TRS", "MA", "01", "MA")
                 .withCodeValue("PHN_USG_TP", "TRS", "001", "001", "Main")
                 .withCodeValue("ALT_ID_TP", "TRS", "002", "002", "Medicaid")
                 .withCodeValue("ALT_ID_TP", "TRS", "004", "004", "SSN")

@@ -18,6 +18,7 @@ see below
 | [`wf_WIC_Stage_Load`](wf_WIC_Stage_Load/README.md) | 5 |
 | [`wf_TRS_Stage_Load_1_Ongoing`](wf_TRS_Stage_Load_1_Ongoing/README.md) | 14 |
 | [`wf_CRE_Stage_Load_Ongoing`](wf_CRE_Stage_Load_Ongoing/README.md) | 1 |
+| [`wf_TRS_Stage_Load_TOA`](wf_TRS_Stage_Load_TOA/README.md) | 1 |
 
 ## Shared functions
 

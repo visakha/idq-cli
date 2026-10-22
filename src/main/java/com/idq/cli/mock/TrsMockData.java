@@ -18,6 +18,7 @@ import com.idq.cli.source.trs.etldb.models.TrsSources.DcPrimaryPayeeDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.DcRelationshipsDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.InManagedCareDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.IndvAddrDelta;
+import com.idq.cli.source.trs.etldb.models.TrsSources.LuToaDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.UniqueAddressDelta;
 import com.idq.cli.source.trs.etldb.models.TrsSources.ValidMember;
 import java.math.BigDecimal;
@@ -352,6 +353,35 @@ public class TrsMockData {
                         .build());
             }
         }
+    }
+
+    /// The TOA catalogue (`wf_TRS_Stage_Load_TOA`): `C3` under two programs and with an older history row (one row
+    /// survives), `A1` whose label differs from the code (no key, as in `docs/common_insights.md` 1.21) and the
+    /// unknown `ZZ`. Rows are marked in `CREATE_USER_ID`.
+    public void fill_sample_mock_data_m_Tgt_C_S_TRS_Stg_TOA() {
+        tables.skipIfMarked("STG_TRS_D_LU_TOA", "CREATE_USER_ID");
+        toaType("MA", "C3", "Medicaid TOA 300", 1, pastDate(2));
+        toaType("MA", "C3", "Medicaid TOA 300 (revised)", 2, pastDate(1));
+        toaType("CH", "C3", "CHIP TOA 300", 3, pastDate(1).minusDays(1));
+        toaType("MA", "A1", "Medicaid TOA 100", 4, pastDate(1));
+        toaType("MA", "ZZ", "Unknown TOA", 5, pastDate(1));
+    }
+
+    private void toaType(String program, String toa, String description, long transId, LocalDateTime updated) {
+        tables.insert(LuToaDelta.builder()
+                .programCode(program)
+                .toaCode(toa)
+                .toaDesc(description)
+                .displayOrderNum(num(transId))
+                .effBeginDt(pastDate(5))
+                .historySeq(num(transId))
+                .uniqueTransId(num(transId))
+                .histNavInd("C")
+                .createUserId(MockTables.MARKER)
+                .createDt(pastDate(5))
+                .updateUserId("TIERSUSR")
+                .updateDt(updated)
+                .build());
     }
 
     public void fill_sample_mock_data_m_Tgt_C_S_TRS_Addr_1() {

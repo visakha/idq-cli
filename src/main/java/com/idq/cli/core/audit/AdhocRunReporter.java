@@ -166,7 +166,7 @@ public class AdhocRunReporter {
         md.append("# ").append(table).append(" - ").append(run.source()).append(" adhoc run (")
                 .append(engineLabel(run.engine())).append(")\n\n")
                 .append("| item | value |\n| --- | --- |\n")
-                .append("| source system | ").append(run.source()).append(" (").append(run.source().workflow)
+                .append("| source system | ").append(run.source()).append(" (").append(run.source().workflowNames())
                 .append(") |\n")
                 .append("| etl_process | ").append(run.engine()).append(" |\n")
                 .append("| run started | ").append(run.started().format(RUN_TIME)).append(" |\n")

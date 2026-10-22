@@ -69,6 +69,7 @@ Expected counts for the current exports:
 | `wf_TTF_Stage_Load` | 4 | 10 |
 | `wf_WIC_Stage_Load` | 5 | 14 |
 | `wf_CRE_Stage_Load_Ongoing` | 1 | 12 |
+| `wf_TRS_Stage_Load_TOA` | 1 | 0 |
 
 The output is deterministic: running the script twice on the same export produces identical files, so the
 output folder can be committed and diffs show real changes only.

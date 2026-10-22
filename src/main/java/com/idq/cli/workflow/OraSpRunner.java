@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 /// Calls the Oracle stored procedures that replace the IDQ mappings (`etl_process=ORA_SP`).
 ///
-/// The procedures and their order come from the workflow's run script,
+/// The procedures and their order come from the run script of each workflow of the source,
 /// `<idq.ora-sp.dir>/<workflow>/run_<workflow>.sql` (its `EXEC sp_ors_main_<mapping>` lines, in taskflow order). Each
 /// procedure commits on success and rolls back and re-raises on error. With `mock_ora_sp=true` nothing is called; the `EXEC` that would run is reported instead.
 @Component
@@ -43,15 +43,19 @@ public class OraSpRunner implements StoredProcedureRunner {
         return EtlProcess.ORA_SP;
     }
 
-    /// `<idq.ora-sp.dir>/<workflow>/run_<workflow>.sql`
-    public Path script(SourceSystem source) {
-        return settings.oraSpDir().resolve(source.workflow).resolve("run_" + source.workflow + ".sql");
+    /// `<idq.ora-sp.dir>/<workflow>/run_<workflow>.sql`, one per workflow, in run order.
+    public List<Path> scripts(SourceSystem source) {
+        return source.workflows.stream().map(wf -> settings.oraSpDir().resolve(wf).resolve("run_" + wf + ".sql"))
+                .toList();
     }
 
-    /// Procedure names of the source's run script, in the order the script executes them.
+    /// Procedure names of the source's run scripts, in the order the scripts execute them.
     @Override
     public List<String> procedures(SourceSystem source) {
-        var script = script(source);
+        return scripts(source).stream().flatMap(script -> procedures(script).stream()).toList();
+    }
+
+    private static List<String> procedures(Path script) {
         try {
             return Files.readAllLines(script, StandardCharsets.UTF_8).stream()
                     .map(line -> EXEC.matcher(line.strip()))

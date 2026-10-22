@@ -56,8 +56,10 @@ class SnowflakeSpRunnerTest {
     void everyCalledProcedureHasItsFileAndIsInstalled(SourceSystem source) throws IOException {
         var install = Files.readString(Path.of("idq-to-snowflake", "install.sql"));
         for (var procedure : runner(true).procedures(source)) {
-            var file = source.workflow + "/" + procedure + ".sql";
-            assertThat(Path.of("idq-to-snowflake", file)).exists();
+            var workflow = source.workflows.stream()
+                    .filter(wf -> Files.exists(Path.of("idq-to-snowflake", wf, procedure + ".sql"))).findFirst();
+            assertThat(workflow).as("workflow folder of %s", procedure).isPresent();
+            var file = workflow.get() + "/" + procedure + ".sql";
             assertThat(install).contains("!source " + file);
             assertThat(Files.readString(Path.of("idq-to-snowflake", file)))
                     .containsPattern(Pattern.compile("CREATE OR REPLACE PROCEDURE " + procedure + "\\s*\\("));

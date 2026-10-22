@@ -22,9 +22,11 @@ import com.idq.cli.mdmdc.etldb.repo.TrsPhoneRepository;
 import com.idq.cli.mdmdc.etldb.repo.TrsPlanRepository;
 import com.idq.cli.mdmdc.etldb.repo.TrsProviderRelationshipRepository;
 import com.idq.cli.mdmdc.etldb.repo.TrsRelationshipRepository;
+import com.idq.cli.mdmdc.etldb.repo.TrsTypeOfAssistanceCatalogueRepository;
 import com.idq.cli.mdmdc.etldb.repo.TrsTypeOfAssistanceRepository;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AddressAssignment;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AssistanceSegment;
+import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AssistanceType;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AuthorizedRepresentative;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.CaseContact;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.DistinctAddress;
@@ -45,6 +47,7 @@ import com.idq.cli.source.trs.etldb.repo.TrsDcPrimaryPayeeDeltaRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsDcRelationshipsDeltaRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsInManagedCareDeltaRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsIndvAddrDeltaRepository;
+import com.idq.cli.source.trs.etldb.repo.TrsLuToaDeltaRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsPartyRoleAltIdRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsUniqueAddressDeltaRepository;
 import com.idq.cli.source.trs.etldb.repo.TrsValidMemberRepository;
@@ -111,6 +114,11 @@ class TrsPkeyTest {
     static TrsTypeOfAssistanceService typeOfAssistance() {
         return new TrsTypeOfAssistanceService(stub(TrsCvMciEdgIndvToaDeltaRepository.class),
                 stub(TrsTypeOfAssistanceRepository.class), stub(BadRecordRepository.class), null);
+    }
+
+    static TrsTypeOfAssistanceCatalogueService typeOfAssistanceCatalogue() {
+        return new TrsTypeOfAssistanceCatalogueService(stub(TrsLuToaDeltaRepository.class),
+                stub(TrsTypeOfAssistanceCatalogueRepository.class));
     }
 
     static TrsUniqueAddressService uniqueAddress() {
@@ -206,6 +214,22 @@ class TrsPkeyTest {
         var out = typeOfAssistance().transform(List.of(row), NoLookups.NONE, ctx(TrsTypeOfAssistanceService.INFO));
 
         assertThat(keys(out.rows(TrsTargets.TypeOfAssistance.class))).containsExactly("123|Member|100|TIERS|77|MA|3");
+    }
+
+    /// Key = the TOA master code matched by label, cut to 10; one row per key (latest change); `A1`, whose label
+    /// differs from the code, has no key and is not loaded.
+    @Test
+    void m_Tgt_C_S_TRS_Stg_TOA_pkey_test() {
+        var older = new AssistanceType("MA", "C3", "old", DAY, null, DAY, "U1", DAY.minusDays(1), null);
+        var latest = new AssistanceType("CH", "C3", "new", DAY, null, DAY, "U1", DAY, null);
+        var byCode = new AssistanceType("MA", "A1", "TOA 100", DAY, null, DAY, "U1", DAY, null);
+        var out = typeOfAssistanceCatalogue().transform(List.of(older, latest, byCode), NoLookups.NONE,
+                ctx(TrsTypeOfAssistanceCatalogueService.INFO));
+
+        var rows = out.rows(TrsTargets.TypeOfAssistanceCatalogue.class);
+        assertThat(rows).extracting(TrsTargets.TypeOfAssistanceCatalogue::pkeySrcObject).containsExactly("0000000300");
+        assertThat(rows.getFirst().toaDesc()).isEqualTo("new");
+        assertThat(rows.getFirst().mbrPrgCd()).isNull();
     }
 
     @Test

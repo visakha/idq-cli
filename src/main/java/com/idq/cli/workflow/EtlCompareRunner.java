@@ -120,7 +120,7 @@ public class EtlCompareRunner {
 
         public List<String> summary() {
             var lines = new ArrayList<String>();
-            lines.add("ORA_SP vs IDQ for %s (%s): %s".formatted(source, source.workflow,
+            lines.add("ORA_SP vs IDQ for %s (%s): %s".formatted(source, source.workflowNames(),
                     same() ? "target tables MATCH" : "target tables DIFFER"));
             warnings.forEach(w -> lines.add("WARNING: " + w));
             targets.forEach(t -> lines.add("  %-28s %s ORA_SP=%d IDQ=%d matched=%d onlyORA_SP=%d onlyIDQ=%d changed=%d%s"
@@ -380,7 +380,8 @@ public class EtlCompareRunner {
 
     private String markdown(Comparison c) {
         var md = new StringBuilder();
-        md.append("# ORA_SP vs IDQ - ").append(c.source()).append(" (").append(c.source().workflow).append(")\n\n");
+        md.append("# ORA_SP vs IDQ - ").append(c.source()).append(" (").append(c.source().workflowNames())
+                .append(")\n\n");
         md.append("| | |\n|---|---|\n");
         md.append("| Started | ").append(c.started().format(TIMESTAMP)).append(" |\n");
         md.append("| Result | **").append(c.same() ? "target tables MATCH" : "target tables DIFFER").append("** |\n");

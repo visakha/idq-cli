@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 /// Calls the Snowflake stored procedures that replace the IDQ mappings (`etl_process=SNOWFLAKE_SP`).
 ///
-/// The procedures and their order come from the workflow's run script,
+/// The procedures and their order come from the run script of each workflow of the source,
 /// `<idq.snowflake-sp.dir>/<workflow>/run_<workflow>.sql` (its `CALL sp_snow_main_<mapping>();` lines, in taskflow
 /// order). Each procedure is one transaction: it commits on success and rolls back and re-raises on error, and it
 /// returns its run log, which becomes the result message. With `mock_snowflake_sp=true` nothing is called; the `CALL`
@@ -51,15 +51,19 @@ public class SnowflakeSpRunner implements StoredProcedureRunner {
         return EtlProcess.SNOWFLAKE_SP;
     }
 
-    /// `<idq.snowflake-sp.dir>/<workflow>/run_<workflow>.sql`
-    public Path script(SourceSystem source) {
-        return settings.snowflakeSpDir().resolve(source.workflow).resolve("run_" + source.workflow + ".sql");
+    /// `<idq.snowflake-sp.dir>/<workflow>/run_<workflow>.sql`, one per workflow, in run order.
+    public List<Path> scripts(SourceSystem source) {
+        return source.workflows.stream().map(wf -> settings.snowflakeSpDir().resolve(wf).resolve("run_" + wf + ".sql"))
+                .toList();
     }
 
-    /// Procedure names of the source's run script, in the order the script calls them.
+    /// Procedure names of the source's run scripts, in the order the scripts call them.
     @Override
     public List<String> procedures(SourceSystem source) {
-        var script = script(source);
+        return scripts(source).stream().flatMap(script -> procedures(script).stream()).toList();
+    }
+
+    private static List<String> procedures(Path script) {
         try {
             return Files.readAllLines(script, StandardCharsets.UTF_8).stream()
                     .map(line -> CALL.matcher(line.strip()))

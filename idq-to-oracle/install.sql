@@ -63,6 +63,9 @@ SET DEFINE OFF
 -- wf_CRE_Stage_Load_Ongoing
 @@wf_CRE_Stage_Load_Ongoing/sp_ors_main_m_Tgt_C_S_CRE_CARE_Clients.sql
 
+-- wf_TRS_Stage_Load_TOA (TRS, run after wf_TRS_Stage_Load_1_Ongoing)
+@@wf_TRS_Stage_Load_TOA/sp_ors_main_m_Tgt_C_S_TRS_Stg_TOA.sql
+
 SHOW ERRORS
 SELECT object_type, object_name, status FROM user_objects
  WHERE (object_name LIKE 'SP\_ORS\_%' ESCAPE '\' OR object_name LIKE 'FN\_ORS\_%' ESCAPE '\'

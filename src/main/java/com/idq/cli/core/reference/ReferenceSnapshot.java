@@ -12,6 +12,7 @@ public final class ReferenceSnapshot implements ReferenceData {
 
     private final Map<String, CodeValue> codeValues = new HashMap<>();
     private final Map<String, CodeValue> codeValuesByMaster = new HashMap<>();
+    private final Map<String, CodeValue> codeValuesByLabel = new HashMap<>();
     private final Map<String, String> masterCodes = new HashMap<>();
     private final Map<String, ExceptionInfo> exceptions = new HashMap<>();
     private final Map<String, AreaCode> areaCodes = new HashMap<>();
@@ -29,6 +30,7 @@ public final class ReferenceSnapshot implements ReferenceData {
         codeValues.putIfAbsent(key(codeType, srcSys, srcValue), value);
         codeValues.putIfAbsent(key(null, srcSys, srcValue), value);
         codeValuesByMaster.putIfAbsent(key(codeType, srcSys, mstrCode), value);
+        codeValuesByLabel.putIfAbsent(key(codeType, null, mstrLabel), value);
         return this;
     }
 
@@ -71,6 +73,11 @@ public final class ReferenceSnapshot implements ReferenceData {
     @Override
     public Optional<CodeValue> codeValueByMaster(String codeType, String srcSys, String mstrRefCode) {
         return Optional.ofNullable(codeValuesByMaster.get(key(codeType, srcSys, mstrRefCode)));
+    }
+
+    @Override
+    public Optional<CodeValue> codeValueByLabel(String codeType, String mstrRefLabel) {
+        return Optional.ofNullable(codeValuesByLabel.get(key(codeType, null, mstrRefLabel)));
     }
 
     @Override

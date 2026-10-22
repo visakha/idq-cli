@@ -19,8 +19,11 @@ Working from another machine (Azure VM, GitHub `@claude`): see getting-started-z
 
 ## Conventions
 - STG _D_ / _H_ tables map to `<Name>Delta` / `<Name>Hist` records.
-- 6 sources (TRS, ECI, FSS, TTF, WIC, CRE), 34 in-scope mappings. CRE is the 6th: one mapping
+- 6 sources (TRS, ECI, FSS, TTF, WIC, CRE), 35 in-scope mappings. CRE is the 6th: one mapping
   (m_Tgt_C_S_CRE_CARE_Clients, 034) loads every C_S_CRE_* target plus CRE_SRC_MRG; no validation mapping.
+- TRS has two workflows (SourceSystem.workflows): wf_TRS_Stage_Load_1_Ongoing (001-012), then
+  wf_TRS_Stage_Load_TOA (035, m_Tgt_C_S_TRS_Stg_TOA: TOA catalogue STG_TRS_D_LU_TOA -> C_S_LU_TOA, reference data,
+  not members; member TOA is 008). Every engine runs both, in that order, as the daily parent workflow does.
 - etl_process engines: JAVA, IDQ, ORA_SP (idq-to-oracle, sp_ors_main_<mapping>, fn_dq_* assumed to exist) and
   SNOWFLAKE_SP (idq-to-snowflake, sp_snow_main_<mapping>; nothing assumed: mapplets/rules are fn_snow_helperNN_common,
   mapping-only helpers fn_snow_helperNN_<mapping>). Each engine has run_<workflow>.sql scripts the CLI reads.

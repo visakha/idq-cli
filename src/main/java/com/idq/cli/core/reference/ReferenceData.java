@@ -13,6 +13,10 @@ public interface ReferenceData {
     /// `LOOKUP_CODE_VALUE` matched on `CODE_TYPE`, `SRC_SYS`, `MSTR_REF_CODE` (used for label lookups).
     Optional<CodeValue> codeValueByMaster(String codeType, String srcSys, String mstrRefCode);
 
+    /// `LOOKUP_CODE_VALUE` matched on `CODE_TYPE` and `MSTR_REF_LABEL`, any source system (the TOA catalogue,
+    /// `m_Tgt_C_S_TRS_Stg_TOA`, translates TIERS codes by label).
+    Optional<CodeValue> codeValueByLabel(String codeType, String mstrRefLabel);
+
     /// `V_LOOKUP_CODE_VALUE.MSTR_CODE_VALUE` matched on `CODE_TYPE`, `SRC_SYS`, `SRC_CODE_VALUE`;
     /// a `null` code type matches any type (as in `rule_Suffix_Std`, which has no type filter).
     Optional<String> masterCode(String codeType, String srcSys, String srcCodeValue);

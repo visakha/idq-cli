@@ -135,7 +135,7 @@ public class IdqShellCommands {
     public String runEtl() {
         return attempt(() -> {
             var run = console.runEtl();
-            return "Workflow %s (%s)%n%s".formatted(run.source().workflow, run.engine(),
+            return "Workflow %s (%s)%n%s".formatted(run.source().workflowNames(), run.engine(),
                     String.join("\n", run.output()));
         });
     }
@@ -162,7 +162,8 @@ public class IdqShellCommands {
         out.println("Source systems:");
         var values = SourceSystem.values();
         for (int i = 0; i < values.length; i++) {
-            out.println("  %d) %-4s %s (%s)".formatted(i + 1, values[i], values[i].workflow, values[i].description));
+            out.println("  %d) %-4s %s (%s)".formatted(i + 1, values[i], values[i].workflowNames(),
+                    values[i].description));
         }
         out.flush();
         var prompt = "Choose a source system [1-%d]%s: ".formatted(values.length,

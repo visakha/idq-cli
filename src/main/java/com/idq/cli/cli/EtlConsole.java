@@ -92,8 +92,8 @@ public class EtlConsole {
             List<String> targetTables) {}
 
     public List<SourceView> sources() {
-        return java.util.Arrays.stream(SourceSystem.values()).map(s -> new SourceView(s, s.workflow, s.description,
-                s.sourceTables, catalog.targetTables(s))).toList();
+        return java.util.Arrays.stream(SourceSystem.values()).map(s -> new SourceView(s, s.workflowNames(),
+                s.description, s.sourceTables, catalog.targetTables(s))).toList();
     }
 
     public String latchSource(String name) {

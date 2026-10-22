@@ -13,12 +13,15 @@ import org.springframework.stereotype.Component;
 ///
 /// | source | order (documentation numbers)                                                     |
 /// |--------|------------------------------------------------------------------------------------|
-/// | TRS    | 001, 007, 002, 003, 004, 005, 006, 008, 009, 010, 011, 012                         |
+/// | TRS    | 001, 007, 002, 003, 004, 005, 006, 008, 009, 010, 011, 012, then 035 (TOA workflow)  |
 /// | ECI    | 013 validation, 014 party, then 015-018                                            |
 /// | FSS    | 019 validation, 020 party, then 021-024                                            |
 /// | TTF    | 025 validation, 026 party, then 027-028                                            |
 /// | WIC    | 029 validation, 030 party, then 031-033                                            |
 /// | CRE    | 034 (one mapping loads every CRE target)                                           |
+///
+/// TRS 035 is the only mapping of the second TRS workflow, `wf_TRS_Stage_Load_TOA`, which the daily parent workflow
+/// runs after `wf_TRS_Stage_Load_1_Ongoing`.
 ///
 /// TRS runs the switches (007) before the authorized-representative flags (002) because 007 empties
 /// `C_S_TRS_PTY_MNG_ATTR` and 002 only replaces its own attribute type.
@@ -26,7 +29,7 @@ import org.springframework.stereotype.Component;
 public class MappingCatalog {
 
     static final List<String> TRS_ORDER = List.of("001", "007", "002", "003", "004", "005", "006", "008", "009",
-            "010", "011", "012");
+            "010", "011", "012", "035");
 
     private final List<MemberMapping<?, ?>> mappings;
 

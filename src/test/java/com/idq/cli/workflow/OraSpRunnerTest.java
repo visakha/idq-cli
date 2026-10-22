@@ -33,6 +33,13 @@ class OraSpRunnerTest {
                 "sp_ors_main_m_Tgt_C_S_ECI_Pty_Rle_Rel");
     }
 
+    /// TRS runs its second workflow, `wf_TRS_Stage_Load_TOA`, after the Ongoing one.
+    @Test
+    void trsRunsTheToaWorkflowLast() {
+        var procedures = runner(true).procedures(SourceSystem.TRS);
+        assertThat(procedures).hasSize(15).last().isEqualTo("sp_ors_main_m_Tgt_C_S_TRS_Stg_TOA");
+    }
+
     @ParameterizedTest
     @EnumSource(SourceSystem.class)
     void everySourceHasARunScript(SourceSystem source) {

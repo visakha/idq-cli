@@ -49,6 +49,8 @@ Unless the entry says otherwise, every port keeps the behaviour as IDQ runs it, 
 | 1.18 | `m_Tgt_C_S_CRE_CARE_Clients` | `FLTR_CRE_MRG` keeps the case moves whose source and target records have **no** merge history, including moves whose CARE ids have no `C_B_PTY_XREF` row at all. The move target row (`REC_TYPE 'A'`) goes through the same lookups when the snapshot gives it a `MAINT_FLAG`. | `CRE_SRC_MRG` gets rows with both `ROWID_OBJECT`s NULL, and the same move can be written twice in one run. |
 | 1.19 | `m_Tgt_C_S_CRE_CARE_Clients` | For an unmerged move the `CARE ID` alternate id is built from `MRG_CARE_ID` = the **target** CARE id, but its key and role are the **source** member's (`<source>|Member|<type>|<target id>`). The exception rows of the Medicaid id and SSN carry the target id as `SRC_SYS_ID_1`. | The moved-away member is published with the target's CARE id. The source and target of one move can log the same Medicaid / SSN exception under the same key (see 12.7). |
 | 1.20 | `m_Tgt_C_S_CRE_CARE_Clients` | `RTR_VALID_ADDRESS` keeps an address when `(TO_INTEGER(MailabilityScore) >= 3 OR NOT IN(SUBSTR(MatchCode,1,1),'I','N')) AND` a state FIPS. Without a score and a match code both tests are NULL. The other address mappings test the opposite way (a missing score is good). | A US address that AddressDoctor returns without score and match code is an exception in CRE but loaded elsewhere. With the pass-through validator of the Java, Oracle-contract and Snowflake ports, **every US CRE address is an exception**; only addresses abroad are loaded. |
+| 1.21 | `m_Tgt_C_S_TRS_Stg_TOA` (`wf_TRS_Stage_Load_TOA`) | The TOA catalogue translates a TIERS TOA code by **master label** (`MSTR_REF_LABEL = TOA_CODE`, no `SRC_SYS` filter). Mapping `m_Tgt_C_S_TRS_Pty_Rle_TOA` translates the same codes by **source value** (`SRC_SYS = 'TRS' AND SRC_CODE_VALUE = ...`). | Wherever label and source value differ, the catalogue key (`C_S_LU_TOA.PKEY_SRC_OBJECT`) and the member's `C_S_TRS_PTY_RLE_TOA.TOA_FK` do not match, or the catalogue row is not loaded at all. Compare the two columns of `LOOKUP_CODE_VALUE` for `CODE_TYPE = 'TOA'`. |
+| 1.22 | `m_Tgt_C_S_TRS_Stg_TOA` | The key of `C_S_LU_TOA` is the TOA master code only; `PROGRAM_CODE` and the history rows (`HISTORY_SEQ`, `HIST_NAV_IND`) of `STG_TRS_D_LU_TOA` are not part of it, and every row is read (no history or end-date filter, no `ORDER BY`). | The unique index keeps the **first row read** per TOA code and Oracle rejects the rest: for a code under several programs, `MBR_PRG_CD` and `TOA_DESC` are whichever row came first. An untranslated code (NULL key) is rejected too; there is no exception row for either case. |
 
 ## 2. Rows that are loaded and logged as exceptions
 
@@ -132,6 +134,9 @@ NULL. The ones that matter most:
   `SRC_SYS_ID_2` of TTF phone exceptions (from the unfed `ID_PHONE`).
 - **`SRC_STATE`** of WIC addresses: `'TX'` is passed to the validator, but the source-state port is unfed.
 - `CREATE_DATE` of `C_S_TRS_PTY_RLE_REL_PROV`, `SRC_COUNTY` of `STG_TRS_D_UNQ_ADDR`.
+- `C_S_LU_TOA` (`m_Tgt_C_S_TRS_Stg_TOA`): `ROWID_OBJECT` is computed (the key without leading zeros) but not
+  linked; `PERIOD_START_DATE` / `PERIOD_END_DATE` are not linked (only `EFF_STRT_DT` / `EFF_END_DT` are), and the
+  source `CREATE_USER_ID`, `DISPLAY_ORDER_NUM` and `HIST_NAV_IND` are read and dropped.
 - The audit columns `ROWID_OBJECT`, `DELETED_*`, `UPDATED_BY`, `CREATOR`, `CREATE_DATE` everywhere. These are
   expected, because the MDM fills them.
 
@@ -196,6 +201,15 @@ A re-implementation that misses these gives different results:
   decision date is lost. Unbound workflow variables keep their initial value: Complete's gate
   `$var:MappingIsSuccessful = true` is always true. Initial's "no data" gate (`TgtRows = 0`) cannot tell an
   empty copy from a failed one, so a failed run still writes the `.ind` file.
+- **TRS runs two stage workflows.** A parent workflow runs `wf_TRS_Stage_Load_1_Ongoing` and then
+  `wf_TRS_Stage_Load_TOA` every day. The second has one mapping, `m_Tgt_C_S_TRS_Stg_TOA`, which reloads the
+  TIERS **catalogue** of types of assistance (`STG_TRS_D_LU_TOA` into the MDM lookup staging table `C_S_LU_TOA`).
+  It is not member data: the TOA a member receives is `m_Tgt_C_S_TRS_Pty_Rle_TOA` in the Ongoing workflow, whose
+  `TOA_FK` holds the catalogue key. The TOA workflow uses nothing the Ongoing one writes (no
+  `STG_TRS_VALID_MEMBERS`), so their order does not change the IDQ output; it may matter to the MDM load
+  (a new TOA code reaches the member table before the catalogue). It is the only stage workflow **without a
+  command task**, so it writes no `.ind` file. Like the other `C_S_*` targets, `C_S_LU_TOA` is truncated and
+  reloaded from whatever the `_D_` table holds that day. See `docs/mappings/035_m_Tgt_C_S_TRS_Stg_TOA.md`.
 - FSS and WIC use a **constant address type `'002'`** (physical mail), so their address score depends only on the
   mailability score and the match code. ECI and TRS look the type up, and an untranslatable type scores `'40'`.
 

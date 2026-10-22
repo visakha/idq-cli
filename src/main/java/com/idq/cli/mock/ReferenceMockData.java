@@ -64,6 +64,10 @@ public class ReferenceMockData {
         tables.skipIfMarked("LOOKUP_CODE_VALUE", "CREATED_BY");
         codeValue("TOA", "TRS", "A1", "100", "Medicaid TOA 100");
         codeValue("TOA", "TRS", "B2", "200", "Medicaid TOA 200");
+        // the TOA catalogue (035) translates by label: here the label is the TIERS code
+        codeValue("TOA", "TRS", "C3", "300", "C3");
+        codeValue("MEMBER_PRG", "TRS", "MA", "01", "MA");
+        codeValue("MEMBER_PRG", "TRS", "CH", "02", "CH");
         for (var usage : List.of("001", "002", "003")) {
             codeValue("PHN_USG_TP", "TRS", usage, usage, "Usage " + usage);
         }

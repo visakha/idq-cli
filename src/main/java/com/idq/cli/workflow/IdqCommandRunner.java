@@ -23,17 +23,30 @@ public class IdqCommandRunner {
 
     public record Outcome(int exitCode, List<String> output) {}
 
+    /// Starts every workflow of the source in order (TRS: Ongoing, then TOA) and stops at the first that fails.
     public Outcome startWorkflow(SourceSystem source) {
+        var output = new ArrayList<String>();
+        for (var workflow : source.workflows) {
+            var outcome = startWorkflow(workflow);
+            output.addAll(outcome.output());
+            if (outcome.exitCode() != 0) {
+                return new Outcome(outcome.exitCode(), List.copyOf(output));
+            }
+        }
+        return new Outcome(0, List.copyOf(output));
+    }
+
+    private Outcome startWorkflow(String workflow) {
         var infacmd = settings.infacmd();
         if (settings.mockInfacmd()) {
             return new Outcome(0, List.of(
                     "[mock] infacmd.bat wfs startWorkflow -dn %s -sn %s -a %s -wf %s".formatted(infacmd.domain(),
-                            infacmd.service(), infacmd.application(), source.workflow),
-                    "[mock] Workflow %s started.".formatted(source.workflow),
+                            infacmd.service(), infacmd.application(), workflow),
+                    "[mock] Workflow %s started.".formatted(workflow),
                     "[mock] infacmd.bat wfs getWorkflowStatus ... status: COMPLETED",
-                    "[mock] Workflow %s completed successfully.".formatted(source.workflow)));
+                    "[mock] Workflow %s completed successfully.".formatted(workflow)));
         }
-        var command = new ArrayList<>(List.of("cmd.exe", "/c", infacmd.script(), source.workflow));
+        var command = new ArrayList<>(List.of("cmd.exe", "/c", infacmd.script(), workflow));
         try {
             var process = new ProcessBuilder(command).redirectErrorStream(true).start();
             var output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).lines().toList();
