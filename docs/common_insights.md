@@ -1,6 +1,6 @@
 # Common insights: how the IDQ stage loads really behave
 
-These are the surprises found while reading the five IDQ workflow exports (`docs/wf_*.xml`) line by line: once for
+These are the surprises found while reading the six IDQ workflow exports (`docs/wf_*.xml`) line by line: once for
 the Java port (`docs/mappings`), once for the IDMC specs (`idmc/`), once for the Oracle procedures
 (`idq-to-oracle/`) and once for the Snowflake procedures (`idq-to-snowflake/`, which also write out the mapplets). Each one is something a reader of the mapping names, descriptions or diagrams would probably get
 wrong.
@@ -45,6 +45,10 @@ Unless the entry says otherwise, every port keeps the behaviour as IDQ runs it, 
 | 1.14 | `m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr` | Unlike FSS and TTF, there is no null-phone filter before `rule_Phone_Std`. | A WIC party with no phone is validated and, when the rule flags it, logged as a phone exception. |
 | 1.15 | `mplt_Date_Greater_Than_Fifty_Years` (`m_Tgt_C_S_TRS_Addr_2`) | `out_Date_Diff = DATE_DIFF(Input_Date, SYSDATE, 'YY')` is a **string(10)** port, and `out_Date` tests `out_Date_Diff > '50'`, a **text** comparison. | Besides end dates more than 50 years ahead, end dates **6 to 10 years ahead** become NULL (`'6.2' > '50'` as text), and dates 100+ years ahead are kept (`'100' < '50'`). A TRS address ending in 7 years is loaded as open-ended. The Snowflake port reproduces it (`fn_snow_helper21_common`); confirm on IDQ, then decide whether to fix. |
 | 1.16 | `mplt_Member_Pty_Rle_Phn_Normalization` (`m_Tgt_C_S_TRS_Pty_Rle_Phn_And_EAddr`) | The three `rule_Phone_Std` instances get only `Phone`; their `SRC_SYS` and `USG_TP` inputs are not linked. | The rule's own "TRS / CRE / ECI main and other numbers may not be toll-free" check never runs for TRS phones, the one source it was written for. |
+| 1.17 | `m_Tgt_C_S_CRE_CARE_Clients` | `rule_Phone_Std` gets only `Phone` here too (`SRC_SYS` and `USG_TP` not linked). | The toll-free check never runs for CRE either: of the three sources it names, only ECI uses it. |
+| 1.18 | `m_Tgt_C_S_CRE_CARE_Clients` | `FLTR_CRE_MRG` keeps the case moves whose source and target records have **no** merge history, including moves whose CARE ids have no `C_B_PTY_XREF` row at all. The move target row (`REC_TYPE 'A'`) goes through the same lookups when the snapshot gives it a `MAINT_FLAG`. | `CRE_SRC_MRG` gets rows with both `ROWID_OBJECT`s NULL, and the same move can be written twice in one run. |
+| 1.19 | `m_Tgt_C_S_CRE_CARE_Clients` | For an unmerged move the `CARE ID` alternate id is built from `MRG_CARE_ID` = the **target** CARE id, but its key and role are the **source** member's (`<source>|Member|<type>|<target id>`). The exception rows of the Medicaid id and SSN carry the target id as `SRC_SYS_ID_1`. | The moved-away member is published with the target's CARE id. The source and target of one move can log the same Medicaid / SSN exception under the same key (see 12.7). |
+| 1.20 | `m_Tgt_C_S_CRE_CARE_Clients` | `RTR_VALID_ADDRESS` keeps an address when `(TO_INTEGER(MailabilityScore) >= 3 OR NOT IN(SUBSTR(MatchCode,1,1),'I','N')) AND` a state FIPS. Without a score and a match code both tests are NULL. The other address mappings test the opposite way (a missing score is good). | A US address that AddressDoctor returns without score and match code is an exception in CRE but loaded elsewhere. With the pass-through validator of the Java, Oracle-contract and Snowflake ports, **every US CRE address is an exception**; only addresses abroad are loaded. |
 
 ## 2. Rows that are loaded and logged as exceptions
 
@@ -82,6 +86,11 @@ looked-up code treat an unconfigured exception as *no exception*.
 | `m_Tgt_C_S_TRS_Addr_2` | `Invalid_Address` | `EXCEPTION_CODE` NULL |
 | `m_Tgt_C_S_TRS_Pty_OnGoing` | `Invalid_Death_Date`, `Invalid_Gender`, race, ethnicity | **No exception row at all**: the router only fires when the code is configured |
 
+| `m_Tgt_C_S_CRE_CARE_Clients` | `Missing_First_Name`, `Missing_Last_Name` | **No exception row**, and the member is still dropped: it silently disappears |
+| `m_Tgt_C_S_CRE_CARE_Clients` | `Invalid_Phone_Number`, `Invalid_SSN` | **The phone / SSN is treated as valid and loaded** |
+| `m_Tgt_C_S_CRE_CARE_Clients` | `Invalid_Address` | Row written with `EXCEPTION_CODE` NULL (the hard-coded type and description of the mapping, which are swapped, are not written) |
+| `m_Tgt_C_S_CRE_CARE_Clients` | `Invalid_Gender`, `Invalid_Ethnicity`, `Invalid_Race` | No exception row. (`Invalid_Suffix` and `Invalid_Medicaid_Id` write the computed code.) |
+
 Keep `EXC_LOOKUP_CODE_VALUE` complete. A missing row silently changes what is loaded and what is reported.
 
 The ECI, FSS and WIC address mappings do not look the description up. They hard-code
@@ -111,6 +120,9 @@ NULL. The ones that matter most:
 
 - **`FLR_NUM`** in the ECI, FSS and WIC address targets: the router port `Sub_buildingNumber` has no input link.
 - **`LCTN_CRDNT_DESC`**, `PSTL_BRCD`, `RGN_CD`, `CRDNT_SYS`, `USG_TP` in every address target.
+- **CRE** (`m_Tgt_C_S_CRE_CARE_Clients`): `HUB_STATE_IND`, `LOC_IDN` and `SRC_ADDR_LN_2` in every target,
+  `CREATE_DATE` of `C_S_CRE_PTY_RLE_ALT_ID`, and `MDL_NM` / `PRFX_NM` of `C_S_CRE_PTY`. `PKEY_SRC_OBJECT_ADDR` (the
+  validated address text) is computed but linked nowhere.
 - **`HUB_STATE_IND`** in most `C_S_*` targets. The exceptions are the TRS relationship targets, where the timeline
   mapplet sets 1 on the current open row. `m_Tgt_C_S_WIC_Pty_Rle_Alt_Id` does not link it at all, so it gets the
   column default.
@@ -170,6 +182,11 @@ A re-implementation that misses these gives different results:
 - **Every `C_S_*` target is truncated and fully reloaded each run**, except `C_S_TRS_PTY_MNG_ATTR` for the auth-rep
   mapping above. The `STG_*_PTY_INACTIVE_*`, `STG_TRS_VALID_MEMBERS` and `STG_ECI_D_*` reactivation targets are
   appended to, not truncated.
+- **CRE is one mapping.** `m_Tgt_C_S_CRE_CARE_Clients` loads all five `C_S_CRE_*` targets and `CRE_SRC_MRG` in one
+  pass. There is no validation mapping and no inactive-status table. Instead it reads the CARE case maintenance of the
+  day (`STG_CRE_D_CARE_CASE_MAINT`): deleted cases (`CASEDEL`) and the source of a case move (`CASEMOV`) are re-sent
+  from the snapshot (`STG_CRE_SN_CARE_CLIENTS`) as end-dated records, the move target is re-sent too, and moves MDM
+  has not merged yet go to `CRE_SRC_MRG` for MDM to merge.
 - **Every workflow ends with a command task** that touches `<workflow>.ind` on the DIS host, an indicator file for
   whatever runs next.
 - FSS and WIC use a **constant address type `'002'`** (physical mail), so their address score depends only on the
@@ -183,7 +200,12 @@ this estate. The Java port and the IDMC specs leave it out. The Oracle procedure
 
 - **Hard-coded `VERSION_SEQ = 1`** in almost every mapping. The rank or MD5 version comparison is commented out in
   IDQ, so the filters that keep version 1 (`fltr_Dups`, `fltr_Rank`) pass every row.
-- **It is real in three places:**
+- **It is real in four places:** the three below and `m_Tgt_C_S_CRE_CARE_Clients`. There `VERSION_SEQ_NUM` is a
+  running number per CARE id after a sort on `REC_TYPE` descending, and `VERSION_SEQ_NUM = 1` keeps one row per CARE
+  id (a delta row beats a deleted, moved-away or move-target row). Deleted and moved-away rows are end-dated:
+  `PERIOD_END_DATE = CARE_LASTUP_DT`, start one day earlier, `TIMELINE_ACTION = 2`, last update one hour before the
+  run (the role keeps the run time). The Java port keeps the de-duplication and the period dates, not the version or
+  timeline columns.
   - `m_Tgt_C_S_TRS_Addr_2`: a running `VERSION_SEQ` per role-address key, and `SRC_ROWID = key|VERSION_SEQ`.
   - The TRS phone and e-mail consolidation mapplets: `VERSION_SEQ` = number of distinct versions of the key.
   - `mplt_Pty_Rle_Rel_Timeline_Validation` (TRS member-to-member and member-to-PCP): this one **changes the row
@@ -247,6 +269,12 @@ WIC and FSS were cloned from ECI, and some ECI-only logic came along:
   `RUN_DATE`).
 - Tables named `*BAK*` or with a date stamp are backups. They are not part of the model.
 - `STG_REF_PHN_AREA_CD_TEST` looks like a leftover test copy of `REF_PHN_AREA_CD`.
+- CRE reads and writes objects that are not in the schema exports: `STG_CRE_SN_CARE_CLIENTS` (the client snapshot),
+  `C_B_PTY_HMRG` (MDM merge history) and `CRE_SRC_MRG` (IDQ connection `SRCMRG`), plus `C_B_PTY_XREF.ORIG_ROWID_OBJECT`.
+  `db/missing-objects.sql` creates them for mock runs; a `C_B_PTY_XREF` created by an earlier bootstrap lacks
+  `ORIG_ROWID_OBJECT` and needs it added by a DBA.
+- The CRE state lookup (`LKP_STATE_CODE`, "return last row") and alternate-id type lookup (`lkp_ALT_ID_MSTR_REF_CODE`)
+  have **no code-type filter**, like `rule_Suffix_Std`: any code type with a matching source value translates.
 - In IDQ, the phone rule's area-code lookup runs against Snowflake (`RDM.REF_PHN_AREA_CD`, filtered with
   `current_date()`). Everything else is Oracle.
 - The race and ethnicity exception targets of `m_Tgt_C_S_TRS_Pty_OnGoing` are fed through **dynamic port groups**

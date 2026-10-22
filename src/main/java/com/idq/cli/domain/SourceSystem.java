@@ -20,7 +20,9 @@ public enum SourceSystem {
     TTF("wf_TTF_Stage_Load", "TTF source system", List.of(
             "V_TTF_ETL_SRC", "STG_TTF_PTY_INACTIVE_STS")),
     WIC("wf_WIC_Stage_Load", "Women, Infants and Children", List.of(
-            "V_WIC_ETL_SRC", "STG_WIC_PTY_INACTIVE_STS"));
+            "V_WIC_ETL_SRC", "STG_WIC_PTY_INACTIVE_STS")),
+    CRE("wf_CRE_Stage_Load_Ongoing", "CARE clients", List.of(
+            "STG_CRE_D_CARE_CLIENTS", "STG_CRE_SN_CARE_CLIENTS", "STG_CRE_D_CARE_CASE_MAINT"));
 
     public final String workflow;
     public final String description;

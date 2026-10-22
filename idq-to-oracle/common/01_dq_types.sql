@@ -122,10 +122,10 @@ CREATE OR REPLACE TYPE t_dq_ssn FORCE AS OBJECT (
 );
 /
 
--- rule_MEDICAID_ID_Std, rule_Member_Id_Std
+-- rule_MEDICAID_ID_Std, rule_Member_Id_Std, rule_CARE_ID_Std
 CREATE OR REPLACE TYPE t_dq_ident FORCE AS OBJECT (
-    id_value        VARCHAR2(50),   -- Medicaid_Id / Member_Id (special characters removed)
-    exception_code  VARCHAR2(300),  -- Invalid_Medicaid_Id / Invalid_Member_Id or NULL (computed)
+    id_value        VARCHAR2(50),   -- Medicaid_Id / Member_Id / CARE_ID (special characters removed)
+    exception_code  VARCHAR2(300),  -- Invalid_Medicaid_Id / Invalid_Member_Id or NULL (computed); CARE id: NULL
     exception_type  VARCHAR2(100),  -- looked up
     exception_desc  VARCHAR2(255)   -- looked up
 );

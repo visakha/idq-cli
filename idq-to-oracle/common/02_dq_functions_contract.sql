@@ -31,6 +31,7 @@
 -- | rule_USA_SSN_Validation_post_June2011                | fn_dq_valid_ssn                 | t_dq_ssn
 -- | rule_MEDICAID_ID_Std                                 | fn_dq_std_medicaid_id           | t_dq_ident
 -- | rule_Member_Id_Std                                   | fn_dq_std_member_id             | t_dq_ident
+-- | rule_CARE_ID_Std (CRE)                               | fn_dq_std_care_id               | t_dq_ident
 -- | mplt_Global_Addr_Validation (+ rule_Addr_Line_*)     | fn_dq_valid_global_addr         | t_dq_address
 -- | mplt_DST_Correction (TIMELINE)                       | fn_dq_dst_correction            | DATE
 -- | mplt_Member_Pty_Rle_Phn_Normalization (TRS)          | fn_dq_norm_member_phn           | t_dq_member_phn_tab (pipelined)
@@ -233,6 +234,17 @@ IS
 BEGIN
     RAISE_APPLICATION_ERROR(-20999, 'contract stub: fn_dq_std_member_id is assumed to exist');
 END fn_dq_std_member_id;
+/
+
+-- rule_CARE_ID_Std (CRE): special characters removed (ref_special_char_list); the rule raises no exception (its
+-- exception ports are not fed, so exception_code / _type / _desc are always NULL).
+CREATE OR REPLACE FUNCTION fn_dq_std_care_id (
+    p_care_id  IN VARCHAR2
+) RETURN t_dq_ident
+IS
+BEGIN
+    RAISE_APPLICATION_ERROR(-20999, 'contract stub: fn_dq_std_care_id is assumed to exist');
+END fn_dq_std_care_id;
 /
 
 -- mplt_Global_Addr_Validation: suite stripping, pre-scrub, AddressDoctor, post-scrub, state/county FIPS, zip split.

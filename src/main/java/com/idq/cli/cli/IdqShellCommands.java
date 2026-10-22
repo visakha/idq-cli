@@ -49,7 +49,7 @@ public class IdqShellCommands {
                 .collect(Collectors.joining("\n"));
     }
 
-    @Command(name = "latch-source-system", description = "Latch a source system: TRS, ECI, FSS, TTF or WIC",
+    @Command(name = "latch-source-system", description = "Latch a source system: TRS, ECI, FSS, TTF, WIC or CRE",
             group = GROUP)
     public String latchSourceSystem(@Argument(index = 0, description = "source system") String source) {
         return attempt(() -> console.latchSource(source));

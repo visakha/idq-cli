@@ -100,6 +100,8 @@ digit zero `0` and other digits `9`, which is what the expressions test.
 * **Medicaid id**: special characters removed (`ref_special_char_list`, treated as every non letter / digit);
   anything other than 9 characters raises `Invalid_Medicaid_Id`.
 * **Member id**: same cleaning; anything other than 9 or 10 characters raises `Invalid_Member_Id`.
+* **CARE id** (`rule_CARE_ID_Std`, CRE): same cleaning; it never raises an exception (its exception ports are not
+  fed).
 
 ## Address validation
 
@@ -172,7 +174,7 @@ condition the left side is the lookup table column and the right side is the loo
 |---|---|---|---|---|
 | `LKP_REF_DYLGHT_SVNGS_TM` | `REF_DYLGHT_SVNGS_TM` (STAGING)<br>multiple match: any row | `DST = DST_Lookup_Date` | `DST_Lookup_Date` &larr; `DST_Lookup_Date` | `DST` &rarr; `Exp_Change_Hour_for_DST.lkp_DST` (Expression) |
 
-### `mplt_Ethnicity_Validation` (ECI, FSS, TRS, TTF, WIC)
+### `mplt_Ethnicity_Validation` (CRE, ECI, FSS, TRS, TTF, WIC)
 
 #### Fed by `Exp_Ethnicity_Validation` (Expression)
 
@@ -186,7 +188,7 @@ condition the left side is the lookup table column and the right side is the loo
 |---|---|---|---|---|
 | `Lookup_V_LOOKUP_CODE_VALUE` | `V_LOOKUP_CODE_VALUE` (STAGING)<br>filter: `"V_LOOKUP_CODE_VALUE"."CODE_TYPE"='ETHNICITY'`<br>multiple match: any row | `SRC_SYS = Src_Sys1 AND SRC_CODE_VALUE = Ethnicity_Cd` | `Src_Sys1` &larr; `Src_Sys`<br>`Ethnicity_Cd` &larr; `Ethnicity_Cd` | `MSTR_CODE_VALUE` &rarr; `Exp_Ethnicity_Validation.MSTR_CODE_VALUE` (Expression) |
 
-### `mplt_Gender_Validation` (ECI, FSS, TRS, TTF, WIC)
+### `mplt_Gender_Validation` (CRE, ECI, FSS, TRS, TTF, WIC)
 
 #### Fed by `exp_Gender_Code_Validation` (Expression)
 
@@ -194,7 +196,7 @@ condition the left side is the lookup table column and the right side is the loo
 |---|---|---|---|---|
 | `Lookup_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = In_Exception_Code` | `In_Exception_Code` &larr; `Exception_Code` | `EXCEPTION_DESC` &rarr; `output.Gender_Exception_Description` (Mapplet output)<br>`EXCEPTION_TYPE` &rarr; `output.Gender_Exception_Type` (Mapplet output) |
 
-### `mplt_Global_Addr_Validation` (ECI, FSS, TRS, WIC)
+### `mplt_Global_Addr_Validation` (CRE, ECI, FSS, TRS, WIC)
 
 #### Fed by `exp_Prepare_For_Address_Validation` (Expression)
 
@@ -230,7 +232,7 @@ condition the left side is the lookup table column and the right side is the loo
 |---|---|---|---|---|
 | `Lookup_LOOKUP_CODE_VALUE` | `LOOKUP_CODE_VALUE` (STAGING)<br>filter: `"LOOKUP_CODE_VALUE"."CODE_TYPE" = 'PHN_USG_TP'`<br>multiple match: any row | `MSTR_REF_CODE = USG_TP AND SRC_SYS = SRC_SYS1` | `USG_TP` &larr; `USG_TP`<br>`SRC_SYS1` &larr; `SRC_SYS` | `MSTR_REF_LABEL` &rarr; `Exp_NEWOUTPUT.MSTR_REF_LABEL` (Expression)<br>`MSTR_REF_CODE` &rarr; `Exp_NEWOUTPUT.MSTR_REF_CODE` (Expression) |
 
-### `mplt_Name_Standardization_Indv_Member` (ECI, FSS, TRS, TTF, WIC)
+### `mplt_Name_Standardization_Indv_Member` (CRE, ECI, FSS, TRS, TTF, WIC)
 
 #### Fed by `exp_Src_Inp_Name` (Expression), `input` (Mapplet input)
 
@@ -259,7 +261,7 @@ condition the left side is the lookup table column and the right side is the loo
 |---|---|---|---|---|
 | `Lookup_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = in_Exception_Code` | `in_Exception_Code` &larr; `Exception_Cd` | `EXCEPTION_CODE` &rarr; `output.Exception_Cd` (Mapplet output)<br>`EXCEPTION_DESC` &rarr; `output.Exception_Desc` (Mapplet output)<br>`EXCEPTION_TYPE` &rarr; `output.Exception_Type` (Mapplet output) |
 
-### `mplt_Race_Validation` (TRS, TTF)
+### `mplt_Race_Validation` (CRE, TRS, TTF)
 
 #### Fed by `Exp_Race_Validation` (Expression)
 
@@ -287,7 +289,7 @@ condition the left side is the lookup table column and the right side is the loo
 |---|---|---|---|---|
 | `LU_SSN_Exc_Code` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXCEPTION_CODE1` | `EXCEPTION_CODE1` &larr; `EXCEPTION_CODE1` | `EXCEPTION_CODE` &rarr; `EXP_prepare_Normalizer.DQ_Exception_Code_SSN` (Expression)<br>`EXCEPTION_DESC` &rarr; `EXP_prepare_Normalizer.DQ_Exception_SSN` (Expression) |
 
-### `rule_MEDICAID_ID_Std` (ECI, TRS)
+### `rule_MEDICAID_ID_Std` (CRE, ECI, TRS)
 
 #### Fed by `exp_validate_MEDICAID_ID` (Expression)
 
@@ -311,7 +313,7 @@ condition the left side is the lookup table column and the right side is the loo
 |---|---|---|---|---|
 | `Lookup_EXC_LOOKUP_CODE_VALUE` | `EXC_LOOKUP_CODE_VALUE` (STAGING)<br>multiple match: any row | `EXCEPTION_CODE = EXCEPTION_CODE1` | `EXCEPTION_CODE1` &larr; `EXCEPTION_CODE1` | `EXCEPTION_CODE1` (pass-through) &rarr; `output.Phone_Nbr_Ext_Exception_Code` (Mapplet output)<br>`EXCEPTION_TYPE` &rarr; `output.Phone_Nbr_Ext_Exception_Type` (Mapplet output)<br>`EXCEPTION_DESC` &rarr; `output.Phone_Nbr_Ext_Exception_Desc` (Mapplet output) |
 
-### `rule_Phone_Std` (ECI, FSS, TRS, TTF, WIC)
+### `rule_Phone_Std` (CRE, ECI, FSS, TRS, TTF, WIC)
 
 #### Fed by `exp_validate_Phone` (Expression)
 

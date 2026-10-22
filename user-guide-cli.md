@@ -28,9 +28,9 @@ Contents
 
 | Concept | What it means here |
 |---|---|
-| Source system | One of the five feeds: `TRS`, `ECI`, `FSS`, `TTF`, `WIC`. Each has its own IDQ workflow (`wf_*_Stage_Load`) and its own source tables (`STG_*`, `V_*`). |
+| Source system | One of the six feeds: `TRS`, `ECI`, `FSS`, `TTF`, `WIC`, `CRE`. Each has its own IDQ workflow (`wf_*_Stage_Load`) and its own source tables (`STG_*`, `V_*`). |
 | Domain / sub-domain | Everything implemented is in the `MEMBER` domain (`PROVIDER` is listed but not implemented). Sub-domains: Demographics, Phone-email, Address, Alternate-ID, Alternate-Name, Party-Managed-Attrib, Role. |
-| Mapping | One IDQ mapping ported to Java, e.g. `m_Tgt_C_S_ECI_Pty_Rle_Rel`. 33 mappings in total; each has a document in `docs/mappings/NNN_<mapping>.md`. |
+| Mapping | One IDQ mapping ported to Java, e.g. `m_Tgt_C_S_ECI_Pty_Rle_Rel`. 34 mappings in total; each has a document in `docs/mappings/NNN_<mapping>.md`. |
 | Target table | The `C_S_*` staging table a mapping loads, e.g. `C_S_ECI_PTY_RLE_REL`. |
 | IdqMapInitQuery | The first SQL a mapping runs to read its source rows. In Java it is a `@Query` method on the repository of the table it reads, returning a record, e.g. `EciFamilyDeltaRepository#fetchFamilyRelations` returning `EciQueryRows.FamilyRelation`. |
 | Latch | The CLI's working context: one source system, optionally one target table and one mapping (plus one or more domains). Commands act on what is latched. |
@@ -172,7 +172,7 @@ Latched source system ECI
 ECI>
 ```
 
-* Values: `TRS`, `ECI`, `FSS`, `TTF`, `WIC` (case-insensitive).
+* Values: `TRS`, `ECI`, `FSS`, `TTF`, `WIC`, `CRE` (case-insensitive).
 * Only one source system can be latched. Latching a different one clears the target table and mapping latches.
 * Check it with `show-latched-source`; remove it with `unlatch-source-system` (clears everything below it too).
 
@@ -358,6 +358,7 @@ Workflow order (documentation numbers):
 | FSS | 019 validation, 020 party, then 021-024 |
 | TTF | 025 validation, 026 party, then 027-028 |
 | WIC | 029 validation, 030 party, then 031-033 |
+| CRE | 034 (one mapping loads every CRE target) |
 
 Running a single mapping is available over REST only: latch the mapping, then `POST /api/etl/run/mapping` (section 10).
 
@@ -448,7 +449,7 @@ directory. Exit code `0` means the test passed.
 ```bat
 mvnw test                                                    all unit tests, no database needed
 mvnw test -Dtest=EciPkeyTest                                 the PKEY tests of one source
-mvnw test -Dtest=OracleWorkflowIT                            all 33 mappings against OCI on mock data
+mvnw test -Dtest=OracleWorkflowIT                            all 34 mappings against OCI on mock data
 mvnw test -Dtest=OracleWorkflowIT#runWritesAuditReports -Dsource=TRS
 mvnw test -Dtest=SourceEntitiesIT                            every source / MDM / reference entity against OCI
 ```
@@ -610,7 +611,7 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 | `Not possible: latch-mapping first` | `show-sample-data`, `fill-sample-*`, `run-unit-tests` need a mapping. |
 | `Not possible: X is not a target of SRC; choose one of [...]` | Pick a table from the list (or from `show-sources`). |
 | `Not possible: X does not load the latched target; choose one of [...]` | Pick a mapping printed by `show-source-mapping`. |
-| `Not possible: No enum constant ...SourceSystem.X` | Unknown source system; use `TRS`, `ECI`, `FSS`, `TTF` or `WIC`. |
+| `Not possible: No enum constant ...SourceSystem.X` | Unknown source system; use `TRS`, `ECI`, `FSS`, `TTF`, `WIC` or `CRE`. |
 | `No source rows (try fill-sample-mock-data)` | The source tables are empty: generate mock data or insert rows. |
 | `mock_data=false: mock data generation is disabled` | Start with `-Dmock_data=true` to generate mock rows. |
 | A mapping or procedure fails with `ORA-00001: unique constraint` on a `C_S_*` table | The target still holds the rows of an earlier run: nothing is truncated any more. Empty the target yourself, outside this tool, if a reload is intended. |
@@ -638,7 +639,7 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 | `help` | `[command]` | | Built-in spring-shell help |
 | `show-domains` | | | Domains, sub-domains and mappings |
 | `show-sources` | | | Source systems, workflows, source and target tables |
-| `latch-source-system` | `TRS\|ECI\|FSS\|TTF\|WIC` | | Latch the source system (clears target and mapping when it changes) |
+| `latch-source-system` | `TRS\|ECI\|FSS\|TTF\|WIC\|CRE` | | Latch the source system (clears target and mapping when it changes) |
 | `unlatch-source-system` | | | Clear source, target table and mapping |
 | `show-latched-source` | | | Show the latched source system |
 | `latch-domain` | `MEMBER\|PROVIDER` | | Add a domain |
@@ -654,7 +655,7 @@ Set in `src/main/resources/application.properties` or as `-Dname=value` before `
 | `fill-sample-real-data` | | mapping | Placeholder for real sample rows |
 | `run-etl` | | source | Mock fill (if enabled), run the workflow, write the audit reports |
 | `run-unit-tests` | | mapping | PKEY unit test of the mapping |
-| `compare-etl-process` | `[TRS\|ECI\|FSS\|TTF\|WIC\|1-5]` (prompted when omitted) | | Run ORA_SP then IDQ on the same source data, compare the target tables, write `compare_runs_<SOURCE>/*.md` |
+| `compare-etl-process` | `[TRS\|ECI\|FSS\|TTF\|WIC\|CRE\|1-6]` (prompted when omitted) | | Run ORA_SP then IDQ on the same source data, compare the target tables, write `compare_runs_<SOURCE>/*.md` |
 | `exit` | | | Leave the shell and stop the REST API |
 
 ---
@@ -684,7 +685,8 @@ Source systems:
   3) FSS  wf_FSS_Stage_Load (FSS source system)
   4) TTF  wf_TTF_Stage_Load (TTF source system)
   5) WIC  wf_WIC_Stage_Load (Women, Infants and Children)
-Choose a source system [1-5]: 2
+  6) CRE  wf_CRE_Stage_Load_Ongoing (CARE clients)
+Choose a source system [1-6]: 2
 ORA_SP vs IDQ for ECI (wf_ECI_Stage_Load): target tables DIFFER
   C_S_ECI_PTY                  SAME ORA_SP=39 IDQ=39 matched=39 onlyORA_SP=0 onlyIDQ=0 changed=0
   C_S_ECI_PTY_RLE_ADDR         DIFF ORA_SP=31 IDQ=30 matched=28 onlyORA_SP=1 onlyIDQ=0 changed=2

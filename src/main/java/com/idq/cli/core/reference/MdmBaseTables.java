@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-/// MDM base-object tables that some mappings look up (hub state, provider TPI). The `@Id`s are provisional.
+/// MDM base-object tables that some mappings look up (hub state, provider TPI, merge history). The `@Id`s are
+/// provisional.
 public final class MdmBaseTables {
 
     private MdmBaseTables() {}
@@ -70,4 +71,9 @@ public final class MdmBaseTables {
             }
         }
     }
+
+    /// Provisional `@Id` `SRC_ROWID_OBJECT`: the table has no primary key, Spring Data JDBC needs one. Only the columns
+    /// the CRE merge lookups read (`LKP_HMRG_*`) are modelled.
+    @Table("C_B_PTY_HMRG")
+    public record PartyHmrg(@Id String srcRowidObject, String tgtRowidObject) {}
 }

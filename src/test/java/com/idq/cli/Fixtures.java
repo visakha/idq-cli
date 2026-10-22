@@ -25,6 +25,9 @@ public final class Fixtures {
                 .withCodeValue("ALT_ID_TP", "TRS", "002", "002", "Medicaid")
                 .withCodeValue("ALT_ID_TP", "TRS", "004", "004", "SSN")
                 .withCodeValue("ALT_ID_TP", "TRS", "007", "007", "Member id")
+                .withCodeValue("ALT_ID_TP", "CRE", "CARE ID", "022", "CARE id")
+                .withCodeValue("ALT_ID_TP", "CRE", "Medicaid ID", "002", "Medicaid")
+                .withCodeValue("ALT_ID_TP", "CRE", "SSN", "004", "SSN")
                 .withCodeValue("REL_TP", "ECI", "1", "MTH", "Mother")
                 .withCodeValue("REL_TP", "FSS", "MOTHER|F", "MTH", "Mother")
                 .withMasterCode("PLAN_CD", "MAX", "PA", "PLN1")
@@ -35,7 +38,7 @@ public final class Fixtures {
                 .withAreaCode("214", null)
                 .withAreaCode("713", null)
                 .withStreetType("ST", "St");
-        for (var src : List.of("TRS", "ECI", "FSS", "TTF", "WIC")) {
+        for (var src : List.of("TRS", "ECI", "FSS", "TTF", "WIC", "CRE")) {
             ref.withMasterCode("RACE", src, "W", "001").withMasterCode("ETHNICITY", src, "H", "1")
                     .withMasterCode("LANGUAGE_CD", src, "ENG", "EN");
         }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 /// | FSS    | 019 validation, 020 party, then 021-024                                            |
 /// | TTF    | 025 validation, 026 party, then 027-028                                            |
 /// | WIC    | 029 validation, 030 party, then 031-033                                            |
+/// | CRE    | 034 (one mapping loads every CRE target)                                           |
 ///
 /// TRS runs the switches (007) before the authorized-representative flags (002) because 007 empties
 /// `C_S_TRS_PTY_MNG_ATTR` and 002 only replaces its own attribute type.

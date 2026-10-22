@@ -1,0 +1,14 @@
+#USE_SECTIONS
+
+[Global]
+$$MappingName=
+
+[HHS_MDM_Stage].[CRE].[mct_TGT_C_S_CRE_CARE_CLIENTS]
+$$MappingName=m_Tgt_C_S_CRE_CARE_Clients
+$$Min_Valid_Mailability_Score=3
+$$PHYSICAL_ADDR_TYPE_CD=002
+$$RLE_BO_CLASS_CD_Member=Member
+$$Default_TX_State_CD=48
+$$County_CD_NonTX=996
+$$CountyCD_DefaultAll=998
+$$Default_NonUS_State_CD=99

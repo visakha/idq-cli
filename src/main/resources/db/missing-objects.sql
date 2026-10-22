@@ -15,12 +15,28 @@ CREATE TABLE "C_B_PTY_RLE_REL_XREF" (
     "MIN_ROWID_XREF" NUMBER
 );
 
+-- ORIG_ROWID_OBJECT is read by the CRE merge lookups (LKP_XREF_SRC / LKP_XREF_TGT). A C_B_PTY_XREF created before
+-- it was added here lacks the column; nothing here alters a table, so add it by hand (DBA) where it is missing.
 CREATE TABLE "C_B_PTY_XREF" (
     "ROWID_XREF" NUMBER(38),
     "PKEY_SRC_OBJECT" VARCHAR2(255),
     "ROWID_OBJECT" VARCHAR2(14),
     "ROWID_SYSTEM" VARCHAR2(14),
-    "HUB_STATE_IND" NUMBER(38)
+    "HUB_STATE_IND" NUMBER(38),
+    "ORIG_ROWID_OBJECT" VARCHAR2(14)
+);
+
+-- MDM merge history of the party base object (CRE LKP_HMRG_*); only the columns the lookups read.
+CREATE TABLE "C_B_PTY_HMRG" (
+    "SRC_ROWID_OBJECT" VARCHAR2(14),
+    "TGT_ROWID_OBJECT" VARCHAR2(14)
+);
+
+-- CRE case moves for MDM to merge (connection SRCMRG in IDQ).
+CREATE TABLE "CRE_SRC_MRG" (
+    "SRC_ROWID_OBJECT" VARCHAR2(14),
+    "TGT_ROWID_OBJECT" VARCHAR2(14),
+    "RUN_DATE" DATE
 );
 
 CREATE TABLE "REF_JUNK_NAME_LIST" (
@@ -359,4 +375,29 @@ CREATE TABLE "STG_ECI_SN_CASE" (
     "ID_CHILD" NUMBER(10),
     "DATE_CREATED" TIMESTAMP(6),
     "DATE_MODIFIED" TIMESTAMP(6)
+);
+
+-- CRE client snapshot, read by the CRE custom query; not in the exports, so the columns of STG_CRE_D_CARE_CLIENTS.
+CREATE TABLE "STG_CRE_SN_CARE_CLIENTS" (
+    "CARE_ID" VARCHAR2(10),
+    "CARE_LASTUP_DT" DATE,
+    "FIRSTNM" VARCHAR2(11),
+    "LASTNM" VARCHAR2(16),
+    "LAST_SUF" VARCHAR2(3),
+    "BIRTH_DT" DATE,
+    "SEX" VARCHAR2(1),
+    "STREET" VARCHAR2(25),
+    "CITY" VARCHAR2(20),
+    "CNTY" VARCHAR2(3),
+    "STATE" VARCHAR2(2),
+    "ZIP" VARCHAR2(5),
+    "ZIPSUF" VARCHAR2(4),
+    "PHONE" VARCHAR2(40),
+    "RECIP_NO" VARCHAR2(9),
+    "MAINT_FLAG" VARCHAR2(1),
+    "SSN" VARCHAR2(9),
+    "INSERT_DATE" DATE,
+    "FEDETH" VARCHAR2(1),
+    "RACE" VARCHAR2(1),
+    "EXTRACT_DT" DATE
 );

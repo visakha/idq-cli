@@ -67,6 +67,21 @@ public final class Infa {
         return value == null ? null : value.toLowerCase();
     }
 
+    /// `INITCAP(value)`: the first letter of every word in upper case, the others in lower case. Words are delimited by
+    /// white space and by every character that is neither a letter nor a digit.
+    public static String initcap(String value) {
+        if (value == null) {
+            return null;
+        }
+        var out = new StringBuilder(value.length());
+        boolean wordStart = true;
+        for (char c : value.toCharArray()) {
+            out.append(wordStart ? Character.toUpperCase(c) : Character.toLowerCase(c));
+            wordStart = !Character.isLetterOrDigit(c);
+        }
+        return out.toString();
+    }
+
     /// `LENGTH(RTRIM(x)) = 0`, false for `NULL`.
     public static boolean isEmptyText(String value) {
         return value != null && value.isBlank();

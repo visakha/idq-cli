@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReferenceMockData {
 
-    static final List<String> SOURCES = List.of("TRS", "ECI", "FSS", "TTF", "WIC");
+    static final List<String> SOURCES = List.of("TRS", "ECI", "FSS", "TTF", "WIC", "CRE");
 
     static final List<String> EXCEPTIONS = List.of("Missing_First_Name", "Missing_Last_Name", "Invalid_First_Name",
             "Invalid_Last_Name", "Invalid_Birth_Date", "Invalid_Death_Date", "Invalid_Gender", "Invalid_Race",
@@ -70,6 +70,10 @@ public class ReferenceMockData {
         for (var type : List.of("002", "004", "007")) {
             codeValue("ALT_ID_TP", "TRS", type, type, "Alternate id " + type);
         }
+        // CRE translates the type names; 022 for the CARE id is a mock code (the real one is not in the exports)
+        codeValue("ALT_ID_TP", "CRE", "CARE ID", "022", "CARE Id");
+        codeValue("ALT_ID_TP", "CRE", "Medicaid ID", "002", "Medicaid Id");
+        codeValue("ALT_ID_TP", "CRE", "SSN", "004", "SSN");
         codeValue("REL_TP", "ECI", "1", "MTH", "Mother");
         codeValue("INVERSE_REL", "ECI", "1|M", "SON", "Son");
         codeValue("INVERSE_REL", "ECI", "1|F", "DAU", "Daughter");
@@ -96,6 +100,8 @@ public class ReferenceMockData {
             masterCode("PREFIX", source, "MR", "MR");
             masterCode("STATE", source, "TX", "48");
         }
+        // a CRE client abroad: the CRE state lookup has no code-type filter, 99 routes the address as non-US
+        masterCode("STATE", "CRE", "FC", "99");
     }
 
     private void areaCodes() {

@@ -1,5 +1,5 @@
-/// Spring Data JDBC records of the MDM `C_S_*` staging tables, one holder per source system: [EciTargets],
-/// [FssTargets], [TrsTargets], [TtfTargets], [WicTargets].
+/// Spring Data JDBC records of the MDM `C_S_*` staging tables, one holder per source system: [CreTargets],
+/// [EciTargets], [FssTargets], [TrsTargets], [TtfTargets], [WicTargets].
 ///
 /// Why it exists: the `C_S_<SRC>_*` tables belong to MDM, not to the source system that fills them. Each record is
 /// the formulated key (`PKEY_SRC_OBJECT`), the common MDM columns (`core.target.MdmAudit`) and one sub-domain column

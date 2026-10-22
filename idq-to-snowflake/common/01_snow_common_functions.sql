@@ -62,6 +62,7 @@
 -- | fn_snow_helper34_common | mplt_Global_Addr_Validation (pass-through validator, OBJECT)                        |
 -- | fn_snow_helper35_common | mplt_DST_Correction (TIMELINE): end date corrected for daylight saving              |
 -- | fn_snow_helper36_common | run log line: mapping, step, row count                                              |
+-- | fn_snow_helper37_common | rule_CARE_ID_Std (CRE) (OBJECT)                                                      |
 --------------------------------------------------------------------------------------------------------------------
 
 -- IDQ IS_NUMBER(): leading/trailing spaces allowed, optional sign, decimal point and exponent. NULL for NULL.
@@ -673,4 +674,16 @@ AS
 $$
     TO_VARCHAR(CURRENT_TIMESTAMP(), 'YYYY-MM-DD HH24:MI:SS.FF3') || ' ' || NVL(p_mapping_name, '') || ' '
     || NVL(p_step, '') || ': ' || NVL(TO_VARCHAR(p_rows), '0') || ' row(s)'
+$$;
+
+-- rule_CARE_ID_Std (CRE): special characters removed (Std_CARE_ID, ref_special_char_list) and the value held in a
+-- string(10) port (cut to 10 characters, BAD DATA). The rule's exception ports are not fed, so it never raises an
+-- exception (exception_code is always NULL). Returns OBJECT {id_value, exception_code}.
+CREATE OR REPLACE FUNCTION fn_snow_helper37_common (p_care_id VARCHAR)
+RETURNS OBJECT
+AS
+$$
+    OBJECT_CONSTRUCT_KEEP_NULL(
+        'id_value', LEFT(fn_snow_helper10_common(p_care_id), 10),
+        'exception_code', NULL)
 $$;

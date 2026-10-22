@@ -43,7 +43,7 @@ One workflow:
 python -I ext-tools/idmc_spec.py docs/wf_ECI_Stage_Load.xml idmc/wf_ECI_Stage_Load
 ```
 
-All five workflows (Git Bash):
+All six workflows (Git Bash):
 
 ```sh
 for f in docs/wf_*.xml; do
@@ -51,7 +51,7 @@ for f in docs/wf_*.xml; do
 done
 ```
 
-All five workflows (PowerShell):
+All six workflows (PowerShell):
 
 ```powershell
 Get-ChildItem docs\wf_*.xml | ForEach-Object {
@@ -68,6 +68,7 @@ Expected counts for the current exports:
 | `wf_TRS_Stage_Load_1_Ongoing` | 14 | 22 (plus 2 retired timeline mapplets) |
 | `wf_TTF_Stage_Load` | 4 | 10 |
 | `wf_WIC_Stage_Load` | 5 | 14 |
+| `wf_CRE_Stage_Load_Ongoing` | 1 | 12 |
 
 The output is deterministic: running the script twice on the same export produces identical files, so the
 output folder can be committed and diffs show real changes only.
