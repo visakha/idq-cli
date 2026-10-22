@@ -4,6 +4,11 @@ Drop-in Snowflake replacements for the 39 IDQ mappings of the six stage-load wor
 port in [`idq-to-oracle/`](../idq-to-oracle/README.md), **nothing is assumed to exist**: the IDQ mapplets and rules of
 [`docs/mappings/000_mapplets.md`](../docs/mappings/000_mapplets.md) are written out here as Snowflake SQL functions.
 
+
+## How is this file generated?
+Hand written by the coding agent
+
+
 | Workflow (IDQ export) | Mappings | Folder | Run script |
 |---|---|---|---|
 | `docs/wf_ECI_Stage_Load.xml` | 9 | [wf_ECI_Stage_Load](wf_ECI_Stage_Load/) | [run_wf_ECI_Stage_Load.sql](wf_ECI_Stage_Load/run_wf_ECI_Stage_Load.sql) |
