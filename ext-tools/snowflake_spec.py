@@ -229,6 +229,11 @@ def top_readme(counts, reg):
            'validations, its bad-data handling and its MDM timeline logic (all in scope for this port), its '
            'parameters, the tables it writes and the shared functions it calls. The IDQ / CDI specification of the '
            'same mapping is in [`docs-from-idq-exports/`](../docs-from-idq-exports/).', '',
+           '## How is this file generated?', 'see below',
+           '### What it is: The docs: one Markdown page per procedure (what it does, validations, bad-data handling, '
+           'timeline, the', '  tables it writes)',
+           "### How it's made: Generated from the procedure headers in idq-to-snowflake/ by ext-tools/snowflake_spec.py;",
+           '\tDo not edit these pages by hand', '', '',
            '| Workflow | Procedures |', '|---|---|']
     out += [f'| [`{wf}`]({wf}/README.md) | {n} |' for wf, n in counts]
     out += ['', '## Shared functions', '',
