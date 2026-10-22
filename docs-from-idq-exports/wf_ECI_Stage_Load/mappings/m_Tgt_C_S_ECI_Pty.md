@@ -173,7 +173,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_ECI_Pty`](../../../idq-to
 ```text
 Drop-in replacement of IDQ mapping m_Tgt_C_S_ECI_Pty (workflow wf_ECI_Stage_Load).
 
-Loads the ECI child and family parties of the delta into C_S_ECI_PTY and C_S_ECI_PTY_RLE (both truncated first)
+Loads the ECI child and family parties of the delta into C_S_ECI_PTY and C_S_ECI_PTY_RLE (both insert only, never truncated)
 and logs demographic exceptions:
   Read_STG_ECI_D_CHILD_AND_FAMILY (custom SQL)
     -> Flt_Remove_Inactive: IsNull(DEACTIVATION_STS) on STG_ECI_PTY_INACTIVE_STS (the stored condition is
@@ -206,8 +206,8 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_ECI_PTY` | truncate, insert |
-| `C_S_ECI_PTY_RLE` | truncate, insert |
+| `C_S_ECI_PTY` | insert |
+| `C_S_ECI_PTY_RLE` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -220,7 +220,6 @@ Shared functions and procedures called:
 | `fn_dq_valid_gender` | replaces `mplt_Gender_Validation`, returns `t_dq_gender` |
 | `fn_dq_valid_language` | replaces `mplt_Language_Validation`, returns `t_dq_code_check` |
 | `fn_dq_valid_race_ind` | replaces `mplt_Race_Ind_Validation`, returns `t_dq_race_ind` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

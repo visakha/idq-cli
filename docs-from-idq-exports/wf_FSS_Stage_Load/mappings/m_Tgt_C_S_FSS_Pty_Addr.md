@@ -128,7 +128,7 @@ Drop-in replacement of IDQ mapping m_Tgt_C_S_FSS_Pty_Addr (workflow wf_FSS_Stage
 mapping).
 
 Validates the FSS client addresses (V_FSS_ETL_SRC, capture action not 'D') and loads the good ones into
-C_S_FSS_PTY_RLE_ADDR (truncated first):
+C_S_FSS_PTY_RLE_ADDR (insert only, never truncated):
   -> Fil_Inactive_recs: party (PTY_SRC_KEY) not in STG_FSS_PTY_INACTIVE_STS
   -> mplt_Global_Addr_Validation (fn_dq_valid_global_addr), zip without extension
   -> Write_DQM_ADDRESS (every active address)
@@ -153,8 +153,8 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_FSS_PTY_RLE_ADDR` | truncate, insert |
 | `DQM_ADDRESS` | insert |
+| `C_S_FSS_PTY_RLE_ADDR` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -167,7 +167,6 @@ Shared functions and procedures called:
 | `fn_ors_helper10_common` | address issue text of exp_Score_and_Exception_details (Addr_Issue_Desc) |
 | `fn_ors_helper11_common` | exp_Address_Hold line 1: empty line 1 replaced by line 2 |
 | `fn_ors_helper12_common` | exp_Address_Hold line 2: cleared when it repeats the held line 1 |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

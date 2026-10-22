@@ -101,7 +101,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_TRS_Pty_Nm`](../../../idq
 Drop-in replacement of IDQ mapping m_Tgt_C_S_TRS_Pty_Nm (workflow wf_TRS_Stage_Load_1_Ongoing).
 
 Alias names of valid TIERS members (STG_TRS_D_CV_DC_MCI_ALIAS + STG_TRS_D_DC_ALIAS joined to STG_TRS_VALID_MEMBERS)
-into C_S_TRS_PTY_NM (truncated first), name type '002' (Alias):
+into C_S_TRS_PTY_NM (insert only, never truncated), name type '002' (Alias):
   -> fltr_Null_Fn_Ln: source first and last name present
   -> mplt_Name_Standardization_Trailing_Num_Removal (fn_dq_std_name_trailing_num) on the source names, then
      mplt_Name_Standardization_Indv_Member (fn_dq_std_name_indv_member) on its output with the source prefix,
@@ -132,7 +132,7 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TRS_PTY_NM` | truncate, insert |
+| `C_S_TRS_PTY_NM` | insert |
 
 Shared functions and procedures called:
 
@@ -140,7 +140,6 @@ Shared functions and procedures called:
 |---|---|
 | `fn_dq_std_name_indv_member` | replaces `mplt_Name_Standardization_Indv_Member (+ TTF CopyOf)`, returns `t_dq_name_std` |
 | `fn_dq_std_name_trailing_num` | replaces `mplt_Name_Standardization_Trailing_Num_Removal`, returns `t_dq_name_parts` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

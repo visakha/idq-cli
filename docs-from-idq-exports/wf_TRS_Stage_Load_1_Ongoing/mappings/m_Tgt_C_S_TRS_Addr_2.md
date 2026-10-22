@@ -131,7 +131,7 @@ the valid members:
   -> lkp_Address_Type (V_LOOKUP_CODE_VALUE ADDR_TP, 'TRS') -> exp_Score_and_Exception_details
   -> rtr_Good_vs_Exception_Pty_Records
        Good ('100')     -> exp_Address_Hold -> srt_Party_Role_Addr_By_PKey_Beg_Date
-                           -> exp_Party_Role_Address_Attribute_Hold (VERSION_SEQ) -> C_S_TRS_PTY_RLE_ADDR (truncated)
+                           -> exp_Party_Role_Address_Attribute_Hold (VERSION_SEQ) -> C_S_TRS_PTY_RLE_ADDR (insert only)
        Exception ('40') -> EXC_STG_BAD_REC_MEMB ('Invalid_Address', looked-up code)
        Default          -> not linked (the score is always '40' or '100')
 
@@ -160,8 +160,8 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_TRS_PTY_RLE_ADDR` | truncate, insert |
 | `DQM_ADDRESS` | insert |
+| `C_S_TRS_PTY_RLE_ADDR` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -177,7 +177,6 @@ Shared functions and procedures called:
 | `fn_ors_helper10_common` | address issue text of exp_Score_and_Exception_details (Addr_Issue_Desc) |
 | `fn_ors_helper11_common` | exp_Address_Hold line 1: empty line 1 replaced by line 2 |
 | `fn_ors_helper12_common` | exp_Address_Hold line 2: cleared when it repeats the held line 1 |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

@@ -100,7 +100,6 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `STG_TRS_VALID_MEMBERS` | delete |
 | `STG_TRS_DEACTIVED_MEMBERS` | insert |
 
 Shared functions and procedures called:

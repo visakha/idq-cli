@@ -140,7 +140,7 @@ Each WIC row (V_WIC_ETL_SRC) gives one phone and possibly one e-mail:
           Bad_Phone_Records (any code)                 -> EXC_STG_BAD_REC_MEMB
   e-mail: Filt_null_email -> rule_email_validation_v01 -> rtr_Valid_EAddr_Records
           Valid_Records -> C_S_WIC_PTY_RLE_EADDR ; Bad_Records -> EXC_STG_BAD_REC_MEMB
-Both C_S targets are truncated first.
+Both C_S targets are only inserted into; nothing is truncated.
 
 TIMELINE: VERSION_SEQ = '1' on both targets; PERIOD_START_DATE = DATEKEY.
 The e-mail key uses the e-mail as read (no trim), unlike ECI.
@@ -150,9 +150,9 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_WIC_PTY_RLE_PHN` | truncate, insert |
-| `C_S_WIC_PTY_RLE_EADDR` | truncate, insert |
+| `C_S_WIC_PTY_RLE_PHN` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
+| `C_S_WIC_PTY_RLE_EADDR` | insert |
 
 Shared functions and procedures called:
 
@@ -160,7 +160,6 @@ Shared functions and procedures called:
 |---|---|
 | `fn_dq_std_phone` | replaces `rule_Phone_Std`, returns `t_dq_phone` |
 | `fn_dq_valid_email` | replaces `rule_email_validation_v01 (+ local part / domain)`, returns `t_dq_email` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations

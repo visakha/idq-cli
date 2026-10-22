@@ -180,7 +180,7 @@ Drop-in replacement in Oracle: [`sp_ors_main_m_Tgt_C_S_FSS_Pty`](../../../idq-to
 Drop-in replacement of IDQ mapping m_Tgt_C_S_FSS_Pty (workflow wf_FSS_Stage_Load).
 
 Loads the FSS clients (V_FSS_ETL_SRC, last active registration) into C_S_FSS_PTY and C_S_FSS_PTY_RLE (both
-truncated first) and logs demographic exceptions:
+insert only, never truncated) and logs demographic exceptions:
   -> Flt_Remove_Inactive: party not in STG_FSS_PTY_INACTIVE_STS
   -> name standardization (with the source suffix), gender, birth date, ethnicity (CD_HISPANIC), race
      indicators, language, rule_Suffix_Std
@@ -203,8 +203,8 @@ Tables written:
 
 | Table | Operation |
 |---|---|
-| `C_S_FSS_PTY` | truncate, insert |
-| `C_S_FSS_PTY_RLE` | truncate, insert |
+| `C_S_FSS_PTY` | insert |
+| `C_S_FSS_PTY_RLE` | insert |
 | `EXC_STG_BAD_REC_MEMB` | insert |
 
 Shared functions and procedures called:
@@ -218,7 +218,6 @@ Shared functions and procedures called:
 | `fn_dq_valid_gender` | replaces `mplt_Gender_Validation`, returns `t_dq_gender` |
 | `fn_dq_valid_language` | replaces `mplt_Language_Validation`, returns `t_dq_code_check` |
 | `fn_dq_valid_race_ind` | replaces `mplt_Race_Ind_Validation`, returns `t_dq_race_ind` |
-| `sp_ors_helper01_common` | truncate a target table (IDQ target property "Truncate target table") |
 | `sp_ors_helper02_common` | run log line: mapping, step, row count (DBMS_OUTPUT) |
 
 ## Transformations
