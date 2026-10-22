@@ -6,7 +6,7 @@ see the instructions-for-rewrite.md
 # idq-cli
 
 A Spring Boot 4 / Java 27 replacement for the Informatica IDQ stage-load workflows of the Member domain
-(`docs/wf_*.xml`: TRS, ECI, FSS, TTF, WIC, CRE; 34 mappings). Spring Data JDBC only, with a spring-shell CLI and a REST API
+(`docs/wf_*.xml`: TRS, ECI, FSS, TTF, WIC, CRE; 35 mappings; TRS has two workflows). Spring Data JDBC only, with a spring-shell CLI and a REST API
 that mirrors it.
 
 * User guide (CLI and REST, by task): [user-guide-cli.md](user-guide-cli.md).
@@ -24,7 +24,7 @@ mvn test
 ```
 
 `mvn test` runs one PKEY unit test per mapping (`<Src>PkeyTest#<mapping>_pkey_test`) without a database.
-The end-to-end run against OCI Oracle is `OracleWorkflowIT` (mock data, all 34 mappings):
+The end-to-end run against OCI Oracle is `OracleWorkflowIT` (mock data, all 35 mappings):
 
 ```bat
 mvn test -Dtest=OracleWorkflowIT

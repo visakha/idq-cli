@@ -71,6 +71,9 @@
 -- wf_CRE_Stage_Load_Ongoing
 !source wf_CRE_Stage_Load_Ongoing/sp_snow_main_m_Tgt_C_S_CRE_CARE_Clients.sql
 
+-- wf_TRS_Stage_Load_TOA
+!source wf_TRS_Stage_Load_TOA/sp_snow_main_m_Tgt_C_S_TRS_Stg_TOA.sql
+
 -- what was installed
 SHOW USER FUNCTIONS LIKE 'FN_SNOW_HELPER%';
 SHOW PROCEDURES LIKE 'SP_SNOW_MAIN_%';

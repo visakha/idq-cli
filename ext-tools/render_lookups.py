@@ -19,7 +19,8 @@ TYPE = {'ExpressionTx': 'Expression', 'MappletInputTx': 'Mapplet input', 'Source
 MATCH = {'returnAny': 'any row', 'returnFirst': 'first row', 'returnLast': 'last row',
          'reportError': 'error', 'returnAll': 'all rows'}
 WF = {'wf_TRS_Stage_Load_1_Ongoing.xml': 'TRS', 'wf_ECI_Stage_Load.xml': 'ECI', 'wf_FSS_Stage_Load.xml': 'FSS',
-      'wf_TTF_Stage_Load.xml': 'TTF', 'wf_WIC_Stage_Load.xml': 'WIC', 'wf_CRE_Stage_Load_Ongoing.xml': 'CRE'}
+      'wf_TTF_Stage_Load.xml': 'TTF', 'wf_WIC_Stage_Load.xml': 'WIC', 'wf_CRE_Stage_Load_Ongoing.xml': 'CRE',
+      'wf_TRS_Stage_Load_TOA.xml': 'TRS'}
 
 
 def code(s):

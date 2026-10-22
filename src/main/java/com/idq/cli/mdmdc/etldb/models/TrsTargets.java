@@ -51,6 +51,14 @@ public final class TrsTargets {
     public record TypeOfAssistance(@Id String pkeySrcObject, @Embedded.Empty MdmAudit audit,
             @Embedded.Empty Columns.TypeOfAssistance columns) implements StagingRow<Columns.TypeOfAssistance> {}
 
+    /// `C_S_LU_TOA` - the TIERS type-of-assistance catalogue (`m_Tgt_C_S_TRS_Stg_TOA`). An MDM lookup table: it has
+    /// no `SRC_LAST_UPD_DT`, so it carries its own audit columns instead of [MdmAudit].
+    @Table("C_S_LU_TOA")
+    public record TypeOfAssistanceCatalogue(@Id String pkeySrcObject, LocalDateTime lastUpdateDate,
+            LocalDateTime createDate, String creator, String updatedBy, String srcRowid, Integer hubStateInd,
+            String toaCd, String toaLbl, String toaDesc, String mbrPrgCd, LocalDateTime effStrtDt,
+            LocalDateTime effEndDt) {}
+
     @Table("C_S_TRS_PTY_RLE_REL")
     public record Relationship(@Id String pkeySrcObject, @Embedded.Empty MdmAudit audit,
             @Embedded.Empty Columns.Relationship columns) implements StagingRow<Columns.Relationship> {}

@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /// Spring Data JDBC entities that mirror, column for column, the TRS source tables and views read by
-/// `wf_TRS_Stage_Load_1_Ongoing`.
+/// `wf_TRS_Stage_Load_1_Ongoing` and `wf_TRS_Stage_Load_TOA` ([LuToaDelta]).
 ///
 /// The mappings read through their `IdqMapInitQuery` records in [TrsQueryRows]; these entities
 /// are the raw-table view used by the audit reports (`adhoc_runs_TRS`) and the rows the mock data inserts. Source
@@ -1630,6 +1630,61 @@ public final class TrsSources {
                         orgNm, bldgNmbr, subBldgNm, subBldgDesc, geocdStsCd, rsdntlDlvryInd, addrdrRsltPct, erlyWrngCd,
                         cassErrCd, dlvryPntVldn, srcAddrLn1, srcAddrLn2, srcCity, srcCounty, srcState, srcCntry,
                         srcPstlCd, srcPstlCdExt);
+            }
+        }
+    }
+
+    /// Provisional `@Id` `TOA_CODE`: the table has no primary key, Spring Data JDBC needs one.
+    /// `STG_TRS_D_LU_TOA`: the TIERS type-of-assistance catalogue, read by `m_Tgt_C_S_TRS_Stg_TOA`
+    /// (`wf_TRS_Stage_Load_TOA`).
+    @Table("STG_TRS_D_LU_TOA")
+    public record LuToaDelta(String programCode, @Id String toaCode, String toaDesc, BigDecimal displayOrderNum,
+            LocalDateTime effBeginDt, LocalDateTime effEndDt, BigDecimal historySeq, BigDecimal uniqueTransId,
+            String histNavInd, String createUserId, LocalDateTime createDt, String updateUserId,
+            LocalDateTime updateDt, LocalDateTime archiveDt, LocalDateTime loadDate) {
+
+        /// `LuToaDelta.builder().toaCode(...).build()`; columns not set are `NULL`.
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public static final class Builder {
+            private String programCode;
+            private String toaCode;
+            private String toaDesc;
+            private BigDecimal displayOrderNum;
+            private LocalDateTime effBeginDt;
+            private LocalDateTime effEndDt;
+            private BigDecimal historySeq;
+            private BigDecimal uniqueTransId;
+            private String histNavInd;
+            private String createUserId;
+            private LocalDateTime createDt;
+            private String updateUserId;
+            private LocalDateTime updateDt;
+            private LocalDateTime archiveDt;
+            private LocalDateTime loadDate;
+
+            public Builder programCode(String value) { programCode = value; return this; }
+            public Builder toaCode(String value) { toaCode = value; return this; }
+            public Builder toaDesc(String value) { toaDesc = value; return this; }
+            public Builder displayOrderNum(BigDecimal value) { displayOrderNum = value; return this; }
+            public Builder effBeginDt(LocalDateTime value) { effBeginDt = value; return this; }
+            public Builder effEndDt(LocalDateTime value) { effEndDt = value; return this; }
+            public Builder historySeq(BigDecimal value) { historySeq = value; return this; }
+            public Builder uniqueTransId(BigDecimal value) { uniqueTransId = value; return this; }
+            public Builder histNavInd(String value) { histNavInd = value; return this; }
+            public Builder createUserId(String value) { createUserId = value; return this; }
+            public Builder createDt(LocalDateTime value) { createDt = value; return this; }
+            public Builder updateUserId(String value) { updateUserId = value; return this; }
+            public Builder updateDt(LocalDateTime value) { updateDt = value; return this; }
+            public Builder archiveDt(LocalDateTime value) { archiveDt = value; return this; }
+            public Builder loadDate(LocalDateTime value) { loadDate = value; return this; }
+
+            public LuToaDelta build() {
+                return new LuToaDelta(programCode, toaCode, toaDesc, displayOrderNum, effBeginDt, effEndDt,
+                        historySeq, uniqueTransId, histNavInd, createUserId, createDt, updateUserId, updateDt,
+                        archiveDt, loadDate);
             }
         }
     }

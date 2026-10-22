@@ -6,6 +6,7 @@ import com.idq.cli.domain.MemberMapping;
 import com.idq.cli.domain.SubDomain;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AddressAssignment;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AssistanceSegment;
+import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AssistanceType;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.AuthorizedRepresentative;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.CaseContact;
 import com.idq.cli.source.trs.etldb.models.TrsQueryRows.DistinctAddress;
@@ -19,7 +20,8 @@ import com.idq.cli.source.trs.etldb.models.TrsQueryRows.PrimaryCareProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/// Registers the plain TRS services with the workflow runner (`wf_TRS_Stage_Load_1_Ongoing`, 001 to 012).
+/// Registers the plain TRS services with the workflow runner (`wf_TRS_Stage_Load_1_Ongoing`, 001 to 012, and
+/// `wf_TRS_Stage_Load_TOA`, 035).
 @Configuration
 public class TrsMappings {
 
@@ -88,6 +90,12 @@ public class TrsMappings {
     MemberMapping<?, ?> trsTypeOfAssistanceMapping(TrsTypeOfAssistanceService service) {
         return new ServiceMapping<>(TrsTypeOfAssistanceService.INFO, SubDomain.ROLE, AssistanceSegment.class,
                 service::fetchAssistanceSegments, NoLookups::none, service::transform, service::load);
+    }
+
+    @Bean
+    MemberMapping<?, ?> trsTypeOfAssistanceCatalogueMapping(TrsTypeOfAssistanceCatalogueService service) {
+        return new ServiceMapping<>(TrsTypeOfAssistanceCatalogueService.INFO, SubDomain.REFERENCE, AssistanceType.class,
+                service::fetchAssistanceTypes, NoLookups::none, service::transform, service::load);
     }
 
     @Bean

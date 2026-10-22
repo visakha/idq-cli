@@ -10,6 +10,7 @@ Drop-in Oracle PL/SQL replacements for the 39 IDQ mappings of the six stage-load
 | `docs/wf_WIC_Stage_Load.xml` | 5 | [wf_WIC_Stage_Load](wf_WIC_Stage_Load/) | [run_wf_WIC_Stage_Load.sql](wf_WIC_Stage_Load/run_wf_WIC_Stage_Load.sql) |
 | `docs/wf_TRS_Stage_Load_1_Ongoing.xml` | 14 | [wf_TRS_Stage_Load_1_Ongoing](wf_TRS_Stage_Load_1_Ongoing/) | [run_wf_TRS_Stage_Load_1_Ongoing.sql](wf_TRS_Stage_Load_1_Ongoing/run_wf_TRS_Stage_Load_1_Ongoing.sql) |
 | `docs/wf_CRE_Stage_Load_Ongoing.xml` | 1 | [wf_CRE_Stage_Load_Ongoing](wf_CRE_Stage_Load_Ongoing/) | [run_wf_CRE_Stage_Load_Ongoing.sql](wf_CRE_Stage_Load_Ongoing/run_wf_CRE_Stage_Load_Ongoing.sql) |
+| `docs/wf_TRS_Stage_Load_TOA.xml` | 1 | [wf_TRS_Stage_Load_TOA](wf_TRS_Stage_Load_TOA/) | [run_wf_TRS_Stage_Load_TOA.sql](wf_TRS_Stage_Load_TOA/run_wf_TRS_Stage_Load_TOA.sql) |
 
 Each mapping spec in `docs-from-idq-exports/<workflow>/mappings/<mapping>.md` has an **Oracle stored procedure** section with what
 the procedure does, its parameters, the tables it writes and the shared objects it calls. Each workflow README in

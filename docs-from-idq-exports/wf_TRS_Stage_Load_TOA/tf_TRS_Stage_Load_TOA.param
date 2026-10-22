@@ -1,0 +1,7 @@
+#USE_SECTIONS
+
+[Global]
+$$MappingName=
+
+[HHS_MDM_Stage].[TRS].[mct_Tgt_C_S_TRS_Stg_TOA]
+$$MappingName=m_Tgt_C_S_TRS_Stg_TOA

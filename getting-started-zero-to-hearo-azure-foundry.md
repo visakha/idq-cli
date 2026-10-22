@@ -368,8 +368,11 @@ Read first: README.md, user-guide-cli.md, the newest gathered-kb-todos-and-impro
 
 ## Conventions
 - STG _D_ / _H_ tables map to `<Name>Delta` / `<Name>Hist` records.
-- 6 sources (TRS, ECI, FSS, TTF, WIC, CRE), 34 in-scope mappings. CRE is the 6th: one mapping
+- 6 sources (TRS, ECI, FSS, TTF, WIC, CRE), 35 in-scope mappings. CRE is the 6th: one mapping
   (m_Tgt_C_S_CRE_CARE_Clients, 034) loads every C_S_CRE_* target plus CRE_SRC_MRG; no validation mapping.
+- TRS has two workflows (SourceSystem.workflows): wf_TRS_Stage_Load_1_Ongoing (001-012), then
+  wf_TRS_Stage_Load_TOA (035, m_Tgt_C_S_TRS_Stg_TOA: TOA catalogue STG_TRS_D_LU_TOA -> C_S_LU_TOA, reference data,
+  not members; member TOA is 008). Every engine runs both, in that order, as the daily parent workflow does.
 - New non-obvious IDQ behaviour (quirks/defects) goes into docs/common_insights.md and is called out in the reply.
 - Mapping docs (docs/mappings/*.md) were generated; edit them directly now and keep SQL in sync with *Queries classes.
   "## Lookups" blocks between <!-- lookups:begin/end --> markers come from ext-tools/lookups.py + render_lookups.py.

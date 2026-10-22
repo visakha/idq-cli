@@ -30,7 +30,7 @@ Contents
 |---|---|
 | Source system | One of the six feeds: `TRS`, `ECI`, `FSS`, `TTF`, `WIC`, `CRE`. Each has its own IDQ workflow (`wf_*_Stage_Load`) and its own source tables (`STG_*`, `V_*`). |
 | Domain / sub-domain | Everything implemented is in the `MEMBER` domain (`PROVIDER` is listed but not implemented). Sub-domains: Demographics, Phone-email, Address, Alternate-ID, Alternate-Name, Party-Managed-Attrib, Role. |
-| Mapping | One IDQ mapping ported to Java, e.g. `m_Tgt_C_S_ECI_Pty_Rle_Rel`. 34 mappings in total; each has a document in `docs/mappings/NNN_<mapping>.md`. |
+| Mapping | One IDQ mapping ported to Java, e.g. `m_Tgt_C_S_ECI_Pty_Rle_Rel`. 35 mappings in total (TRS runs two workflows: Ongoing, then TOA, 035); each has a document in `docs/mappings/NNN_<mapping>.md`. |
 | Target table | The `C_S_*` staging table a mapping loads, e.g. `C_S_ECI_PTY_RLE_REL`. |
 | IdqMapInitQuery | The first SQL a mapping runs to read its source rows. In Java it is a `@Query` method on the repository of the table it reads, returning a record, e.g. `EciFamilyDeltaRepository#fetchFamilyRelations` returning `EciQueryRows.FamilyRelation`. |
 | Latch | The CLI's working context: one source system, optionally one target table and one mapping (plus one or more domains). Commands act on what is latched. |
@@ -150,7 +150,7 @@ Each line shows `[requires ...]` for commands that need a latch first.
 
 ```text
 idq (no context)> show-sources
-TRS  wf_TRS_Stage_Load_1_Ongoing (TIERS eligibility system)
+TRS  wf_TRS_Stage_Load_1_Ongoing + wf_TRS_Stage_Load_TOA (TIERS eligibility system)
   source tables: [STG_TRS_D_DC_INDV, STG_TRS_D_CV_DC_MCI_INDV, ...]
   target tables: [C_S_TRS_PTY, C_S_TRS_PTY_RLE, C_S_TRS_PTY_MNG_ATTR, ...]
 ECI  wf_ECI_Stage_Load (ECI child and family system)
@@ -449,7 +449,7 @@ directory. Exit code `0` means the test passed.
 ```bat
 mvnw test                                                    all unit tests, no database needed
 mvnw test -Dtest=EciPkeyTest                                 the PKEY tests of one source
-mvnw test -Dtest=OracleWorkflowIT                            all 34 mappings against OCI on mock data
+mvnw test -Dtest=OracleWorkflowIT                            all 35 mappings against OCI on mock data
 mvnw test -Dtest=OracleWorkflowIT#runWritesAuditReports -Dsource=TRS
 mvnw test -Dtest=SourceEntitiesIT                            every source / MDM / reference entity against OCI
 ```
@@ -680,7 +680,7 @@ Then run the command. Without an argument it lists the source systems and asks w
 idq (no context)> compare-etl-process
 Compare etl-process ORA_SP vs IDQ (no mock data; the source tables are left unchanged).
 Source systems:
-  1) TRS  wf_TRS_Stage_Load_1_Ongoing (TIERS eligibility system)
+  1) TRS  wf_TRS_Stage_Load_1_Ongoing + wf_TRS_Stage_Load_TOA (TIERS eligibility system)
   2) ECI  wf_ECI_Stage_Load (ECI child and family system)
   3) FSS  wf_FSS_Stage_Load (FSS source system)
   4) TTF  wf_TTF_Stage_Load (TTF source system)

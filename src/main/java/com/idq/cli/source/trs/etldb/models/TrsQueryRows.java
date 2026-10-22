@@ -72,4 +72,9 @@ public final class TrsQueryRows {
             BigDecimal addrdrRsltPct, String erlyWrngCd, String cassErrCd, String dlvryPntVldn, String srcAddrLn1,
             String srcAddrLn2, String srcCity, String srcCounty, String srcState, String srcCntry, String srcPstlCd,
             String srcPstlCdExt) {}
+
+    /// [docs/mappings/035_m_Tgt_C_S_TRS_Stg_TOA.md#trs-035-type-of-assistance-catalogue]
+    public record AssistanceType(String programCode, String toaCode, String toaDesc, LocalDateTime effBeginDt,
+            LocalDateTime effEndDt, LocalDateTime createDt, String updateUserId, LocalDateTime updateDt,
+            BigDecimal uniqueTransId) {}
 }

@@ -4,7 +4,8 @@ One document per IDQ mapping, in workflow execution order. Shared mapplet logic
 (name standardization, address validation, phone / e-mail rules, timestamps) is described in
 [000_mapplets.md](000_mapplets.md).
 
-Workflow order: TRS 001, 007, 002-006, 008-012; ECI 013-018; FSS 019-024; TTF 025-028; WIC 029-033; CRE 034.
+Workflow order: TRS 001, 007, 002-006, 008-012; ECI 013-018; FSS 019-024; TTF 025-028; WIC 029-033; CRE 034; TRS TOA catalogue 035 (separate workflow `wf_TRS_Stage_Load_TOA`, run after the TRS
+Ongoing workflow).
 
 | # | Mapping | Source | Sub-domain |
 |---|---|---|---|
@@ -42,3 +43,4 @@ Workflow order: TRS 001, 007, 002-006, 008-012; ECI 013-018; FSS 019-024; TTF 02
 | [032](032_m_Tgt_C_S_WIC_Pty_Rle_Alt_Id.md) | `m_Tgt_C_S_WIC_Pty_Rle_Alt_Id` | WIC | Alternate-ID |
 | [033](033_m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr.md) | `m_Tgt_C_S_WIC_Pty_Rle_Phn_And_EAddr` | WIC | Phone-email |
 | [034](034_m_Tgt_C_S_CRE_CARE_Clients.md) | `m_Tgt_C_S_CRE_CARE_Clients` | CRE (CARE clients) | Demographics (plus Role), Address, Phone-email, Alternate-ID |
+| [035](035_m_Tgt_C_S_TRS_Stg_TOA.md) | `m_Tgt_C_S_TRS_Stg_TOA` | TRS (TOA workflow) | Reference data (TOA catalogue) |

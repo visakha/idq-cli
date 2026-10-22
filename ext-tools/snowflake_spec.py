@@ -20,7 +20,7 @@ OUT_DIR = os.path.join(ROOT, 'docs-from-snowflake-db-scripts')
 IDMC_DIR = os.path.join(ROOT, 'docs-from-idq-exports')
 DOCS_DIR = os.path.join(ROOT, 'docs', 'mappings')
 WORKFLOWS = ['wf_ECI_Stage_Load', 'wf_FSS_Stage_Load', 'wf_TTF_Stage_Load', 'wf_WIC_Stage_Load',
-             'wf_TRS_Stage_Load_1_Ongoing', 'wf_CRE_Stage_Load_Ongoing']
+             'wf_TRS_Stage_Load_1_Ongoing', 'wf_CRE_Stage_Load_Ongoing', 'wf_TRS_Stage_Load_TOA']
 MARKERS = ('VALIDATION', 'BAD DATA', 'TIMELINE')
 
 

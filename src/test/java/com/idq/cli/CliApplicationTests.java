@@ -15,7 +15,7 @@ class CliApplicationTests {
 
     @Test
     void contextLoadsWithEveryMapping() {
-        assertThat(catalog.all()).hasSize(34);
+        assertThat(catalog.all()).hasSize(35);
         assertThat(catalog.all().getFirst().info().name()).isEqualTo("m_Tgt_C_S_TRS_Pty_OnGoing");
     }
 }
