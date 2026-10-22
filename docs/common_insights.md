@@ -189,6 +189,13 @@ A re-implementation that misses these gives different results:
   has not merged yet go to `CRE_SRC_MRG` for MDM to merge.
 - **Every workflow ends with a command task** that touches `<workflow>.ind` on the DIS host, an indicator file for
   whatever runs next.
+- **WIC deactivation workflows** (`wf_WIC_Deactivation_Initial` / `_Complete`, outside the 34 mappings; see
+  `docs-wic-activations-workflow/`). Initial truncates `HHS_MDM_ORS.ZZ_UTL_UNMERGE_TREE_SRC_KEY`, copies every `P`
+  status into it and runs `unmerge_soft_delete_party.sh` on the MDM host. Complete moves `P` to `D` once the WIC
+  `C_B_PTY_XREF` row has `HUB_STATE_IND = -1`, and **overwrites `DEACTIVATION_DT`** with its own run start, so the
+  decision date is lost. Unbound workflow variables keep their initial value: Complete's gate
+  `$var:MappingIsSuccessful = true` is always true. Initial's "no data" gate (`TgtRows = 0`) cannot tell an
+  empty copy from a failed one, so a failed run still writes the `.ind` file.
 - FSS and WIC use a **constant address type `'002'`** (physical mail), so their address score depends only on the
   mailability score and the match code. ECI and TRS look the type up, and an untranslatable type scores `'40'`.
 
