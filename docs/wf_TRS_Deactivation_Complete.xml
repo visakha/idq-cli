@@ -1,0 +1,783 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Informatica proprietary -->
+<imx:IMX xmlns:imx="http://com.informatica.imx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" serializationSpecVersion="14.0" crcEnabled="1" xmlns:connectinfo1="http://com.informatica.metadata.common.connectinfo/2" versionconnectinfo1="2.4.0" xmlns:typelibrary="http://com.informatica.metadata.common.typesystem.typelibrary/2" versiontypelibrary="2.5.0" xmlns:binding="http://com.informatica.metadata.common.binding/1" versionbinding="1.13.0" xmlns:description="http://com.informatica.metadata.common.description/2" versiondescription="2.1.0" xmlns:project="http://com.informatica.metadata.common.project/2" versionproject="2.2.0" xmlns:source1="http://com.informatica.metadata.common.txhandlerconfig.source/2" versionsource1="2.1.0" xmlns:source="http://com.informatica.metadata.common.transformation.source/2" versionsource="2.1.0" xmlns:target1="http://com.informatica.metadata.common.txhandlerconfig.target/2" versiontarget1="2.4.0" xmlns:resourceaccess1="http://com.informatica.metadata.common.txhandlerconfig.resourceaccess/2" versionresourceaccess1="2.1.0" xmlns:datasourceoperation="http://com.informatica.metadata.relational.datasourceoperation/2" versiondatasourceoperation="2.11.0" xmlns:datarecord="http://com.informatica.metadata.relational.datarecord/2" versiondatarecord="2.5.0" xmlns:connectinfo="http://com.informatica.metadata.relational.connectinfo/0" versionconnectinfo="9.0.11.0" xmlns:optimizer="http://com.informatica.metadata.common.optimizer/1" versionoptimizer="1.0.1" xmlns:txhandlerconfig="http://com.informatica.metadata.common.txhandlerconfig/2" versiontxhandlerconfig="2.1.1" xmlns:parameter="http://com.informatica.metadata.common.parameter/9" versionparameter="9.11.1" xmlns:optimizerconfig="http://com.informatica.metadata.common.optimizerconfig/1" versionoptimizerconfig="1.0.0" xmlns:property="http://com.informatica.metadata.common.property/1" versionproperty="1.2.0" xmlns:value="http://com.informatica.metadata.common.value/1" versionvalue="1.1.0" xmlns:lookup="http://com.informatica.metadata.common.transformation.lookup/2" versionlookup="2.6.0" xmlns:types="http://com.informatica.metadata.common.types/2" versiontypes="2.4.0" xmlns:mapping="http://com.informatica.metadata.common.task.mapping/1" versionmapping="1.13.0" xmlns:adapter="http://com.informatica.metadata.common.adapter/2" versionadapter="2.2.0" xmlns:expression="http://com.informatica.metadata.common.transformation.expression/2" versionexpression="2.3.0" xmlns:workflow="http://com.informatica.metadata.common.workflow/1" versionworkflow="1.4.1" xmlns:datasourceoperation1="http://com.informatica.metadata.common.datasourceoperation/2" versiondatasourceoperation1="2.6.1" xmlns:genericannotation="http://com.informatica.metadata.common.genericannotation/2" versiongenericannotation="2.1.0" xmlns:datahandler="http://com.informatica.metadata.common.datahandler/2" versiondatahandler="2.2.0" xmlns:runtime="http://com.informatica.metadata.common.runtime/2" versionruntime="2.14.0" xmlns:transformation="http://com.informatica.metadata.common.transformation/3" versiontransformation="3.6.0" xmlns:dsoconfig1="http://com.informatica.metadata.common.dsoconfig/2" versiondsoconfig1="2.1.0" xmlns:lookup1="http://com.informatica.metadata.common.txhandlerconfig.lookup/2" versionlookup1="2.3.0" xmlns:command="http://com.informatica.metadata.common.task.command/1" versioncommand="1.0.0" xmlns:target="http://com.informatica.metadata.common.transformation.target/2" versiontarget="2.4.0" xmlns:updatestrategy="http://com.informatica.metadata.common.transformation.updatestrategy/2" versionupdatestrategy="2.6.0" xmlns:filter="http://com.informatica.metadata.common.transformation.filter/2" versionfilter="2.4.0" xmlns:core="http://com.informatica.metadata.common.core/2" versioncore="2.2.1" xmlns:task="http://com.informatica.metadata.common.task/1" versiontask="1.4.0" xmlns:mapping1="http://com.informatica.metadata.common.mapping/2" versionmapping1="2.11.1" xmlns:resourceaccess="http://com.informatica.metadata.common.transformation.resourceaccess/2" versionresourceaccess="2.3.0" xmlns:dsoconfig="http://com.informatica.metadata.relational.dsoconfig/2" versiondsoconfig="2.2.0" xmlns:variable="http://com.informatica.metadata.common.variable/1" versionvariable="1.1.0" xmlns:pdo="http://com.informatica.metadata.common.optimizerconfig.pdo/1" versionpdo="1.0.0" xmlns:typesystem="http://com.informatica.metadata.common.typesystem/2" versiontypesystem="2.2.0" xmlns:basic="http://com.informatica.metadata.common.task.basic/1" versionbasic="1.4.0" xsi:schemaLocation="http://com.informatica.imx IMX.xsd http://com.informatica.metadata.common.connectinfo/2 com.informatica.metadata.common.connectinfo.xsd http://com.informatica.metadata.common.typesystem.typelibrary/2 com.informatica.metadata.common.typesystem.typelibrary.xsd http://com.informatica.metadata.common.binding/1 com.informatica.metadata.common.binding.xsd http://com.informatica.metadata.common.description/2 com.informatica.metadata.common.description.xsd http://com.informatica.metadata.common.project/2 com.informatica.metadata.common.project.xsd http://com.informatica.metadata.common.txhandlerconfig.source/2 com.informatica.metadata.common.txhandlerconfig.source.xsd http://com.informatica.metadata.common.transformation.source/2 com.informatica.metadata.common.transformation.source.xsd http://com.informatica.metadata.common.txhandlerconfig.target/2 com.informatica.metadata.common.txhandlerconfig.target.xsd http://com.informatica.metadata.common.txhandlerconfig.resourceaccess/2 com.informatica.metadata.common.txhandlerconfig.resourceaccess.xsd http://com.informatica.metadata.relational.datasourceoperation/2 com.informatica.metadata.relational.datasourceoperation.xsd http://com.informatica.metadata.relational.datarecord/2 com.informatica.metadata.relational.datarecord.xsd http://com.informatica.metadata.relational.connectinfo/0 com.informatica.metadata.relational.connectinfo.xsd http://com.informatica.metadata.common.optimizer/1 com.informatica.metadata.common.optimizer.xsd http://com.informatica.metadata.common.txhandlerconfig/2 com.informatica.metadata.common.txhandlerconfig.xsd http://com.informatica.metadata.common.parameter/9 com.informatica.metadata.common.parameter.xsd http://com.informatica.metadata.common.optimizerconfig/1 com.informatica.metadata.common.optimizerconfig.xsd http://com.informatica.metadata.common.property/1 com.informatica.metadata.common.property.xsd http://com.informatica.metadata.common.value/1 com.informatica.metadata.common.value.xsd http://com.informatica.metadata.common.transformation.lookup/2 com.informatica.metadata.common.transformation.lookup.xsd http://com.informatica.metadata.common.types/2 com.informatica.metadata.common.types.xsd http://com.informatica.metadata.common.task.mapping/1 com.informatica.metadata.common.task.mapping.xsd http://com.informatica.metadata.common.adapter/2 com.informatica.metadata.common.adapter.xsd http://com.informatica.metadata.common.transformation.expression/2 com.informatica.metadata.common.transformation.expression.xsd http://com.informatica.metadata.common.workflow/1 com.informatica.metadata.common.workflow.xsd http://com.informatica.metadata.common.datasourceoperation/2 com.informatica.metadata.common.datasourceoperation.xsd http://com.informatica.metadata.common.genericannotation/2 com.informatica.metadata.common.genericannotation.xsd http://com.informatica.metadata.common.datahandler/2 com.informatica.metadata.common.datahandler.xsd http://com.informatica.metadata.common.runtime/2 com.informatica.metadata.common.runtime.xsd http://com.informatica.metadata.common.transformation/3 com.informatica.metadata.common.transformation.xsd http://com.informatica.metadata.common.dsoconfig/2 com.informatica.metadata.common.dsoconfig.xsd http://com.informatica.metadata.common.txhandlerconfig.lookup/2 com.informatica.metadata.common.txhandlerconfig.lookup.xsd http://com.informatica.metadata.common.task.command/1 com.informatica.metadata.common.task.command.xsd http://com.informatica.metadata.common.transformation.target/2 com.informatica.metadata.common.transformation.target.xsd http://com.informatica.metadata.common.transformation.updatestrategy/2 com.informatica.metadata.common.transformation.updatestrategy.xsd http://com.informatica.metadata.common.transformation.filter/2 com.informatica.metadata.common.transformation.filter.xsd http://com.informatica.metadata.common.core/2 com.informatica.metadata.common.core.xsd http://com.informatica.metadata.common.task/1 com.informatica.metadata.common.task.xsd http://com.informatica.metadata.common.mapping/2 com.informatica.metadata.common.mapping.xsd http://com.informatica.metadata.common.transformation.resourceaccess/2 com.informatica.metadata.common.transformation.resourceaccess.xsd http://com.informatica.metadata.relational.dsoconfig/2 com.informatica.metadata.relational.dsoconfig.xsd http://com.informatica.metadata.common.variable/1 com.informatica.metadata.common.variable.xsd http://com.informatica.metadata.common.optimizerconfig.pdo/1 com.informatica.metadata.common.optimizerconfig.pdo.xsd http://com.informatica.metadata.common.typesystem/2 com.informatica.metadata.common.typesystem.xsd http://com.informatica.metadata.common.task.basic/1 com.informatica.metadata.common.task.basic.xsd" serDeCompatibilityAnnotation="com.informatica.metadata.common.transformation#TransformationDataInterface:output=4,input=4|AbstractTransformation:tracing=4,variableFnTypeUsable=4,aggregateFnTypeUsable=4,active=4|DerivableField:expression=4,variable=4|TransformationField:output=4,input=4~com.informatica.metadata.common.transformation.filter#FilterTx:variableFnTypeUsable=4,aggregateFnTypeUsable=4~com.informatica.metadata.common.property#StringBoxedReceiverObject:value=4|BoxedReceiverObject:isReceiving=4~com.informatica.metadata.common.description#Description:body=4~com.informatica.metadata.common.txhandlerconfig.lookup#LookupHandlerConfig:cacheFileNamePrefix=4,indexCacheSize=4,cachePreBuilt=4,recacheFromLkpSource=4,cacheDirectory=4,dataCacheSize=4~com.informatica.metadata.common.types#BooleanValue:value=4~com.informatica.metadata.relational.datasourceoperation#WriteRelationalDataSourceOperation:postSQL=4,updateOverride=4,createTargetQuery=4,reCreateTargetTable=4,targetSchemaStrategy=4,truncateHiveTargetPartitionOnly=4,insert=4,autoSync=4,tableNamePrefix=4,delete=4,truncateTargetTable=4,updateStrategy=4,hadoopConnectorArgs=4,ignoreHadoopConnector=4,preSQL=4|RelationalField:odbcScale=4,name=4|RelationalRecordInstance:ownerName=4,physicalName=4|ReadRelationalDataSourceOperation:postSQL=4,queryMode=4,sqlQuery=4,sortOrders=4,hintsAfterQuery=4,distinct=4,autoSync=4,tableNamePrefix=4,joinCondition=4,sqlSafeForSubquery=4,filterCondition=4,hadoopConnectorArgs=4,ignoreHadoopConnector=4,hintsAfterSelect=4,sortedPorts=4,preSQL=4~com.informatica.metadata.common.transformation.lookup#DynamicCacheField:ignoreInMatch=4,associatedExpression=4,associatedFieldType=4,ignoreNulls=4|LookupTx:nullHighest=4,sortedInput=4,dynamicCache=4,stringCompareWithCase=4,ignoreNullComparision=4,insertElseUpdate=4,oldValueReturnedOnUpdate=4,updateElseInsert=4,persistentCache=4~com.informatica.metadata.common.txhandlerconfig.target#TargetTxHandlerConfig:rejectDirectory=4~com.informatica.metadata.common.datasourceoperation#DataAccessGroup:input=4~com.informatica.metadata.common.typesystem.typelibrary#StructuralFeature:nullable=4,scale=4|TypeLibrary:urn=4,urnPrefix=4,name=4~com.informatica.metadata.common.task.basic#StartTask:catchMode=4|EndTask:endMode=4~com.informatica.metadata.common.optimizerconfig.pdo#PushdownConfig:safeForPushdown=4,pushdownType=4~com.informatica.metadata.common.project#Project:shared=4~com.informatica.metadata.common.transformation.target#TargetTx:rejectOverflow=4,orderInsensitive=4,dynamicField=4,loadScope=4~com.informatica.metadata.common.task.command#CommandTaskConfig:isNewExecutionShell=4~com.informatica.metadata.common.transformation.expression#ExpressionTx:isPartitionable=4,orderInsensitive=4,variableFnTypeUsable=4,aggregateFnTypeUsable=4~com.informatica.metadata.common.core#NamedElement:name=4~com.informatica.metadata.relational.connectinfo#OracleNativeConnectInfo:connectionRetryPeriod=4,quoteChar=4,enableParallelMode=4,password=4,environmentSQL=4,enableKerberosAuthentication=4,enableQuotes=4,impersonateUser=4,transactionSQL=4,userName=4,connectString=4~com.informatica.metadata.common.workflow#TaskInstance:activationMode=4|SequenceFlow:condition=4,isDefault=4|RuntimeWorkflowCharacteristic:enableAutoRecovery=4~com.informatica.metadata.common.transformation.resourceaccess#ResourceAccessTx:dsoName=4,refreshSchemaAtRuntime=4~com.informatica.metadata.common.transformation.updatestrategy#UpdateStrategyTx:useHiveMerge=4,variableFnTypeUsable=4,aggregateFnTypeUsable=4|UpdateStrategyField:orderByKey=4,ascending=4~com.informatica.metadata.common.datahandler#DataElement:lower=4,precision=4,upper=4,scale=4~com.informatica.metadata.relational.datarecord#RelationalRecord:ownerName=4|Table:tableType=4|Column:odbcScale=4,nullable=4,scale=4~com.informatica.metadata.common.runtime#ExecutionEnvironment:version=4|StreamingConfig:checkpointDirectory=4,connectionName=4|NativePartitioningConfig:maxParallelism=4|RuntimeCharacteristic:maximumDataErrors=4,stateStore=4,maximumRowsReadPerPartition=4,targetCommitInterval=4~com.informatica.metadata.common.task#AbstractTask:taskRecoveryStrategy=4,asynchronous=4~com.informatica.metadata.common.connectinfo#ConnectionPoolAttributes:maxIdelTime=4,minConnections=4,poolSize=4,usePool=4|ConnectInfo:passThruEnabled=4">
+<workflow:Workflow imx:id="U:8JkmlA2cEeuewz-Hobq1Tw" firstInstance="U:8JkmlQ2cEeuewz-Hobq1Tw" name="wf_TRS_Deactivation_Complete">
+<annotations>
+<Annotation imx:id="ID_1" xsi:type="description:Description" body="This+job+examines+all+source+keys+in+the+MDM+and+marks+the+equivalent+source+key+in+the+the+deactivation+log+in+staging+as+%22processed%22+so+it+will+not+run+through+deactivation+processing+again."/>
+</annotations>
+<characteristics>
+<Characteristic imx:id="ID_2" xsi:type="workflow:RuntimeWorkflowCharacteristic" enableRecovery="true" loglevel="INFO"/>
+</characteristics>
+<taskInstances>
+<TaskInstance imx:id="U:8JkmlQ2cEeuewz-Hobq1Tw" xsi:type="workflow:TaskInstance" name="Start_Event" task="U:8JlN4Q2cEeuewz-Hobq1Tw">
+<anonymousTask imx:id="U:8JlN4Q2cEeuewz-Hobq1Tw" xsi:type="basic:StartTask" name="Start_Event"/>
+<outgoingSequenceFlows>
+<SequenceFlow imx:id="U:kw73dg2dEeuewz-Hobq1Tw" xsi:type="workflow:SequenceFlow" fromInstance="U:8JkmlQ2cEeuewz-Hobq1Tw" name="Start_Event_to_m_Tgt_C_S_TRS_Pty_Deactivation_4_Mark_Processed" toInstance="U:kw73Zg2dEeuewz-Hobq1Tw"/>
+</outgoingSequenceFlows>
+</TaskInstance>
+<TaskInstance imx:id="U:8Jkmlg2cEeuewz-Hobq1Tw" xsi:type="workflow:TaskInstance" incomingSequenceFlows="U:8JkmrA2cEeuewz-Hobq1Tw" name="End_Event" task="U:8JlN4A2cEeuewz-Hobq1Tw">
+<anonymousTask imx:id="U:8JlN4A2cEeuewz-Hobq1Tw" xsi:type="basic:EndTask" name="End_Event"/>
+</TaskInstance>
+<TaskInstance imx:id="U:8JkmmQ2cEeuewz-Hobq1Tw" xsi:type="workflow:TaskInstance" incomingSequenceFlows="U:SUMdk6xJEe---UeWjADCPg" name="Command_Task" task="U:8Jkmqw2cEeuewz-Hobq1Tw">
+<anonymousTask imx:id="U:8Jkmqw2cEeuewz-Hobq1Tw" xsi:type="command:CommandTask" name="Command_Task" command="touch+%24%7Bvar:sys.WorkflowName%7D.ind">
+<commandTaskConfig imx:id="U:8Jkmrg2cEeuewz-Hobq1Tw" xsi:type="command:CommandTaskConfig">
+<stdErrorLength imx:id="U:8Jkmrw2cEeuewz-Hobq1Tw" xsi:type="property:IntegerBoxedReceiverObject" value="1024"/>
+<stdOutLength imx:id="U:8JkmsA2cEeuewz-Hobq1Tw" xsi:type="property:IntegerBoxedReceiverObject" value="1024"/>
+<workingDirectory imx:id="U:8JkmsQ2cEeuewz-Hobq1Tw" xsi:type="property:StringBoxedReceiverObject" value="%2Fopt%2Fapps%2Finformatica%2FSrcFiles%2FIndicators"/>
+</commandTaskConfig>
+</anonymousTask>
+<inputBindings>
+<InputBinding imx:id="ID_3" xsi:type="binding:InputBinding">
+<input imx:id="U:8JkmrQ2cEeuewz-Hobq1Tw" xsi:type="binding:TokenizedTaskInput" name="sys.WorkflowName" type="smd:com.informatica.metadata.seed.variable.VariableTypeSeed.typesystem%2Fstring" token="%24%7Bvar:sys.WorkflowName%7D"/>
+<value imx:id="ID_4" xsi:type="value:RollupVariableValue" variable="smd:com.informatica.metadata.seed.variable.WorkflowSystemVariableSeed.seedContainer%2FWF_SYS_WorkflowName"/>
+</InputBinding>
+</inputBindings>
+<outgoingSequenceFlows>
+<SequenceFlow imx:id="U:8JkmrA2cEeuewz-Hobq1Tw" xsi:type="workflow:SequenceFlow" fromInstance="U:8JkmmQ2cEeuewz-Hobq1Tw" name="Command_Task_to_End_Event" toInstance="U:8Jkmlg2cEeuewz-Hobq1Tw"/>
+</outgoingSequenceFlows>
+</TaskInstance>
+<TaskInstance imx:id="U:kw73Zg2dEeuewz-Hobq1Tw" xsi:type="workflow:TaskInstance" incomingSequenceFlows="U:kw73dg2dEeuewz-Hobq1Tw" name="m_Tgt_C_S_TRS_Pty_Deactivation_4_Mark_Processed" task="U:kw73Zw2dEeuewz-Hobq1Tw">
+<anonymousTask imx:id="U:kw73Zw2dEeuewz-Hobq1Tw" xsi:type="mapping:MappingTask" name="m_Tgt_C_S_TRS_Pty_Deactivation_4_Mark_Processed" mapping="U:cFe8pg1oEeuewz-Hobq1Tw">
+<mappingTaskConfig imx:id="U:kw73aw2dEeuewz-Hobq1Tw" xsi:type="mapping:MappingTaskConfig">
+<dateFormat imx:id="U:kw73bA2dEeuewz-Hobq1Tw" xsi:type="property:StringBoxedReceiverObject" value="MM%2FDD%2FYYYY+HH24:MI:SS"/>
+<highPrecisionEnabled imx:id="U:kw73bQ2dEeuewz-Hobq1Tw" xsi:type="property:BooleanBoxedReceiverObject" value="true"/>
+<javaClasspath imx:id="U:kw73bg2dEeuewz-Hobq1Tw" xsi:type="property:StringBoxedReceiverObject"/>
+<optimizationLevel imx:id="U:kw73bw2dEeuewz-Hobq1Tw" xsi:type="property:IntegerBoxedReceiverObject" value="2"/>
+<overrideTracingLevel imx:id="U:kw73cA2dEeuewz-Hobq1Tw" xsi:type="property:StringBoxedReceiverObject" value="normal"/>
+<sessionLogFileDirectory imx:id="U:kw73cQ2dEeuewz-Hobq1Tw" xsi:type="property:StringBoxedReceiverObject" isReceiving="true"/>
+<sessionLogFileName imx:id="U:kw73cg2dEeuewz-Hobq1Tw" xsi:type="property:StringBoxedReceiverObject" value="m_Tgt_C_S_TRS_Pty_Deactivation_4_Mark_Processed"/>
+<sessionLogSaveRunCount imx:id="U:kw73cw2dEeuewz-Hobq1Tw" xsi:type="property:IntegerBoxedReceiverObject" value="1"/>
+<sessionLogSaveType imx:id="U:kw73dA2dEeuewz-Hobq1Tw" xsi:type="property:EnumBoxedReceiverObject" value="com.informatica.metadata.common.task.mapping.SessionLogSaveType:TIMESTAMP"/>
+<sortOrder imx:id="U:kw73dQ2dEeuewz-Hobq1Tw" xsi:type="property:StringBoxedReceiverObject" value="binary"/>
+</mappingTaskConfig>
+</anonymousTask>
+<inputBindings>
+<InputBinding imx:id="ID_5" xsi:type="binding:InputBinding">
+<input imx:id="U:kw73ag2dEeuewz-Hobq1Tw" xsi:type="binding:BoxedReceiverTaskInput" boxedReceiverObject="U:kw73cQ2dEeuewz-Hobq1Tw"/>
+<value imx:id="ID_6" xsi:type="value:RollupParameterValue" parameter="smd:com.informatica.metadata.common.parameter.util.InfaParameterSeed.LogDir"/>
+</InputBinding>
+</inputBindings>
+<outgoingSequenceFlows>
+<SequenceFlow imx:id="U:SUMdoaxJEe---UeWjADCPg" xsi:type="workflow:SequenceFlow" fromInstance="U:kw73Zg2dEeuewz-Hobq1Tw" name="m_Tgt_C_S_TRS_Pty_Deactivation_4_Mark_Processed_to_m_Tgt_C_S_TRS_Pty_Rle_Rel_Deactivation_4_Mark_Processed" toInstance="U:SUMdkaxJEe---UeWjADCPg"/>
+</outgoingSequenceFlows>
+<outputBindings>
+<OutputBinding imx:id="ID_7" xsi:type="binding:OutputBinding">
+<output imx:id="U:kw73aQ2dEeuewz-Hobq1Tw" xsi:type="binding:TaskOutputTaskOuput" name="taskStatus" type="smd:com.informatica.metadata.seed.variable.VariableTypeSeed.typesystem%2Fboolean" taskOutput="smd:com.informatica.metadata.seed.task.BaseTaskOutputSeed.taskStatus"/>
+<target imx:id="ID_8" xsi:type="binding:RollupVariableTarget" variable="U:8Jkmmw2cEeuewz-Hobq1Tw"/>
+</OutputBinding>
+</outputBindings>
+</TaskInstance>
+<TaskInstance imx:id="U:SUMdkaxJEe---UeWjADCPg" xsi:type="workflow:TaskInstance" incomingSequenceFlows="U:SUMdoaxJEe---UeWjADCPg" name="m_Tgt_C_S_TRS_Pty_Rle_Rel_Deactivation_4_Mark_Processed" task="U:SUMdkqxJEe---UeWjADCPg">
+<anonymousTask imx:id="U:SUMdkqxJEe---UeWjADCPg" xsi:type="mapping:MappingTask" name="m_Tgt_C_S_TRS_Pty_Rle_Rel_Deactivation_4_Mark_Processed" mapping="U:X-l7ZubaEe6qTkaUv1AtNg">
+<annotations>
+<Annotation imx:id="ID_9" xsi:type="genericannotation:GenericAnnotation" source="autoDeploySource">
+<nameValuePairs>
+<NameValuePair imx:id="ID_10" xsi:type="genericannotation:NameValuePair" name="isSetToAutoDeploy">
+<value xsi:type="types:BooleanValue"/>
+</NameValuePair>
+</nameValuePairs>
+</Annotation>
+</annotations>
+<mappingTaskConfig imx:id="U:SUMdlaxJEe---UeWjADCPg" xsi:type="mapping:MappingTaskConfig">
+<clusterIdentifier imx:id="U:SUMdlqxJEe---UeWjADCPg" xsi:type="property:StringBoxedReceiverObject"/>
+<dateFormat imx:id="U:SUMdl6xJEe---UeWjADCPg" xsi:type="property:StringBoxedReceiverObject" value="MM%2FDD%2FYYYY+HH24:MI:SS"/>
+<highPrecisionEnabled imx:id="U:SUMdmKxJEe---UeWjADCPg" xsi:type="property:BooleanBoxedReceiverObject" value="true"/>
+<javaClasspath imx:id="U:SUMdmaxJEe---UeWjADCPg" xsi:type="property:StringBoxedReceiverObject"/>
+<optimizationLevel imx:id="U:SUMdmqxJEe---UeWjADCPg" xsi:type="property:IntegerBoxedReceiverObject" value="-1"/>
+<overrideTracingLevel imx:id="U:SUMdm6xJEe---UeWjADCPg" xsi:type="property:StringBoxedReceiverObject" value="normal"/>
+<sessionLogFileDirectory imx:id="U:SUMdnKxJEe---UeWjADCPg" xsi:type="property:StringBoxedReceiverObject" isReceiving="true"/>
+<sessionLogFileName imx:id="U:SUMdnaxJEe---UeWjADCPg" xsi:type="property:StringBoxedReceiverObject" value="m_Tgt_C_S_TRS_Pty_Rle_Rel_Deactivation_4_Mark_Processed"/>
+<sessionLogSaveRunCount imx:id="U:SUMdnqxJEe---UeWjADCPg" xsi:type="property:IntegerBoxedReceiverObject" value="1"/>
+<sessionLogSaveType imx:id="U:SUMdn6xJEe---UeWjADCPg" xsi:type="property:EnumBoxedReceiverObject" value="com.informatica.metadata.common.task.mapping.SessionLogSaveType:TIMESTAMP"/>
+<sortOrder imx:id="U:SUMdoKxJEe---UeWjADCPg" xsi:type="property:StringBoxedReceiverObject" value="binary"/>
+</mappingTaskConfig>
+</anonymousTask>
+<inputBindings>
+<InputBinding imx:id="ID_12" xsi:type="binding:InputBinding">
+<input imx:id="U:SUMdlKxJEe---UeWjADCPg" xsi:type="binding:BoxedReceiverTaskInput" boxedReceiverObject="U:SUMdnKxJEe---UeWjADCPg"/>
+<value imx:id="ID_13" xsi:type="value:RollupParameterValue" parameter="smd:com.informatica.metadata.common.parameter.util.InfaParameterSeed.LogDir"/>
+</InputBinding>
+</inputBindings>
+<outgoingSequenceFlows>
+<SequenceFlow imx:id="U:SUMdk6xJEe---UeWjADCPg" xsi:type="workflow:SequenceFlow" fromInstance="U:SUMdkaxJEe---UeWjADCPg" name="m_Tgt_C_S_TRS_Pty_Rle_Rel_Deactivation_4_Mark_Processed_to_Command_Task" toInstance="U:8JkmmQ2cEeuewz-Hobq1Tw"/>
+</outgoingSequenceFlows>
+</TaskInstance>
+</taskInstances>
+<workflowVariables>
+<Variable imx:id="U:8Jkmmw2cEeuewz-Hobq1Tw" xsi:type="variable:UserVariable" type="smd:com.informatica.metadata.seed.variable.VariableTypeSeed.typesystem%2Fboolean" name="MappingIsSuccessful">
+<initialValue imx:id="ID_14" xsi:type="variable:BooleanVariableValue" boolValue="true"/>
+</Variable>
+</workflowVariables>
+</workflow:Workflow>
+<connectinfo:OracleNativeConnectInfo imx:id="stringIdentity:STAGING" connectionType="ORACLE" name="STAGING">
+<defaultAttributes imx:id="U:zz7hD8OmEeW_T_KMlbTRnw" xsi:type="connectinfo1:ConnectionPoolAttributes"/>
+</connectinfo:OracleNativeConnectInfo>
+<connectinfo:OracleNativeConnectInfo imx:id="stringIdentity:HHS_MDM_ORS" connectionType="ORACLE" name="HHS_MDM_ORS">
+<defaultAttributes imx:id="U:51DajsthEeWfK3BfRx1Syg" xsi:type="connectinfo1:ConnectionPoolAttributes"/>
+</connectinfo:OracleNativeConnectInfo>
+<mapping1:Mapping imx:id="U:cFe8pg1oEeuewz-Hobq1Tw" name="m_Tgt_C_S_TRS_Pty_Deactivation_4_Mark_Processed">
+<annotations>
+<Annotation imx:id="ID_15" xsi:type="description:Description" body="This+mapping+runs+after+deactivated+records+in+TIERS+have+been+unmerged+and+soft+deleted+in+the+MDM.++%0D%0AAfter+the+successful+conclusion+of+those+activities%2C+this+mapping+will+udpate+the+processed+flag+in+the+deactivation+table+to+%27Y%27+so+the+data+will+not+get+re-processed+in+the+next+excution.%0D%0A%5BRS:05%2F21%2F2025%5D+Update+the+Source+table+to+ZZ_UTL_UNMERGE_TREE_SRC_KEY"/>
+</annotations>
+<characteristics>
+<Characteristic imx:id="ID_16" xsi:type="runtime:RuntimeCharacteristic" maximumRuntimeIntervalPerSource="PT0S" selectedExecutionEnvironmentName="native" stateStore.="smd:com.informatica.metadata.common.parameter.util.InfaParameterSeed.StateStore">
+<environments>
+<ExecutionEnvironment imx:id="ID_17" xsi:type="runtime:NativeExecutionEnvironment">
+<partitioningConfig imx:id="ID_18" xsi:type="runtime:NativePartitioningConfig"/>
+</ExecutionEnvironment>
+</environments>
+<handlers>
+<TxHandlerConfig imx:id="ID_19" xsi:type="target1:TargetTxHandlerConfig" txInstance="U:cFe8qg1oEeuewz-Hobq1Tw" selectedAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalWriterDataAdapter" rejectDirectory.="smd:com.informatica.metadata.common.parameter.util.InfaParameterSeed.RejectDir" rejectFile="Write_STG_TRS_DEACTIVED_MEMBERS.bad"/>
+<TxHandlerConfig imx:id="ID_20" xsi:type="lookup1:LookupHandlerConfig" txInstance="U:cFe8rA1oEeuewz-Hobq1Tw" selectedAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" cacheDirectory.="smd:com.informatica.metadata.common.parameter.util.InfaParameterSeed.CacheDir" cached="true"/>
+<TxHandlerConfig imx:id="ID_21" xsi:type="source1:SourceTxHandlerConfig" txInstance="U:kIvhoA1rEeuewz-Hobq1Tw" selectedAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter"/>
+</handlers>
+<streamingConfig imx:id="ID_22" xsi:type="runtime:StreamingConfig" batchInterval="PT20S" cacheRefreshInterval="PT1H"/>
+</Characteristic>
+<Characteristic imx:id="ID_23" xsi:type="optimizer:OptimizerCharacteristic">
+<configs>
+<OptimizerConfig imx:id="ID_24" xsi:type="pdo:PushdownConfig"/>
+</configs>
+</Characteristic>
+</characteristics>
+<definedLibraries imx:id="U:cFe8pw1oEeuewz-Hobq1Tw" xsi:type="typelibrary:TypeLibrary" name="Type_Definition_Library" typeSystem="smd:com.informatica.metadata.seed.platform.Platform.typesystem"/>
+<instances>
+<Instance imx:id="U:cFe8qg1oEeuewz-Hobq1Tw" xsi:type="mapping1:Instance" name="Write_STG_TRS_DEACTIVED_MEMBERS" toOutlineLinks="ID_25" transformation="U:cFe8sQ1oEeuewz-Hobq1Tw">
+<ports>
+<TransformationFieldPort imx:id="ID_26" xsi:type="mapping1:TransformationFieldPort" instance="U:cFe8qg1oEeuewz-Hobq1Tw" transformationField="U:cFfj7Q1oEeuewz-Hobq1Tw">
+<children>
+<NestedPort imx:id="ID_27" xsi:type="mapping1:NestedPort" fromPort="ID_28" parent="ID_26" structuralFeature="U:cFfj8Q1oEeuewz-Hobq1Tw"/>
+<NestedPort imx:id="ID_29" xsi:type="mapping1:NestedPort" fromPort="ID_30" parent="ID_26" structuralFeature="U:cFfj-A1oEeuewz-Hobq1Tw"/>
+</children>
+</TransformationFieldPort>
+</ports>
+</Instance>
+<Instance imx:id="U:cFe8qw1oEeuewz-Hobq1Tw" xsi:type="mapping1:Instance" name="Upd_Processed_Deactivations" toOutlineLinks="ID_31" transformation="U:cFe8sg1oEeuewz-Hobq1Tw">
+<annotations>
+<Annotation imx:id="ID_32" xsi:type="description:Description" body="Update+processed+to+%27Y%27."/>
+</annotations>
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_25" xsi:type="mapping1:OutlineLink" fromInstance="U:cFe8qw1oEeuewz-Hobq1Tw" toInstance="U:cFe8qg1oEeuewz-Hobq1Tw"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_30" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_33" toPorts="ID_29" instance="U:cFe8qw1oEeuewz-Hobq1Tw" transformationField="U:kIwIvg1rEeuewz-Hobq1Tw"/>
+<TransformationFieldPort imx:id="ID_28" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_34" toPorts="ID_27" instance="U:cFe8qw1oEeuewz-Hobq1Tw" transformationField="U:cFfj6g1oEeuewz-Hobq1Tw"/>
+</ports>
+</Instance>
+<Instance imx:id="U:cFe8rA1oEeuewz-Hobq1Tw" xsi:type="mapping1:Instance" name="Lookup_Unprocessed_Deactivations" toOutlineLinks="ID_35" transformation="U:cFe8sw1oEeuewz-Hobq1Tw">
+<annotations>
+<Annotation imx:id="ID_36" xsi:type="description:Description" body="Find+corresponding+record+that+are+flagged+as+unprocessed."/>
+</annotations>
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_37" xsi:type="mapping1:OutlineLink" fromInstance="U:cFe8rA1oEeuewz-Hobq1Tw" toInstance="U:cFe8rQ1oEeuewz-Hobq1Tw"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_38" xsi:type="mapping1:TransformationFieldPort" instance="U:cFe8rA1oEeuewz-Hobq1Tw" transformationField="U:cFe8zQ1oEeuewz-Hobq1Tw">
+<children>
+<NestedPort imx:id="ID_39" xsi:type="mapping1:NestedPort" toPorts="ID_40" parent="ID_38" structuralFeature="U:cFfj4Q1oEeuewz-Hobq1Tw"/>
+</children>
+</TransformationFieldPort>
+<TransformationFieldPort imx:id="ID_41" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_42" instance="U:cFe8rA1oEeuewz-Hobq1Tw" transformationField="U:cFe8zA1oEeuewz-Hobq1Tw"/>
+</ports>
+</Instance>
+<Instance imx:id="U:cFe8rQ1oEeuewz-Hobq1Tw" xsi:type="mapping1:Instance" name="Filt_Keep_Unprocessed" toOutlineLinks="ID_37 ID_43" transformation="U:cFe8tA1oEeuewz-Hobq1Tw">
+<annotations>
+<Annotation imx:id="ID_44" xsi:type="description:Description" body="Keep+only+records+that+have+not+been+written+to+the+deactivation+table+before.++%28Simplifies+re-run+of+this+mapping+if+necessary%29."/>
+</annotations>
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_45" xsi:type="mapping1:OutlineLink" fromInstance="U:cFe8rQ1oEeuewz-Hobq1Tw" toInstance="U:kIvhoQ1rEeuewz-Hobq1Tw"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_46" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_42" toPorts="ID_34" instance="U:cFe8rQ1oEeuewz-Hobq1Tw" transformationField="U:cFe8wQ1oEeuewz-Hobq1Tw"/>
+<TransformationFieldPort imx:id="ID_40" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_39" instance="U:cFe8rQ1oEeuewz-Hobq1Tw" transformationField="U:cFe8yQ1oEeuewz-Hobq1Tw"/>
+</ports>
+</Instance>
+<Instance imx:id="U:kIvhoA1rEeuewz-Hobq1Tw" xsi:type="mapping1:Instance" name="Read_ZZ_UTL_UNMERGE_TREE_SRC_KEY" transformation="U:kIwIsg1rEeuewz-Hobq1Tw">
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_35" xsi:type="mapping1:OutlineLink" fromInstance="U:kIvhoA1rEeuewz-Hobq1Tw" toInstance="U:cFe8rA1oEeuewz-Hobq1Tw"/>
+<OutlineLink imx:id="ID_43" xsi:type="mapping1:OutlineLink" fromInstance="U:kIvhoA1rEeuewz-Hobq1Tw" toInstance="U:cFe8rQ1oEeuewz-Hobq1Tw"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_47" xsi:type="mapping1:TransformationFieldPort" instance="U:kIvhoA1rEeuewz-Hobq1Tw" transformationField="U:kIwIuQ1rEeuewz-Hobq1Tw">
+<children>
+<NestedPort imx:id="ID_42" xsi:type="mapping1:NestedPort" toPorts="ID_41 ID_46" parent="ID_47" structuralFeature="U:HasagTZYEfC7NKTdmVE6LA"/>
+</children>
+</TransformationFieldPort>
+</ports>
+</Instance>
+<Instance imx:id="U:kIvhoQ1rEeuewz-Hobq1Tw" xsi:type="mapping1:Instance" name="Exp_Set_to_Processed" toOutlineLinks="ID_45" transformation="U:kIwIsw1rEeuewz-Hobq1Tw">
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_31" xsi:type="mapping1:OutlineLink" fromInstance="U:kIvhoQ1rEeuewz-Hobq1Tw" toInstance="U:cFe8qw1oEeuewz-Hobq1Tw"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_34" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_46" toPorts="ID_28" instance="U:kIvhoQ1rEeuewz-Hobq1Tw" transformationField="U:kIwItQ1rEeuewz-Hobq1Tw"/>
+<TransformationFieldPort imx:id="ID_33" xsi:type="mapping1:TransformationFieldPort" toPorts="ID_30" instance="U:kIvhoQ1rEeuewz-Hobq1Tw" transformationField="U:kIwItg1rEeuewz-Hobq1Tw"/>
+</ports>
+</Instance>
+</instances>
+<transformations>
+<AbstractTransformation imx:id="U:cFe8sQ1oEeuewz-Hobq1Tw" xsi:type="target:TargetTx" active="true" name="Write_STG_TRS_DEACTIVED_MEMBERS" dso="U:cFfj6w1oEeuewz-Hobq1Tw">
+<anonymousDso imx:id="U:cFfj6w1oEeuewz-Hobq1Tw" xsi:type="datasourceoperation:WriteRelationalDataSourceOperation" name="STG_TRS_DEACTIVED_MEMBERS" loadType="Normal" tableDefinition="U:-Cidz9ykEeqEj4GGW_Etrw" typeSystem="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem">
+<defaultConfigs>
+<DSORuntimeConfig imx:id="U:cFfj7g1oEeuewz-Hobq1Tw" xsi:type="dsoconfig:RelationalDSORuntimeConfig" connectInfo="stringIdentity:STAGING" connectionName="STAGING"/>
+</defaultConfigs>
+<operations>
+<Capability imx:id="ID_48" xsi:type="datasourceoperation1:WriteCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalWriterDataAdapter" defaultConfig="U:cFfj7g1oEeuewz-Hobq1Tw">
+<inGroups>
+<DataAccessGroup imx:id="ID_49" xsi:type="datasourceoperation1:DataAccessGroup" groupType="U:cFfj7w1oEeuewz-Hobq1Tw" input="true"/>
+</inGroups>
+</Capability>
+</operations>
+<ownedCapabilityTypes>
+<ComplexType imx:id="U:cFfj7w1oEeuewz-Hobq1Tw" xsi:type="typelibrary:ComplexType" name="STG_TRS_DEACTIVED_MEMBERS">
+<features>
+<StructuralFeature imx:id="U:cFfj8A1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdouble" lower="1" name="INDV_ID" nullable="true" precision="15" upper="1"/>
+<StructuralFeature imx:id="U:cFfj8Q1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PTY_PK" precision="255" upper="1"/>
+<StructuralFeature imx:id="U:cFfj8g1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="SRC_TBL" nullable="true" precision="20" upper="1"/>
+<StructuralFeature imx:id="U:cFfj8w1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" name="CREATE_DATE" nullable="true" precision="29" scale="9" upper="1"/>
+<StructuralFeature imx:id="U:cFfj9A1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" name="SRC_DEACTIVATION_DATE" nullable="true" precision="29" scale="9" upper="1"/>
+<StructuralFeature imx:id="U:cFfj9Q1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" name="LOAD_DATE" nullable="true" precision="29" scale="9" upper="1"/>
+<StructuralFeature imx:id="U:cFfj9g1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="INACTIVE_IND" nullable="true" precision="1" upper="1"/>
+<StructuralFeature imx:id="U:cFfj9w1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="DELETE_SW" nullable="true" precision="1" upper="1"/>
+<StructuralFeature imx:id="U:cFfj-A1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PROCESSED_YN" nullable="true" precision="1" upper="1"/>
+</features>
+</ComplexType>
+</ownedCapabilityTypes>
+<relationalFields>
+<RelationalField imx:id="ID_50" xsi:type="datasourceoperation:RelationalField" column="U:-Cid0NykEeqEj4GGW_Etrw" feature="U:cFfj8A1oEeuewz-Hobq1Tw" name="INDV_ID" odbcPrecision="15" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdouble" recordInstance="ID_51"/>
+<RelationalField imx:id="ID_52" xsi:type="datasourceoperation:RelationalField" column="U:-Cid0dykEeqEj4GGW_Etrw" feature="U:cFfj8Q1oEeuewz-Hobq1Tw" name="PTY_PK" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_51"/>
+<RelationalField imx:id="ID_53" xsi:type="datasourceoperation:RelationalField" column="U:-Cid0tykEeqEj4GGW_Etrw" feature="U:cFfj8g1oEeuewz-Hobq1Tw" name="SRC_TBL" odbcPrecision="20" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_51"/>
+<RelationalField imx:id="ID_54" xsi:type="datasourceoperation:RelationalField" column="U:-Cid09ykEeqEj4GGW_Etrw" feature="U:cFfj8w1oEeuewz-Hobq1Tw" name="CREATE_DATE" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" recordInstance="ID_51"/>
+<RelationalField imx:id="ID_55" xsi:type="datasourceoperation:RelationalField" column="U:-Cid1NykEeqEj4GGW_Etrw" feature="U:cFfj9A1oEeuewz-Hobq1Tw" name="SRC_DEACTIVATION_DATE" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" recordInstance="ID_51"/>
+<RelationalField imx:id="ID_56" xsi:type="datasourceoperation:RelationalField" column="U:-Cid1dykEeqEj4GGW_Etrw" feature="U:cFfj9Q1oEeuewz-Hobq1Tw" name="LOAD_DATE" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" recordInstance="ID_51"/>
+<RelationalField imx:id="ID_57" xsi:type="datasourceoperation:RelationalField" column="U:-Cid1tykEeqEj4GGW_Etrw" feature="U:cFfj9g1oEeuewz-Hobq1Tw" name="INACTIVE_IND" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_51"/>
+<RelationalField imx:id="ID_58" xsi:type="datasourceoperation:RelationalField" column="U:-Cid19ykEeqEj4GGW_Etrw" feature="U:cFfj9w1oEeuewz-Hobq1Tw" name="DELETE_SW" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_51"/>
+<RelationalField imx:id="ID_59" xsi:type="datasourceoperation:RelationalField" column="U:-Cid2NykEeqEj4GGW_Etrw" feature="U:cFfj-A1oEeuewz-Hobq1Tw" name="PROCESSED_YN" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_51"/>
+</relationalFields>
+<relationalRecordInstance imx:id="ID_51" xsi:type="datasourceoperation:RelationalRecordInstance" name="STG_TRS_DEACTIVED_MEMBERS" record="U:-Cidz9ykEeqEj4GGW_Etrw"/>
+</anonymousDso>
+<targetInterfaces>
+<TargetDataInterface imx:id="U:cFfj7A1oEeuewz-Hobq1Tw" xsi:type="target:TargetDataInterface" input="true" name="Group">
+<targetFields>
+<TargetTxField imx:id="U:cFfj7Q1oEeuewz-Hobq1Tw" xsi:type="target:TargetTxField" type="U:cFfj7w1oEeuewz-Hobq1Tw" input="true" name="Input"/>
+</targetFields>
+</TargetDataInterface>
+</targetInterfaces>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:cFe8sg1oEeuewz-Hobq1Tw" xsi:type="updatestrategy:UpdateStrategyTx" active="true" name="Upd_Processed_Deactivations" rejectForwarding="true" updateStrategy="DD_UPDATE">
+<updateStrategyInterface>
+<UpdateStrategyDataInterface imx:id="U:cFfj6Q1oEeuewz-Hobq1Tw" xsi:type="updatestrategy:UpdateStrategyDataInterface" input="true" name="Group" output="true">
+<updateStrategyFields>
+<UpdateStrategyField imx:id="U:cFfj6g1oEeuewz-Hobq1Tw" xsi:type="updatestrategy:UpdateStrategyField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="255" upper="1" input="true" name="PTY_PK" output="true"/>
+<UpdateStrategyField imx:id="U:kIwIvg1rEeuewz-Hobq1Tw" xsi:type="updatestrategy:UpdateStrategyField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="1" upper="1" input="true" name="Processed_Y" output="true"/>
+</updateStrategyFields>
+</UpdateStrategyDataInterface>
+</updateStrategyInterface>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:cFe8sw1oEeuewz-Hobq1Tw" xsi:type="lookup:LookupTx" name="Lookup_Unprocessed_Deactivations" dso="U:cFe8yg1oEeuewz-Hobq1Tw" lookupCondition="PTY_PK+%3D+PTY_PK1" multipleMatchHandling="returnAny" updateDynamicCacheCondition="TRUE">
+<anonymousDso imx:id="U:cFe8yg1oEeuewz-Hobq1Tw" xsi:type="datasourceoperation:ReadRelationalDataSourceOperation" name="STG_TRS_DEACTIVED_MEMBERS" filterCondition="%22STG_TRS_DEACTIVED_MEMBERS%22.%22PROCESSED_YN%22+%3D+%27N%27" tableDefinitions="U:-Cidz9ykEeqEj4GGW_Etrw" typeSystem="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem">
+<defaultConfigs>
+<DSORuntimeConfig imx:id="U:cFe8zg1oEeuewz-Hobq1Tw" xsi:type="dsoconfig:RelationalDSORuntimeConfig" connectInfo="stringIdentity:STAGING" connectionName="STAGING"/>
+</defaultConfigs>
+<operations>
+<Capability imx:id="ID_60" xsi:type="datasourceoperation1:ReadCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" defaultConfig="U:cFe8zg1oEeuewz-Hobq1Tw">
+<outGroups>
+<DataAccessGroup imx:id="ID_61" xsi:type="datasourceoperation1:DataAccessGroup" groupType="U:cFe8zw1oEeuewz-Hobq1Tw"/>
+</outGroups>
+</Capability>
+<Capability imx:id="ID_62" xsi:type="datasourceoperation1:LookupCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" defaultConfig="U:cFe8zg1oEeuewz-Hobq1Tw"/>
+</operations>
+<ownedCapabilityTypes>
+<ComplexType imx:id="U:cFe8zw1oEeuewz-Hobq1Tw" xsi:type="typelibrary:ComplexType" name="STG_TRS_DEACTIVED_MEMBERS">
+<features>
+<StructuralFeature imx:id="U:cFfj4A1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdouble" lower="1" name="INDV_ID" nullable="true" precision="15" upper="1"/>
+<StructuralFeature imx:id="U:cFfj4Q1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PTY_PK" precision="255" upper="1"/>
+<StructuralFeature imx:id="U:cFfj4g1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="SRC_TBL" nullable="true" precision="20" upper="1"/>
+<StructuralFeature imx:id="U:cFfj4w1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" name="CREATE_DATE" nullable="true" precision="29" scale="9" upper="1"/>
+<StructuralFeature imx:id="U:cFfj5A1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" name="SRC_DEACTIVATION_DATE" nullable="true" precision="29" scale="9" upper="1"/>
+<StructuralFeature imx:id="U:cFfj5Q1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" name="LOAD_DATE" nullable="true" precision="29" scale="9" upper="1"/>
+<StructuralFeature imx:id="U:cFfj5g1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="INACTIVE_IND" nullable="true" precision="1" upper="1"/>
+<StructuralFeature imx:id="U:cFfj5w1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="DELETE_SW" nullable="true" precision="1" upper="1"/>
+<StructuralFeature imx:id="U:cFfj6A1oEeuewz-Hobq1Tw" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PROCESSED_YN" nullable="true" precision="1" upper="1"/>
+</features>
+</ComplexType>
+</ownedCapabilityTypes>
+<relationalFields>
+<RelationalField imx:id="ID_63" xsi:type="datasourceoperation:RelationalField" column="U:-Cid0NykEeqEj4GGW_Etrw" feature="U:cFfj4A1oEeuewz-Hobq1Tw" name="INDV_ID" odbcPrecision="15" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdouble" recordInstance="ID_64"/>
+<RelationalField imx:id="ID_65" xsi:type="datasourceoperation:RelationalField" column="U:-Cid0dykEeqEj4GGW_Etrw" feature="U:cFfj4Q1oEeuewz-Hobq1Tw" name="PTY_PK" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_64"/>
+<RelationalField imx:id="ID_66" xsi:type="datasourceoperation:RelationalField" column="U:-Cid0tykEeqEj4GGW_Etrw" feature="U:cFfj4g1oEeuewz-Hobq1Tw" name="SRC_TBL" odbcPrecision="20" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_64"/>
+<RelationalField imx:id="ID_67" xsi:type="datasourceoperation:RelationalField" column="U:-Cid09ykEeqEj4GGW_Etrw" feature="U:cFfj4w1oEeuewz-Hobq1Tw" name="CREATE_DATE" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" recordInstance="ID_64"/>
+<RelationalField imx:id="ID_68" xsi:type="datasourceoperation:RelationalField" column="U:-Cid1NykEeqEj4GGW_Etrw" feature="U:cFfj5A1oEeuewz-Hobq1Tw" name="SRC_DEACTIVATION_DATE" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" recordInstance="ID_64"/>
+<RelationalField imx:id="ID_69" xsi:type="datasourceoperation:RelationalField" column="U:-Cid1dykEeqEj4GGW_Etrw" feature="U:cFfj5Q1oEeuewz-Hobq1Tw" name="LOAD_DATE" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" recordInstance="ID_64"/>
+<RelationalField imx:id="ID_70" xsi:type="datasourceoperation:RelationalField" column="U:-Cid1tykEeqEj4GGW_Etrw" feature="U:cFfj5g1oEeuewz-Hobq1Tw" name="INACTIVE_IND" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_64"/>
+<RelationalField imx:id="ID_71" xsi:type="datasourceoperation:RelationalField" column="U:-Cid19ykEeqEj4GGW_Etrw" feature="U:cFfj5w1oEeuewz-Hobq1Tw" name="DELETE_SW" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_64"/>
+<RelationalField imx:id="ID_72" xsi:type="datasourceoperation:RelationalField" column="U:-Cid2NykEeqEj4GGW_Etrw" feature="U:cFfj6A1oEeuewz-Hobq1Tw" name="PROCESSED_YN" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_64"/>
+</relationalFields>
+<relationalRecordInstances>
+<RelationalRecordInstance imx:id="ID_64" xsi:type="datasourceoperation:RelationalRecordInstance" name="STG_TRS_DEACTIVED_MEMBERS" record="U:-Cidz9ykEeqEj4GGW_Etrw"/>
+</relationalRecordInstances>
+</anonymousDso>
+<dynamicCacheFields>
+<DynamicCacheField imx:id="ID_73" xsi:type="lookup:DynamicCacheField" dynamicUpdatesFrom="U:cFe8zA1oEeuewz-Hobq1Tw" ignoreInMatch="true" lookupFeature="U:cFfj4A1oEeuewz-Hobq1Tw"/>
+<DynamicCacheField imx:id="ID_74" xsi:type="lookup:DynamicCacheField" dynamicUpdatesFrom="U:cFe8zA1oEeuewz-Hobq1Tw" ignoreInMatch="true" lookupFeature="U:cFfj4Q1oEeuewz-Hobq1Tw"/>
+<DynamicCacheField imx:id="ID_75" xsi:type="lookup:DynamicCacheField" lookupFeature="U:cFfj4g1oEeuewz-Hobq1Tw"/>
+<DynamicCacheField imx:id="ID_76" xsi:type="lookup:DynamicCacheField" lookupFeature="U:cFfj4w1oEeuewz-Hobq1Tw"/>
+<DynamicCacheField imx:id="ID_77" xsi:type="lookup:DynamicCacheField" lookupFeature="U:cFfj5A1oEeuewz-Hobq1Tw"/>
+<DynamicCacheField imx:id="ID_78" xsi:type="lookup:DynamicCacheField" lookupFeature="U:cFfj5Q1oEeuewz-Hobq1Tw"/>
+<DynamicCacheField imx:id="ID_79" xsi:type="lookup:DynamicCacheField" lookupFeature="U:cFfj5g1oEeuewz-Hobq1Tw"/>
+<DynamicCacheField imx:id="ID_80" xsi:type="lookup:DynamicCacheField" lookupFeature="U:cFfj5w1oEeuewz-Hobq1Tw"/>
+<DynamicCacheField imx:id="ID_81" xsi:type="lookup:DynamicCacheField" lookupFeature="U:cFfj6A1oEeuewz-Hobq1Tw"/>
+</dynamicCacheFields>
+<lookupInterface>
+<LookupDataInterface imx:id="U:cFe8yw1oEeuewz-Hobq1Tw" xsi:type="lookup:LookupDataInterface" input="true" name="Group" output="true">
+<lookupFields>
+<LookupField imx:id="U:cFe8zA1oEeuewz-Hobq1Tw" xsi:type="lookup:LookupField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="255" upper="1" input="true" name="PTY_PK1" output="true"/>
+<LookupField imx:id="U:cFe8zQ1oEeuewz-Hobq1Tw" xsi:type="lookup:LookupField" type="U:cFe8zw1oEeuewz-Hobq1Tw" lower="1" precision="10" upper="1" name="output" output="true"/>
+</lookupFields>
+</LookupDataInterface>
+</lookupInterface>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:cFe8tA1oEeuewz-Hobq1Tw" xsi:type="filter:FilterTx" active="true" name="Filt_Keep_Unprocessed" filterCondition="NOT+ISNULL%28PTY_PK1%29">
+<filterInterface>
+<FilterDataInterface imx:id="U:cFe8vw1oEeuewz-Hobq1Tw" xsi:type="filter:FilterDataInterface" input="true" name="Group" output="true">
+<filterFields>
+<FilterField imx:id="U:cFe8wQ1oEeuewz-Hobq1Tw" xsi:type="filter:FilterField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="255" upper="1" input="true" name="PTY_PK" output="true"/>
+<FilterField imx:id="U:cFe8yQ1oEeuewz-Hobq1Tw" xsi:type="filter:FilterField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="255" upper="1" input="true" name="PTY_PK1" output="true"/>
+</filterFields>
+</FilterDataInterface>
+</filterInterface>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:kIwIsg1rEeuewz-Hobq1Tw" xsi:type="source:SourceTx" active="true" name="Read_ZZ_UTL_UNMERGE_TREE_SRC_KEY" dso="U:HasafjZYEfC7NKTdmVE6LA">
+<anonymousDso imx:id="U:HasafjZYEfC7NKTdmVE6LA" xsi:type="datasourceoperation:ReadRelationalDataSourceOperation" name="ZZ_UTL_UNMERGE_TREE_SRC_KEY" tableDefinitions="U:AHBCqy9jEfCMXyG8zczD2Q" typeSystem="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem">
+<defaultConfigs>
+<DSORuntimeConfig imx:id="U:JO7YVTZYEfC7NKTdmVE6LA" xsi:type="dsoconfig:RelationalDSORuntimeConfig" connectInfo="stringIdentity:HHS_MDM_ORS" connectionName="HHS_MDM_ORS"/>
+</defaultConfigs>
+<operations>
+<Capability imx:id="ID_82" xsi:type="datasourceoperation1:ReadCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" defaultConfig="U:JO7YVTZYEfC7NKTdmVE6LA">
+<outGroups>
+<DataAccessGroup imx:id="ID_83" xsi:type="datasourceoperation1:DataAccessGroup" groupType="U:HasafzZYEfC7NKTdmVE6LA"/>
+</outGroups>
+</Capability>
+<Capability imx:id="ID_84" xsi:type="datasourceoperation1:LookupCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" defaultConfig="U:JO7YVTZYEfC7NKTdmVE6LA"/>
+</operations>
+<ownedCapabilityTypes>
+<ComplexType imx:id="U:HasafzZYEfC7NKTdmVE6LA" xsi:type="typelibrary:ComplexType" name="ZZ_UTL_UNMERGE_TREE_SRC_KEY">
+<features>
+<StructuralFeature imx:id="U:HasagTZYEfC7NKTdmVE6LA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PKEY_SRC_OBJECT" nullable="true" precision="255" upper="1"/>
+<StructuralFeature imx:id="U:HasagjZYEfC7NKTdmVE6LA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="ROWID_SYSTEM" nullable="true" precision="14" upper="1"/>
+<StructuralFeature imx:id="U:HasagzZYEfC7NKTdmVE6LA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="EXPLODE_NODE_IND" nullable="true" precision="1" upper="1"/>
+</features>
+</ComplexType>
+</ownedCapabilityTypes>
+<typeLibrary imx:id="U:HasagDZYEfC7NKTdmVE6LA" xsi:type="typelibrary:TypeLibrary"/>
+<relationalFields>
+<RelationalField imx:id="ID_85" xsi:type="datasourceoperation:RelationalField" column="U:AHBCrC9jEfCMXyG8zczD2Q" feature="U:HasagTZYEfC7NKTdmVE6LA" name="PKEY_SRC_OBJECT" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_86"/>
+<RelationalField imx:id="ID_87" xsi:type="datasourceoperation:RelationalField" column="U:AHBCrS9jEfCMXyG8zczD2Q" feature="U:HasagjZYEfC7NKTdmVE6LA" name="ROWID_SYSTEM" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" recordInstance="ID_86"/>
+<RelationalField imx:id="ID_88" xsi:type="datasourceoperation:RelationalField" column="U:AHBCri9jEfCMXyG8zczD2Q" feature="U:HasagzZYEfC7NKTdmVE6LA" name="EXPLODE_NODE_IND" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_86"/>
+</relationalFields>
+<relationalRecordInstances>
+<RelationalRecordInstance imx:id="ID_86" xsi:type="datasourceoperation:RelationalRecordInstance" name="ZZ_UTL_UNMERGE_TREE_SRC_KEY" record="U:AHBCqy9jEfCMXyG8zczD2Q"/>
+</relationalRecordInstances>
+</anonymousDso>
+<sourceInterfaces>
+<SourceDataInterface imx:id="U:kIwIuA1rEeuewz-Hobq1Tw" xsi:type="source:SourceDataInterface" name="Group" output="true">
+<sourceFields>
+<SourceTxField imx:id="U:kIwIuQ1rEeuewz-Hobq1Tw" xsi:type="source:SourceTxField" type="U:HasafzZYEfC7NKTdmVE6LA" name="output" output="true"/>
+</sourceFields>
+</SourceDataInterface>
+</sourceInterfaces>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:kIwIsw1rEeuewz-Hobq1Tw" xsi:type="expression:ExpressionTx" name="Exp_Set_to_Processed">
+<expressionInterface>
+<ExpressionDataInterface imx:id="U:kIwItA1rEeuewz-Hobq1Tw" xsi:type="expression:ExpressionDataInterface" input="true" name="Group" output="true">
+<expressionFields>
+<ExpressionField imx:id="U:kIwItQ1rEeuewz-Hobq1Tw" xsi:type="expression:ExpressionField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="255" upper="1" input="true" name="PTY_PK" output="true"/>
+<ExpressionField imx:id="U:kIwItg1rEeuewz-Hobq1Tw" xsi:type="expression:ExpressionField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="1" upper="1" name="Processed_Y" output="true" expression="%27Y%27">
+<defaultValue xsi:type="types:StringValue" valueLiteral="ERROR%28%27transformation+error%27%29"/>
+</ExpressionField>
+</expressionFields>
+</ExpressionDataInterface>
+</expressionInterface>
+</AbstractTransformation>
+</transformations>
+</mapping1:Mapping>
+<project:Project imx:id="U:F0mx-HNoEeqAlzgMn4KpqQ" name="HHSC_Enterprise_Development">
+<imx:annotations>
+<imx:IGenericAnnotations>
+<com.informatica.tools.objectie key1="projectName" value1="MREP_DEV"/>
+</imx:IGenericAnnotations>
+</imx:annotations>
+<annotations>
+<Annotation imx:id="ID_90" xsi:type="description:Description"/>
+</annotations>
+<contents>
+<IObject imx:idref="U:8JkmlA2cEeuewz-Hobq1Tw" xsi:type="workflow:Workflow"/>
+<IObject imx:idref="U:cFe8pg1oEeuewz-Hobq1Tw" xsi:type="mapping1:Mapping"/>
+<IObject imx:id="U:-Cidz9ykEeqEj4GGW_Etrw" xsi:type="datarecord:Table" connection="stringIdentity:STAGING" connectionName="STAGING" connectionType="com.informatica.metadata.relational.connectinfo.OracleNativeConnectInfo" name="STG_TRS_DEACTIVED_MEMBERS" physicalName="STG_TRS_DEACTIVED_MEMBERS" primaryKey="U:-Cid2dykEeqEj4GGW_Etrw">
+<columns>
+<Column imx:id="U:-Cid0NykEeqEj4GGW_Etrw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber" name="INDV_ID" nullable="true" odbcPrecision="15" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdouble" precision="15"/>
+<Column imx:id="U:-Cid0dykEeqEj4GGW_Etrw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="PTY_PK" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:-Cid0tykEeqEj4GGW_Etrw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="SRC_TBL" nullable="true" odbcPrecision="20" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="20"/>
+<Column imx:id="U:-Cid09ykEeqEj4GGW_Etrw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fdate" name="CREATE_DATE" nullable="true" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" precision="19"/>
+<Column imx:id="U:-Cid1NykEeqEj4GGW_Etrw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fdate" name="SRC_DEACTIVATION_DATE" nullable="true" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" precision="19"/>
+<Column imx:id="U:-Cid1dykEeqEj4GGW_Etrw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fdate" name="LOAD_DATE" nullable="true" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" precision="19"/>
+<Column imx:id="U:-Cid1tykEeqEj4GGW_Etrw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="INACTIVE_IND" nullable="true" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="1"/>
+<Column imx:id="U:-Cid19ykEeqEj4GGW_Etrw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="DELETE_SW" nullable="true" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="1"/>
+<Column imx:id="U:-Cid2NykEeqEj4GGW_Etrw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="PROCESSED_YN" nullable="true" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="1"/>
+</columns>
+<uniqueKeys>
+<UniqueKey imx:id="U:-Cid2dykEeqEj4GGW_Etrw" xsi:type="datarecord:PrimaryKey" columns="U:-Cid0dykEeqEj4GGW_Etrw" name="SYS_C0013030"/>
+</uniqueKeys>
+</IObject>
+<IObject imx:id="U:X-l7ZubaEe6qTkaUv1AtNg" xsi:type="mapping1:Mapping" name="m_Tgt_C_S_TRS_Pty_Rle_Rel_Deactivation_4_Mark_Processed">
+<annotations>
+<Annotation imx:id="ID_91" xsi:type="description:Description" body="This+mapping+runs+after+deactivated+records+in+TIERS+have+been+unmerged+and+soft+deleted+in+the+MDM.++%0D%0AAfter+the+successful+conclusion+of+those+activities%2C+this+mapping+will+udpate+the+processed+flag+in+the+deactivation+table+to+%27Y%27+so+the+data+will+not+get+re-processed+in+the+next+excution.%0D%0A%0D%0A%5B9%2F24%2F2025+ML%5D+Corrected+source+fiter+criteria+to+include+null+processed_YN"/>
+</annotations>
+<characteristics>
+<Characteristic imx:id="ID_92" xsi:type="runtime:RuntimeCharacteristic" maximumRuntimeIntervalPerSource="PT0S" selectedExecutionEnvironmentName="native" stateStore.="smd:com.informatica.metadata.common.parameter.util.InfaParameterSeed.StateStore">
+<environments>
+<ExecutionEnvironment imx:id="ID_93" xsi:type="runtime:NativeExecutionEnvironment">
+<partitioningConfig imx:id="ID_94" xsi:type="runtime:NativePartitioningConfig"/>
+</ExecutionEnvironment>
+</environments>
+<handlers>
+<TxHandlerConfig imx:id="ID_95" xsi:type="lookup1:LookupHandlerConfig" txInstance="U:E7AGCbc0Ee-jGA1qVUMsUA" selectedAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" cacheDirectory.="smd:com.informatica.metadata.common.parameter.util.InfaParameterSeed.CacheDir" cached="true"/>
+<TxHandlerConfig imx:id="ID_96" xsi:type="source1:SourceTxHandlerConfig" txInstance="U:uGvK7bc7Ee-jGA1qVUMsUA" selectedAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter"/>
+<TxHandlerConfig imx:id="ID_97" xsi:type="target1:TargetTxHandlerConfig" txInstance="U:G7Vs3rc8Ee-jGA1qVUMsUA" selectedAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalWriterDataAdapter" rejectDirectory.="smd:com.informatica.metadata.common.parameter.util.InfaParameterSeed.RejectDir" rejectFile="Write_STG_TRS_DEACTIVATED_RELATIONSHIPS.bad"/>
+</handlers>
+<streamingConfig imx:id="ID_98" xsi:type="runtime:StreamingConfig" batchInterval="PT20S" cacheRefreshInterval="PT1H"/>
+</Characteristic>
+<Characteristic imx:id="ID_99" xsi:type="optimizer:OptimizerCharacteristic">
+<configs>
+<OptimizerConfig imx:id="ID_100" xsi:type="pdo:PushdownConfig"/>
+</configs>
+</Characteristic>
+</characteristics>
+<definedLibraries imx:id="U:X-mid-baEe6qTkaUv1AtNg" xsi:type="typelibrary:TypeLibrary" name="Type_Definition_Library" typeSystem="smd:com.informatica.metadata.seed.platform.Platform.typesystem"/>
+<instances>
+<Instance imx:id="U:X-mieebaEe6qTkaUv1AtNg" xsi:type="mapping1:Instance" name="Upd_Processed_Deactivations" toOutlineLinks="ID_101" transformation="U:X-mif-baEe6qTkaUv1AtNg">
+<annotations>
+<Annotation imx:id="ID_102" xsi:type="description:Description" body="Update+processed+to+%27Y%27."/>
+</annotations>
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_103" xsi:type="mapping1:OutlineLink" fromInstance="U:X-mieebaEe6qTkaUv1AtNg" toInstance="U:G7Vs3rc8Ee-jGA1qVUMsUA"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_104" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_105" toPorts="ID_106" instance="U:X-mieebaEe6qTkaUv1AtNg" transformationField="U:X-mioubaEe6qTkaUv1AtNg"/>
+<TransformationFieldPort imx:id="ID_107" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_108" toPorts="ID_109" instance="U:X-mieebaEe6qTkaUv1AtNg" transformationField="U:X-mioebaEe6qTkaUv1AtNg"/>
+<TransformationFieldPort imx:id="ID_110" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_111" toPorts="ID_112" instance="U:X-mieebaEe6qTkaUv1AtNg" transformationField="U:E7AGHrc0Ee-jGA1qVUMsUA"/>
+</ports>
+</Instance>
+<Instance imx:id="U:X-mifebaEe6qTkaUv1AtNg" xsi:type="mapping1:Instance" name="Exp_Set_to_Processed" toOutlineLinks="ID_113" transformation="U:X-mig-baEe6qTkaUv1AtNg">
+<annotations>
+<Annotation imx:id="ID_114" xsi:type="description:Description" body="Set+Prcocessed+flag+to+Y"/>
+</annotations>
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_101" xsi:type="mapping1:OutlineLink" fromInstance="U:X-mifebaEe6qTkaUv1AtNg" toInstance="U:X-mieebaEe6qTkaUv1AtNg"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_108" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_115" toPorts="ID_107" instance="U:X-mifebaEe6qTkaUv1AtNg" transformationField="U:X-mihebaEe6qTkaUv1AtNg"/>
+<TransformationFieldPort imx:id="ID_105" xsi:type="mapping1:TransformationFieldPort" toPorts="ID_104" instance="U:X-mifebaEe6qTkaUv1AtNg" transformationField="U:X-mihubaEe6qTkaUv1AtNg"/>
+<TransformationFieldPort imx:id="ID_111" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_116" toPorts="ID_110" instance="U:X-mifebaEe6qTkaUv1AtNg" transformationField="U:E7AGHbc0Ee-jGA1qVUMsUA"/>
+</ports>
+</Instance>
+<Instance imx:id="U:E7AGCbc0Ee-jGA1qVUMsUA" xsi:type="mapping1:Instance" name="Lookup_C_B_PTY_RLE_REL_XREF" toOutlineLinks="ID_117" transformation="U:E7AGDbc0Ee-jGA1qVUMsUA">
+<annotations>
+<Annotation imx:id="ID_118" xsi:type="description:Description" body="Find+PKEYS+that+have+been+soft+deleted+in+the+MDM."/>
+</annotations>
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_119" xsi:type="mapping1:OutlineLink" fromInstance="U:E7AGCbc0Ee-jGA1qVUMsUA" toInstance="U:E7AGCrc0Ee-jGA1qVUMsUA"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_120" xsi:type="mapping1:TransformationFieldPort" instance="U:E7AGCbc0Ee-jGA1qVUMsUA" transformationField="U:E7AGGLc0Ee-jGA1qVUMsUA">
+<children>
+<NestedPort imx:id="ID_121" xsi:type="mapping1:NestedPort" toPorts="ID_115" parent="ID_120" structuralFeature="U:UVOU6LcwEe-jGA1qVUMsUA"/>
+</children>
+</TransformationFieldPort>
+<TransformationFieldPort imx:id="ID_122" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_123" instance="U:E7AGCbc0Ee-jGA1qVUMsUA" transformationField="U:E7AGF7c0Ee-jGA1qVUMsUA"/>
+</ports>
+</Instance>
+<Instance imx:id="U:E7AGCrc0Ee-jGA1qVUMsUA" xsi:type="mapping1:Instance" name="Filt_Keep_Soft_Deletes" toOutlineLinks="ID_119 ID_124" transformation="U:E7AGDrc0Ee-jGA1qVUMsUA">
+<annotations>
+<Annotation imx:id="ID_125" xsi:type="description:Description" body="Keep+row+there+PKEY+is+not+null+%28soft+delete+found+in+the+MDM%29"/>
+</annotations>
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_113" xsi:type="mapping1:OutlineLink" fromInstance="U:E7AGCrc0Ee-jGA1qVUMsUA" toInstance="U:X-mifebaEe6qTkaUv1AtNg"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_115" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_121" toPorts="ID_108" instance="U:E7AGCrc0Ee-jGA1qVUMsUA" transformationField="U:E7AGFLc0Ee-jGA1qVUMsUA"/>
+<TransformationFieldPort imx:id="ID_116" xsi:type="mapping1:TransformationFieldPort" fromPort="ID_126" toPorts="ID_111" instance="U:E7AGCrc0Ee-jGA1qVUMsUA" transformationField="U:E7AGFbc0Ee-jGA1qVUMsUA"/>
+</ports>
+</Instance>
+<Instance imx:id="U:uGvK7bc7Ee-jGA1qVUMsUA" xsi:type="mapping1:Instance" name="Read_STG_TRS_DEACTIVATED_RELATIONSHIPS" transformation="U:uGvK7rc7Ee-jGA1qVUMsUA">
+<fromOutlineLinks>
+<OutlineLink imx:id="ID_117" xsi:type="mapping1:OutlineLink" fromInstance="U:uGvK7bc7Ee-jGA1qVUMsUA" toInstance="U:E7AGCbc0Ee-jGA1qVUMsUA"/>
+<OutlineLink imx:id="ID_124" xsi:type="mapping1:OutlineLink" fromInstance="U:uGvK7bc7Ee-jGA1qVUMsUA" toInstance="U:E7AGCrc0Ee-jGA1qVUMsUA"/>
+</fromOutlineLinks>
+<ports>
+<TransformationFieldPort imx:id="ID_127" xsi:type="mapping1:TransformationFieldPort" instance="U:uGvK7bc7Ee-jGA1qVUMsUA" transformationField="U:uGvK8Lc7Ee-jGA1qVUMsUA">
+<children>
+<NestedPort imx:id="ID_123" xsi:type="mapping1:NestedPort" toPorts="ID_122" parent="ID_127" structuralFeature="U:XmnMerc7Ee-jGA1qVUMsUA"/>
+<NestedPort imx:id="ID_126" xsi:type="mapping1:NestedPort" toPorts="ID_116" parent="ID_127" structuralFeature="U:XmnMfbc7Ee-jGA1qVUMsUA"/>
+</children>
+</TransformationFieldPort>
+</ports>
+</Instance>
+<Instance imx:id="U:G7Vs3rc8Ee-jGA1qVUMsUA" xsi:type="mapping1:Instance" name="Write_STG_TRS_DEACTIVATED_RELATIONSHIPS" toOutlineLinks="ID_103" transformation="U:G7Vs37c8Ee-jGA1qVUMsUA">
+<ports>
+<TransformationFieldPort imx:id="ID_128" xsi:type="mapping1:TransformationFieldPort" instance="U:G7Vs3rc8Ee-jGA1qVUMsUA" transformationField="U:G7Vs4bc8Ee-jGA1qVUMsUA">
+<children>
+<NestedPort imx:id="ID_109" xsi:type="mapping1:NestedPort" fromPort="ID_107" parent="ID_128" structuralFeature="U:-fh9-7c7Ee-jGA1qVUMsUA"/>
+<NestedPort imx:id="ID_112" xsi:type="mapping1:NestedPort" fromPort="ID_110" parent="ID_128" structuralFeature="U:-fh9_rc7Ee-jGA1qVUMsUA"/>
+<NestedPort imx:id="ID_106" xsi:type="mapping1:NestedPort" fromPort="ID_104" parent="ID_128" structuralFeature="U:-fh-Arc7Ee-jGA1qVUMsUA"/>
+</children>
+</TransformationFieldPort>
+</ports>
+</Instance>
+</instances>
+<transformations>
+<AbstractTransformation imx:id="U:X-mif-baEe6qTkaUv1AtNg" xsi:type="updatestrategy:UpdateStrategyTx" active="true" name="Upd_Processed_Deactivations" rejectForwarding="true" updateStrategy="DD_UPDATE">
+<updateStrategyInterface>
+<UpdateStrategyDataInterface imx:id="U:X-mioObaEe6qTkaUv1AtNg" xsi:type="updatestrategy:UpdateStrategyDataInterface" input="true" name="Group" output="true">
+<updateStrategyFields>
+<UpdateStrategyField imx:id="U:X-mioebaEe6qTkaUv1AtNg" xsi:type="updatestrategy:UpdateStrategyField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="255" upper="1" input="true" name="PTY_REL_PK" output="true"/>
+<UpdateStrategyField imx:id="U:E7AGHrc0Ee-jGA1qVUMsUA" xsi:type="updatestrategy:UpdateStrategyField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" precision="29" scale="9" upper="1" input="true" name="LOAD_DATE" output="true"/>
+<UpdateStrategyField imx:id="U:X-mioubaEe6qTkaUv1AtNg" xsi:type="updatestrategy:UpdateStrategyField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="1" upper="1" input="true" name="Processed_Y" output="true"/>
+</updateStrategyFields>
+</UpdateStrategyDataInterface>
+</updateStrategyInterface>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:X-mig-baEe6qTkaUv1AtNg" xsi:type="expression:ExpressionTx" name="Exp_Set_to_Processed">
+<expressionInterface>
+<ExpressionDataInterface imx:id="U:X-mihObaEe6qTkaUv1AtNg" xsi:type="expression:ExpressionDataInterface" input="true" name="Group" output="true">
+<expressionFields>
+<ExpressionField imx:id="U:X-mihebaEe6qTkaUv1AtNg" xsi:type="expression:ExpressionField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="255" upper="1" input="true" name="PTY_REL_PK" output="true"/>
+<ExpressionField imx:id="U:E7AGHbc0Ee-jGA1qVUMsUA" xsi:type="expression:ExpressionField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" precision="29" scale="9" upper="1" input="true" name="LOAD_DATE" output="true"/>
+<ExpressionField imx:id="U:X-mihubaEe6qTkaUv1AtNg" xsi:type="expression:ExpressionField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="1" upper="1" name="Processed_Y" output="true" expression="%27Y%27">
+<defaultValue xsi:type="types:StringValue" valueLiteral="ERROR%28%27transformation+error%27%29"/>
+</ExpressionField>
+</expressionFields>
+</ExpressionDataInterface>
+</expressionInterface>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:E7AGDbc0Ee-jGA1qVUMsUA" xsi:type="lookup:LookupTx" name="Lookup_C_B_PTY_RLE_REL_XREF" dso="U:UVOU5LcwEe-jGA1qVUMsUA" lookupCondition="PKEY_SRC_OBJECT+%3D+PKEY_SRC_OBJECT1" multipleMatchHandling="returnAny" updateDynamicCacheCondition="TRUE">
+<anonymousDso imx:id="U:UVOU5LcwEe-jGA1qVUMsUA" xsi:type="datasourceoperation:ReadRelationalDataSourceOperation" name="C_B_PTY_RLE_REL_XREF" queryMode="SEMI" sqlQuery="SELECT+%2F%2A%2B+parallel+%284%29+%2A%2F++T.PKEY_SRC_OBJECT%0D%0AFROM+C_B_PTY_RLE_REL_XREF+T%0D%0AWHERE+T.ROWID_SYSTEM+%3D+%27TRS%27%0D%0AGROUP+BY+T.PKEY_SRC_OBJECT%0D%0AHAVING+MAX%28T.HUB_STATE_IND%29+%3D+-1" tableDefinitions="U:SoFnjtsTEe60l3FRIcHzLg" typeSystem="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem">
+<defaultConfigs>
+<DSORuntimeConfig imx:id="U:E7AGGbc0Ee-jGA1qVUMsUA" xsi:type="dsoconfig:RelationalDSORuntimeConfig" connectInfo="stringIdentity:HHS_MDM_ORS" connectionName="HHS_MDM_ORS"/>
+</defaultConfigs>
+<operations>
+<Capability imx:id="ID_130" xsi:type="datasourceoperation1:ReadCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" defaultConfig="U:E7AGGbc0Ee-jGA1qVUMsUA">
+<outGroups>
+<DataAccessGroup imx:id="ID_131" xsi:type="datasourceoperation1:DataAccessGroup" groupType="U:UVOU5bcwEe-jGA1qVUMsUA"/>
+</outGroups>
+</Capability>
+<Capability imx:id="ID_132" xsi:type="datasourceoperation1:LookupCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" defaultConfig="U:E7AGGbc0Ee-jGA1qVUMsUA"/>
+</operations>
+<ownedCapabilityTypes>
+<ComplexType imx:id="U:UVOU5bcwEe-jGA1qVUMsUA" xsi:type="typelibrary:ComplexType" name="C_B_PTY_RLE_REL_XREF">
+<features>
+<StructuralFeature imx:id="U:UVOU6LcwEe-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PKEY_SRC_OBJECT" nullable="true" precision="255" upper="1"/>
+</features>
+</ComplexType>
+</ownedCapabilityTypes>
+<typeLibrary imx:id="U:UVOU5rcwEe-jGA1qVUMsUA" xsi:type="typelibrary:TypeLibrary"/>
+<relationalFields>
+<RelationalField imx:id="ID_133" xsi:type="datasourceoperation:RelationalField" column="U:SoFnkNsTEe60l3FRIcHzLg" feature="U:UVOU6LcwEe-jGA1qVUMsUA" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_134"/>
+</relationalFields>
+<relationalRecordInstances>
+<RelationalRecordInstance imx:id="ID_134" xsi:type="datasourceoperation:RelationalRecordInstance" name="C_B_PTY_RLE_REL_XREF" record="U:SoFnjtsTEe60l3FRIcHzLg"/>
+</relationalRecordInstances>
+</anonymousDso>
+<dynamicCacheFields>
+<DynamicCacheField imx:id="ID_135" xsi:type="lookup:DynamicCacheField" dynamicUpdatesFrom="U:E7AGF7c0Ee-jGA1qVUMsUA" ignoreInMatch="true" lookupFeature="U:UVOU6LcwEe-jGA1qVUMsUA"/>
+</dynamicCacheFields>
+<lookupInterface>
+<LookupDataInterface imx:id="U:E7AGFrc0Ee-jGA1qVUMsUA" xsi:type="lookup:LookupDataInterface" input="true" name="Group" output="true">
+<lookupFields>
+<LookupField imx:id="U:E7AGF7c0Ee-jGA1qVUMsUA" xsi:type="lookup:LookupField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="255" upper="1" input="true" name="PKEY_SRC_OBJECT1" output="true"/>
+<LookupField imx:id="U:E7AGGLc0Ee-jGA1qVUMsUA" xsi:type="lookup:LookupField" type="U:UVOU5bcwEe-jGA1qVUMsUA" lower="1" precision="10" upper="1" name="output" output="true"/>
+</lookupFields>
+</LookupDataInterface>
+</lookupInterface>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:E7AGDrc0Ee-jGA1qVUMsUA" xsi:type="filter:FilterTx" active="true" name="Filt_Keep_Soft_Deletes" filterCondition="NOT+ISNULL%28PKEY_SRC_OBJECT%29">
+<filterInterface>
+<FilterDataInterface imx:id="U:E7AGE7c0Ee-jGA1qVUMsUA" xsi:type="filter:FilterDataInterface" input="true" name="Group" output="true">
+<filterFields>
+<FilterField imx:id="U:E7AGFLc0Ee-jGA1qVUMsUA" xsi:type="filter:FilterField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" precision="255" upper="1" input="true" name="PKEY_SRC_OBJECT" output="true"/>
+<FilterField imx:id="U:E7AGFbc0Ee-jGA1qVUMsUA" xsi:type="filter:FilterField" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" precision="29" scale="9" upper="1" input="true" name="LOAD_DATE" output="true"/>
+</filterFields>
+</FilterDataInterface>
+</filterInterface>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:uGvK7rc7Ee-jGA1qVUMsUA" xsi:type="source:SourceTx" active="true" name="Read_STG_TRS_DEACTIVATED_RELATIONSHIPS" dso="U:XmnMcbc7Ee-jGA1qVUMsUA">
+<anonymousDso imx:id="U:XmnMcbc7Ee-jGA1qVUMsUA" xsi:type="datasourceoperation:ReadRelationalDataSourceOperation" name="STG_TRS_DEACTIVATED_RELATIONSHIPS" autoSync="false" filterCondition="nvl%28%22STG_TRS_DEACTIVATED_RELATIONSHIPS%22.%22PROCESSED_YN%22%2C%27N%27%29+%3C%3E%27Y%27%0D%0Aand+%22STG_TRS_DEACTIVATED_RELATIONSHIPS%22.%22ROWID_XREF%22+is+not+null" hintsAfterSelect="%2F%2A%2B+Parallel+%284%29+%2A%2F" tableDefinitions="U:qYU4q7czEe-APhKcpoqDtw" typeSystem="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem">
+<defaultConfigs>
+<DSORuntimeConfig imx:id="U:uGvK8bc7Ee-jGA1qVUMsUA" xsi:type="dsoconfig:RelationalDSORuntimeConfig" connectInfo="stringIdentity:STAGING" connectionName="STAGING"/>
+</defaultConfigs>
+<operations>
+<Capability imx:id="ID_136" xsi:type="datasourceoperation1:ReadCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" defaultConfig="U:uGvK8bc7Ee-jGA1qVUMsUA">
+<outGroups>
+<DataAccessGroup imx:id="ID_137" xsi:type="datasourceoperation1:DataAccessGroup" groupType="U:XmnMcrc7Ee-jGA1qVUMsUA"/>
+</outGroups>
+</Capability>
+<Capability imx:id="ID_138" xsi:type="datasourceoperation1:LookupCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalReaderDataAdapter" defaultConfig="U:uGvK8bc7Ee-jGA1qVUMsUA"/>
+</operations>
+<ownedCapabilityTypes>
+<ComplexType imx:id="U:XmnMcrc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:ComplexType" name="STG_TRS_DEACTIVATED_RELATIONSHIPS">
+<features>
+<StructuralFeature imx:id="U:XmnMerc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PKEY_SRC_OBJECT" precision="255" upper="1"/>
+<StructuralFeature imx:id="U:XmnMfbc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" name="LOAD_DATE" precision="29" scale="9" upper="1"/>
+<StructuralFeature imx:id="U:XmnMgbc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PROCESSED_YN" nullable="true" precision="1" upper="1"/>
+</features>
+</ComplexType>
+</ownedCapabilityTypes>
+<typeLibrary imx:id="U:XmnMc7c7Ee-jGA1qVUMsUA" xsi:type="typelibrary:TypeLibrary"/>
+<relationalFields>
+<RelationalField imx:id="ID_139" xsi:type="datasourceoperation:RelationalField" column="U:qYU4srczEe-APhKcpoqDtw" feature="U:XmnMerc7Ee-jGA1qVUMsUA" name="PKEY_SRC_OBJECT" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_140"/>
+<RelationalField imx:id="ID_141" xsi:type="datasourceoperation:RelationalField" column="U:qYU4tbczEe-APhKcpoqDtw" feature="U:XmnMfbc7Ee-jGA1qVUMsUA" name="LOAD_DATE" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" recordInstance="ID_140"/>
+<RelationalField imx:id="ID_142" xsi:type="datasourceoperation:RelationalField" column="U:qYU4ubczEe-APhKcpoqDtw" feature="U:XmnMgbc7Ee-jGA1qVUMsUA" name="PROCESSED_YN" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_140"/>
+</relationalFields>
+<relationalRecordInstances>
+<RelationalRecordInstance imx:id="ID_140" xsi:type="datasourceoperation:RelationalRecordInstance" name="STG_TRS_DEACTIVATED_RELATIONSHIPS" record="U:qYU4q7czEe-APhKcpoqDtw"/>
+</relationalRecordInstances>
+</anonymousDso>
+<sourceInterfaces>
+<SourceDataInterface imx:id="U:uGvK77c7Ee-jGA1qVUMsUA" xsi:type="source:SourceDataInterface" name="Group" output="true">
+<sourceFields>
+<SourceTxField imx:id="U:uGvK8Lc7Ee-jGA1qVUMsUA" xsi:type="source:SourceTxField" type="U:XmnMcrc7Ee-jGA1qVUMsUA" name="output" output="true"/>
+</sourceFields>
+</SourceDataInterface>
+</sourceInterfaces>
+</AbstractTransformation>
+<AbstractTransformation imx:id="U:G7Vs37c8Ee-jGA1qVUMsUA" xsi:type="target:TargetTx" active="true" name="Write_STG_TRS_DEACTIVATED_RELATIONSHIPS" dso="U:-fh98rc7Ee-jGA1qVUMsUA">
+<anonymousDso imx:id="U:-fh98rc7Ee-jGA1qVUMsUA" xsi:type="datasourceoperation:WriteRelationalDataSourceOperation" name="STG_TRS_DEACTIVATED_RELATIONSHIPS" loadType="Normal" tableDefinition="U:qYU4q7czEe-APhKcpoqDtw" typeSystem="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem">
+<defaultConfigs>
+<DSORuntimeConfig imx:id="U:G7Vs4rc8Ee-jGA1qVUMsUA" xsi:type="dsoconfig:RelationalDSORuntimeConfig" connectInfo="stringIdentity:STAGING" connectionName="STAGING"/>
+</defaultConfigs>
+<operations>
+<Capability imx:id="ID_143" xsi:type="datasourceoperation1:WriteCapability" defaultAdapter="smd:com.informatica.metadata.seed.relational.CanonicalRelational.relationalWriterDataAdapter" defaultConfig="U:G7Vs4rc8Ee-jGA1qVUMsUA">
+<inGroups>
+<DataAccessGroup imx:id="ID_144" xsi:type="datasourceoperation1:DataAccessGroup" groupType="U:-fh987c7Ee-jGA1qVUMsUA" input="true"/>
+</inGroups>
+</Capability>
+</operations>
+<ownedCapabilityTypes>
+<ComplexType imx:id="U:-fh987c7Ee-jGA1qVUMsUA" xsi:type="typelibrary:ComplexType" name="STG_TRS_DEACTIVATED_RELATIONSHIPS">
+<features>
+<StructuralFeature imx:id="U:-fh99bc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdouble" lower="1" name="INDV_ID" nullable="true" precision="15" upper="1"/>
+<StructuralFeature imx:id="U:-fh99rc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdouble" lower="1" name="REF_INDV_ID" nullable="true" precision="15" upper="1"/>
+<StructuralFeature imx:id="U:-fh997c7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PTY_RLE_FK_1" nullable="true" precision="255" upper="1"/>
+<StructuralFeature imx:id="U:-fh9-Lc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PTY_RLE_FK_2" nullable="true" precision="255" upper="1"/>
+<StructuralFeature imx:id="U:-fh9-bc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="REL_TYPE_CODE" nullable="true" precision="255" upper="1"/>
+<StructuralFeature imx:id="U:-fh9-rc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdecimal" lower="1" name="ROWID_XREF" nullable="true" precision="38" upper="1"/>
+<StructuralFeature imx:id="U:-fh9-7c7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PKEY_SRC_OBJECT" precision="255" upper="1"/>
+<StructuralFeature imx:id="U:-fh9_Lc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="ROWID_OBJECT" nullable="true" precision="14" upper="1"/>
+<StructuralFeature imx:id="U:-fh9_bc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="ROWID_SYSTEM" nullable="true" precision="14" upper="1"/>
+<StructuralFeature imx:id="U:-fh9_rc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdate%2Ftime" lower="1" name="LOAD_DATE" precision="29" scale="9" upper="1"/>
+<StructuralFeature imx:id="U:-fh9_7c7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fdecimal" lower="1" name="SRC_PKEY_CT" nullable="true" precision="38" upper="1"/>
+<StructuralFeature imx:id="U:-fh-ALc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="MASTER_RECORD_YN" nullable="true" precision="1" upper="1"/>
+<StructuralFeature imx:id="U:-fh-Abc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="MERGED_YN" nullable="true" precision="1" upper="1"/>
+<StructuralFeature imx:id="U:-fh-Arc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:StructuralFeature" type="smd:com.informatica.metadata.seed.platform.Platform.typesystem%2Fstring" lower="1" name="PROCESSED_YN" nullable="true" precision="1" upper="1"/>
+</features>
+</ComplexType>
+</ownedCapabilityTypes>
+<typeLibrary imx:id="U:-fh99Lc7Ee-jGA1qVUMsUA" xsi:type="typelibrary:TypeLibrary"/>
+<relationalFields>
+<RelationalField imx:id="ID_145" xsi:type="datasourceoperation:RelationalField" column="U:qYU4rLczEe-APhKcpoqDtw" feature="U:-fh99bc7Ee-jGA1qVUMsUA" name="INDV_ID" odbcPrecision="15" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdouble" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_147" xsi:type="datasourceoperation:RelationalField" column="U:qYU4rbczEe-APhKcpoqDtw" feature="U:-fh99rc7Ee-jGA1qVUMsUA" name="REF_INDV_ID" odbcPrecision="15" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdouble" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_148" xsi:type="datasourceoperation:RelationalField" column="U:qYU4rrczEe-APhKcpoqDtw" feature="U:-fh997c7Ee-jGA1qVUMsUA" name="PTY_RLE_FK_1" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_149" xsi:type="datasourceoperation:RelationalField" column="U:qYU4r7czEe-APhKcpoqDtw" feature="U:-fh9-Lc7Ee-jGA1qVUMsUA" name="PTY_RLE_FK_2" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_150" xsi:type="datasourceoperation:RelationalField" column="U:qYU4sLczEe-APhKcpoqDtw" feature="U:-fh9-bc7Ee-jGA1qVUMsUA" name="REL_TYPE_CODE" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_151" xsi:type="datasourceoperation:RelationalField" column="U:qYU4sbczEe-APhKcpoqDtw" feature="U:-fh9-rc7Ee-jGA1qVUMsUA" name="ROWID_XREF" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_152" xsi:type="datasourceoperation:RelationalField" column="U:qYU4srczEe-APhKcpoqDtw" feature="U:-fh9-7c7Ee-jGA1qVUMsUA" name="PKEY_SRC_OBJECT" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_153" xsi:type="datasourceoperation:RelationalField" column="U:qYU4s7czEe-APhKcpoqDtw" feature="U:-fh9_Lc7Ee-jGA1qVUMsUA" name="ROWID_OBJECT" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_154" xsi:type="datasourceoperation:RelationalField" column="U:qYU4tLczEe-APhKcpoqDtw" feature="U:-fh9_bc7Ee-jGA1qVUMsUA" name="ROWID_SYSTEM" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_155" xsi:type="datasourceoperation:RelationalField" column="U:qYU4tbczEe-APhKcpoqDtw" feature="U:-fh9_rc7Ee-jGA1qVUMsUA" name="LOAD_DATE" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_156" xsi:type="datasourceoperation:RelationalField" column="U:qYU4trczEe-APhKcpoqDtw" feature="U:-fh9_7c7Ee-jGA1qVUMsUA" name="SRC_PKEY_CT" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_157" xsi:type="datasourceoperation:RelationalField" column="U:qYU4t7czEe-APhKcpoqDtw" feature="U:-fh-ALc7Ee-jGA1qVUMsUA" name="MASTER_RECORD_YN" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_158" xsi:type="datasourceoperation:RelationalField" column="U:qYU4uLczEe-APhKcpoqDtw" feature="U:-fh-Abc7Ee-jGA1qVUMsUA" name="MERGED_YN" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_146"/>
+<RelationalField imx:id="ID_159" xsi:type="datasourceoperation:RelationalField" column="U:qYU4ubczEe-APhKcpoqDtw" feature="U:-fh-Arc7Ee-jGA1qVUMsUA" name="PROCESSED_YN" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" recordInstance="ID_146"/>
+</relationalFields>
+<relationalRecordInstance imx:id="ID_146" xsi:type="datasourceoperation:RelationalRecordInstance" name="STG_TRS_DEACTIVATED_RELATIONSHIPS" record="U:qYU4q7czEe-APhKcpoqDtw"/>
+</anonymousDso>
+<targetInterfaces>
+<TargetDataInterface imx:id="U:G7Vs4Lc8Ee-jGA1qVUMsUA" xsi:type="target:TargetDataInterface" input="true" name="Group">
+<targetFields>
+<TargetTxField imx:id="U:G7Vs4bc8Ee-jGA1qVUMsUA" xsi:type="target:TargetTxField" type="U:-fh987c7Ee-jGA1qVUMsUA" input="true" name="Input"/>
+</targetFields>
+</TargetDataInterface>
+</targetInterfaces>
+</AbstractTransformation>
+</transformations>
+</IObject>
+<IObject imx:id="U:qYU4q7czEe-APhKcpoqDtw" xsi:type="datarecord:Table" connection="stringIdentity:STAGING" connectionName="STAGING" connectionType="com.informatica.metadata.relational.connectinfo.OracleNativeConnectInfo" name="STG_TRS_DEACTIVATED_RELATIONSHIPS" physicalName="STG_TRS_DEACTIVATED_RELATIONSHIPS" primaryKey="U:qYU4urczEe-APhKcpoqDtw">
+<columns>
+<Column imx:id="U:qYU4rLczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber" name="INDV_ID" nullable="true" odbcPrecision="15" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdouble" precision="15"/>
+<Column imx:id="U:qYU4rbczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber" name="REF_INDV_ID" nullable="true" odbcPrecision="15" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdouble" precision="15"/>
+<Column imx:id="U:qYU4rrczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="PTY_RLE_FK_1" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:qYU4r7czEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="PTY_RLE_FK_2" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:qYU4sLczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="REL_TYPE_CODE" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:qYU4sbczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="ROWID_XREF" nullable="true" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:qYU4srczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="PKEY_SRC_OBJECT" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:qYU4s7czEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fchar" name="ROWID_OBJECT" nullable="true" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" precision="14"/>
+<Column imx:id="U:qYU4tLczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fchar" name="ROWID_SYSTEM" nullable="true" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" precision="14"/>
+<Column imx:id="U:qYU4tbczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fdate" name="LOAD_DATE" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" precision="19"/>
+<Column imx:id="U:qYU4trczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="SRC_PKEY_CT" nullable="true" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:qYU4t7czEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="MASTER_RECORD_YN" nullable="true" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="1"/>
+<Column imx:id="U:qYU4uLczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="MERGED_YN" nullable="true" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="1"/>
+<Column imx:id="U:qYU4ubczEe-APhKcpoqDtw" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="PROCESSED_YN" nullable="true" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="1"/>
+</columns>
+<uniqueKeys>
+<UniqueKey imx:id="U:qYU4urczEe-APhKcpoqDtw" xsi:type="datarecord:PrimaryKey" columns="U:qYU4srczEe-APhKcpoqDtw U:qYU4tbczEe-APhKcpoqDtw" name="STG_TRS_DEACTIVATED_RELATIONSHIPS_PK"/>
+</uniqueKeys>
+</IObject>
+<IObject imx:id="U:SoFnjtsTEe60l3FRIcHzLg" xsi:type="datarecord:Table" connection="stringIdentity:HHS_MDM_ORS" connectionName="HHS_MDM_ORS" connectionType="com.informatica.metadata.relational.connectinfo.OracleNativeConnectInfo" name="C_B_PTY_RLE_REL_XREF" physicalName="C_B_PTY_RLE_REL_XREF" primaryKey="U:SoFnr9sTEe60l3FRIcHzLg">
+<columns>
+<Column imx:id="U:SoFnj9sTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="ROWID_XREF" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:SoFnkNsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="PKEY_SRC_OBJECT" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:SoFnkdsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fchar" name="ROWID_OBJECT" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" precision="14"/>
+<Column imx:id="U:SoFnktsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fchar" name="ROWID_SYSTEM" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" precision="14"/>
+<Column imx:id="U:SoFnk9sTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Ftimestamp" name="SRC_LUD" nullable="true" odbcPrecision="29" odbcScale="9" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Ftimestamp" precision="26" scale="6"/>
+<Column imx:id="U:SoFnlNsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="PUT_UPDATE_MERGE_IND" nullable="true" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:SoFnldsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="INTERACTION_ID" nullable="true" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:SoFnltsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="HUB_STATE_IND" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:SoFnl9sTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="PROMOTE_IND" nullable="true" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:SoFnmNsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="NULL_INDICATOR_BITMAP" nullable="true" odbcPrecision="1000" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="1000"/>
+<Column imx:id="U:SoFnmdsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Ftimestamp" name="PERIOD_START_DATE" nullable="true" odbcPrecision="29" odbcScale="9" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Ftimestamp" precision="26" scale="6"/>
+<Column imx:id="U:SoFnmtsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Ftimestamp" name="PERIOD_END_DATE" nullable="true" odbcPrecision="29" odbcScale="9" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Ftimestamp" precision="26" scale="6"/>
+<Column imx:id="U:SoFnm9sTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="CREATOR" nullable="true" odbcPrecision="50" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="50"/>
+<Column imx:id="U:SoFnnNsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Ftimestamp" name="CREATE_DATE" nullable="true" odbcPrecision="29" odbcScale="9" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Ftimestamp" precision="26" scale="6"/>
+<Column imx:id="U:SoFnndsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="UPDATED_BY" nullable="true" odbcPrecision="50" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="50"/>
+<Column imx:id="U:SoFnntsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Ftimestamp" name="LAST_UPDATE_DATE" nullable="true" odbcPrecision="29" odbcScale="9" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Ftimestamp" precision="26" scale="6"/>
+<Column imx:id="U:SoFnn9sTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="DELETED_IND" nullable="true" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:SoFnoNsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="DELETED_BY" nullable="true" odbcPrecision="50" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="50"/>
+<Column imx:id="U:SoFnodsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Ftimestamp" name="DELETED_DATE" nullable="true" odbcPrecision="29" odbcScale="9" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Ftimestamp" precision="26" scale="6"/>
+<Column imx:id="U:SoFnotsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fchar" name="ORIG_ROWID_OBJECT" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" precision="14"/>
+<Column imx:id="U:SoFno9sTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fchar" name="STG_ROWID_TABLE" nullable="true" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" precision="14"/>
+<Column imx:id="U:SoFnpNsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="PTY_RLE_FK_1" nullable="true" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:SoFnpdsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fnumber%28p%2Cs%29" name="PTY_RLE_FK_2" nullable="true" odbcPrecision="38" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdecimal" precision="38"/>
+<Column imx:id="U:SoFnptsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="REL_TYPE_CODE" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:SoFnp9sTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="HIERARCHY_CODE" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:SoFnqNsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="REL_TP" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:SoFnqdsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="S_PTY_RLE_FK_1" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:SoFnqtsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="S_REL_TYPE_CODE" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:SoFnq9sTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="S_PTY_RLE_FK_2" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:SoFnrNsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="S_HIERARCHY_CODE" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:SoFnrdsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="S_REL_TP" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:SoFnrtsTEe60l3FRIcHzLg" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fdate" name="SRC_LAST_UPD_DT" nullable="true" odbcPrecision="10" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fdate" precision="19"/>
+</columns>
+<uniqueKeys>
+<UniqueKey imx:id="U:SoFnr9sTEe60l3FRIcHzLg" xsi:type="datarecord:PrimaryKey" columns="U:SoFnj9sTEe60l3FRIcHzLg" name="SVR1_2CHV"/>
+</uniqueKeys>
+</IObject>
+<IObject imx:id="U:AHBCqy9jEfCMXyG8zczD2Q" xsi:type="datarecord:Table" connection="stringIdentity:HHS_MDM_ORS" connectionName="HHS_MDM_ORS" connectionType="com.informatica.metadata.relational.connectinfo.OracleNativeConnectInfo" name="ZZ_UTL_UNMERGE_TREE_SRC_KEY" physicalName="ZZ_UTL_UNMERGE_TREE_SRC_KEY">
+<columns>
+<Column imx:id="U:AHBCrC9jEfCMXyG8zczD2Q" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="PKEY_SRC_OBJECT" nullable="true" odbcPrecision="255" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="255"/>
+<Column imx:id="U:AHBCrS9jEfCMXyG8zczD2Q" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fchar" name="ROWID_SYSTEM" nullable="true" odbcPrecision="14" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fchar" precision="14"/>
+<Column imx:id="U:AHBCri9jEfCMXyG8zczD2Q" xsi:type="datarecord:Column" type="smd:com.informatica.adapters.typesystem.relational.OracleTypeSystem.typesystem%2Fvarchar2" name="EXPLODE_NODE_IND" nullable="true" odbcPrecision="1" odbcType="smd:com.informatica.metadata.seed.odbc.ODBC.typesystem%2Fvarchar" precision="1"/>
+</columns>
+</IObject>
+</contents>
+</project:Project>
+<imx:crc value="4061364988"/>
+</imx:IMX>

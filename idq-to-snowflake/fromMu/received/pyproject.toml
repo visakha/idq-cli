@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trs-compare"
+version = "5.4.0"
+description = "Copy Oracle IDQ data to Snowflake, run the Snowflake ETL, and compare IDQ vs Snowflake targets by domain, dimension and spine. No ORM: Pydantic models + repositories + SQLAlchemy Core fluent queries + explicit table definitions."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "sqlalchemy>=2.0",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "oracledb>=2.0",
+    "snowflake-sqlalchemy>=1.5",
+    "snowflake-connector-python>=3.6",
+    "swagger-ui-bundle>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "httpx>=0.27"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The project root must be on sys.path for `import app` and
+# `from tests.test_services import ...` to work.  pytest >= 7
+# honours this (relative to the directory holding this file).
+# Without it, bare `pytest` fails with ModuleNotFoundError: No
+# module named 'app', while `python -m pytest` passes -- because
+# only the latter puts the current directory on sys.path.
+pythonpath = ["."]
