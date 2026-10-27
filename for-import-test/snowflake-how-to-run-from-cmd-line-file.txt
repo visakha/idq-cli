@@ -1,0 +1,7 @@
+snowsql -a DOOPELI-LL99227 -u VIZY --authenticator SNOWFLAKE_JWT --private-key-path C:\keys\vizy_rsa_key.p8 -r ACCOUNTADMIN -w SNOWFLAKE_LEARNING_WH -d MDM_ETL_TTF -s TTF_ETL_WRK -q "CALL sp_etl_run_wf_TTF_Stage_Load();" > C:\logs\ttf_stage_load.log 2>&1
+
+
+usage:
+A few notes on it: the runner takes no arguments in this variant, and its returned summary is what lands in the log file. The key file has to be a copy on your Windows machine (the one I generated lives on my VM, which Windows can't reach), and since it's unencrypted no passphrase is needed. The database, schema, and warehouse are the package's documented TTF topology — swap them for your actual install. The flag set (-a/-u/-d/-s/-w/-q, --private-key-path with --authenticator SNOWFLAKE_JWT) is straight from Snowflake's snowsql docs. If you want the log to hold just the bare summary value instead of snowsql's formatted table, add -o output_format=csv -o header=False before the redirect.
+
+

@@ -1,0 +1,114 @@
+
+sequenceDiagram
+    autonumber
+
+    actor Tester
+    participant API as Test Harness REST API
+    participant ProdETL as Production ETL
+    participant ProdOracle as Production Oracle
+    participant ProdSQLite as Prod_SQLite
+    participant Whitelist as White_list_tables_safe_to_truncate.txt
+    participant DevOracle as Dev Oracle
+    participant Snowflake as Snowflake ETL (Dev)
+    participant DevSQLite as Dev_SQLite
+    participant Compare as Comparison Engine
+    participant Results as Compare_Results_SQLite
+    participant UI as Streamlit UI
+
+    rect rgb(235, 245, 255)
+        Note over ProdETL,ProdOracle: A. Production ETL completes daily by 8 AM
+        ProdETL->>ProdOracle: Populate ETL_INPUT_TABLES
+        ProdETL->>ProdOracle: Populate ETL_OUTPUT_TABLES
+        Note over ProdOracle: INPUT: _D_, _H_, supporting tables
+        Note over ProdOracle: OUTPUT: C_S_*, Status, ZZ* tables
+        ProdETL-->>ProdOracle: Production data ready
+    end
+
+    rect rgb(235, 250, 240)
+        Note over Tester,ProdSQLite: B. Capture Production baseline
+        Tester->>API: POST /snapshots/production?source=SOURCE
+        API->>ProdOracle: Read INPUT and OUTPUT tables
+        ProdOracle-->>API: Production table data
+        API->>ProdSQLite: Create production snapshot
+        ProdSQLite-->>API: Snapshot completed
+        API-->>Tester: Snapshot ID and success status
+    end
+
+    rect rgb(255, 248, 230)
+        Note over Tester,DevOracle: C. Restore Production input into Dev Oracle
+        Tester->>API: POST /restore/dev-oracle?source=SOURCE
+        API->>Whitelist: Read allowed table names
+        Whitelist-->>API: Safe-to-truncate table list
+        API->>ProdSQLite: Read ETL_INPUT_TABLES
+        ProdSQLite-->>API: Input table records
+
+        loop For each input table
+            API->>API: Validate table against whitelist
+            alt Table is whitelisted
+                API->>DevOracle: TRUNCATE allowed table
+                API->>DevOracle: Bulk INSERT production records
+                DevOracle-->>API: Load status and row count
+            else Table is not whitelisted
+                API-->>Tester: Reject table operation
+            end
+        end
+
+        API-->>Tester: Dev Oracle restore summary
+    end
+
+    rect rgb(245, 235, 255)
+        Note over Tester,Snowflake: D. Execute Snowflake ETL in Dev
+        Tester->>API: POST /etl/run?source=SOURCE
+        API->>Snowflake: Start ETL for selected source
+        Snowflake-->>API: Execution Job ID
+
+        loop Until ETL completes
+            API->>Snowflake: Poll job execution status
+            Snowflake-->>API: Running / Completed / Failed
+        end
+
+        API-->>Tester: ETL execution status
+    end
+
+    rect rgb(235, 250, 250)
+        Note over Tester,DevSQLite: E. Capture Dev Snowflake output
+        Tester->>API: POST /snapshots/dev?source=SOURCE
+        API->>Snowflake: Read ETL_OUTPUT_TABLES
+        Snowflake-->>API: Dev output records
+        API->>DevSQLite: Create Dev snapshot
+        DevSQLite-->>API: Snapshot completed
+        API-->>Tester: Dev snapshot ID and status
+    end
+
+    rect rgb(255, 240, 240)
+        Note over Tester,Results: F. Compare Production vs Dev results
+        Tester->>API: POST /compare?source=SOURCE
+        API->>Compare: Start comparison
+        Compare->>ProdSQLite: Read Production OUTPUT tables
+        ProdSQLite-->>Compare: Production baseline records
+        Compare->>DevSQLite: Read Dev OUTPUT tables
+        DevSQLite-->>Compare: Dev records
+
+        loop For each output table
+            Compare->>Compare: Match records using primary / business keys
+            Compare->>Compare: Compare column values
+            Compare->>Compare: Identify missing, extra and changed rows
+            Compare->>Results: Store table and record-level differences
+        end
+
+        Compare-->>API: Comparison summary and run ID
+        API-->>Tester: Pass / Fail and mismatch counts
+    end
+
+    rect rgb(240, 245, 255)
+        Note over Tester,UI: G. Manual verification using Streamlit
+        Tester->>UI: Open comparison dashboard
+        UI->>Results: Query comparison runs and results
+        Results-->>UI: Table summaries and row-level differences
+        UI-->>Tester: Display pass/fail, filters and differences
+
+        Tester->>UI: Drill down into mismatched records
+        UI->>Results: Fetch column-level differences
+        Results-->>UI: Expected vs Actual values
+        UI-->>Tester: Display detailed variance report
+    end
