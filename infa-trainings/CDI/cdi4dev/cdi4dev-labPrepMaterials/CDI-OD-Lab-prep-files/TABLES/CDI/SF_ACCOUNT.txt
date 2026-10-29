@@ -1,0 +1,49 @@
+"ID","NAME","TYPE","PARENTID","BILLINGSTREET","BILLINGCITY","BILLINGSTATE","BILLINGPOSTALCODE","BILLINGCOUNTRY","SHIPPINGSTREET","SHIPPINGCITY","SHIPPINGSTATE","SHIPPINGPOSTALCODE","SHIPPINGCOUNTRY","PHONE","WEBSITE","INDUSTRY","NUMBEROFEMPLOYEES","DESCRIPTION","CREATEDDATE","CREATEDBYID","LASTMODIFIEDDATE","LASTMODIFIEDBYID","LASTACTIVITYDATE","ANNUALREVENUE"
+"0015g00000qGiMR","Sample Account for Entitlements",,,,,,,,,,,,,,,,,,"08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,
+"0015g00000qBXqt","GenePoint","Customer - Channel",,"345 Shoreline Park
+Mountain View, CA 94043
+USA","Mountain View","CA",,,"345 Shoreline Park
+Mountain View, CA 94043
+USA",,,,,"(650) 867-3450","www.genepoint.com","Biotechnology",265,"Genomics company engaged in mapping and sequencing of the human genome and developing gene-based drugs","08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,30000000
+"0015g00000qBXqr","United Oil & Gas, UK","Customer - Direct",,"Kings Park, 17th Avenue, Team Valley Trading Estate,
+Gateshead, Tyne and Wear NE26 3HS
+United Kingdom",,"UK",,,"Kings Park, 17th Avenue, Team Valley Trading Estate,
+Gateshead, Tyne and Wear NE26 3HS
+United Kingdom",,,,,"+44 191 4956203","http://www.uos.com","Energy",24000,,"08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,
+"0015g00000qBXqs","United Oil & Gas, Singapore","Customer - Direct",,"9 Tagore Lane
+Singapore, Singapore 787472
+Singapore","Singapore","Singapore",,,"9 Tagore Lane
+Singapore, Singapore 787472
+Singapore",,,,,"(650) 450-8810","http://www.uos.com","Energy",3000,,"08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,
+"0015g00000qBXqj","Edge Communications","Customer - Direct",,"312 Constitution Place
+Austin, TX 78767
+USA","Austin","TX",,,"312 Constitution Place
+Austin, TX 78767
+USA",,,,,"(512) 757-6000","http://edgecomm.com","Electronics",1000,"Edge, founded in 1998, is a start-up based in Austin, TX. The company designs and manufactures a device to convert music from one digital format to another. Edge sells its product through retailers and its own website.","08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,139000000
+"0015g00000qBXqk","Burlington Textiles Corp of America","Customer - Direct",,"525 S. Lexington Ave","Burlington","NC",27215,"USA",,,,,,"(336) 222-7000","www.burlington.com","Apparel",9000,,"08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,350000000
+"0015g00000qBXql","Pyramid Construction Inc.","Customer - Channel",,"2 Place Jussieu","Paris",,75251,"France","2 Place Jussieu","Paris",,75251,"France","(014) 427-4427","www.pyramid.com","Construction",2680,,"08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,950000000
+"0015g00000qBXqm","Dickenson plc","Customer - Channel",,"1301 Hoch Drive","Lawrence","KS",66045,"USA","1301 Hoch Drive","Lawrence","KS",66045,"USA","(785) 241-6200","dickenson-consulting.com","Consulting",120,,"08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,50000000
+"0015g00000qBXqn","Grand Hotels & Resorts Ltd","Customer - Direct",,"2334 N. Michigan Avenue, Suite 1500
+Chicago, IL 60601, USA","Chicago","IL",,,"2334 N. Michigan Avenue, Suite 1500
+Chicago, IL 60601, USA",,,,,"(312) 596-1000","www.grandhotels.com","Hospitality",5600,"Chain of hotels and resorts across the US, UK, Eastern Europe, Japan, and SE Asia.","08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,500000000
+"0015g00000qBXqp","Express Logistics and Transport","Customer - Channel",,"620 SW 5th Avenue Suite 400
+Portland, Oregon 97204
+United States","Portland","OR",,,"620 SW 5th Avenue Suite 400
+Portland, Oregon 97204
+United States",,,,,"(503) 421-7800","www.expressl&t.net","Transportation",12300,"Commerical logistics and transportation company.","08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,950000000
+"0015g00000qBXqq","University of Arizona","Customer - Direct",,"888 N Euclid 
+Hallis Center, Room 501
+Tucson, AZ 85721
+United States","Tucson","AZ",,,"888 N Euclid 
+Hallis Center, Room 501
+Tucson, AZ 85721
+United States",,,,,"(520) 773-9050","www.universityofarizona.com","Education",39000,"Leading university in AZ offering undergraduate and graduate programs in arts and humanities, pure sciences, engineering, business, and medicine.","08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,
+"0015g00000qBXqo","United Oil & Gas Corp.","Customer - Direct",,"1301 Avenue of the Americas 
+New York, NY 10019
+USA","New York","NY",,,"1301 Avenue of the Americas 
+New York, NY 10019
+USA",,,,,"(212) 842-5500","http://www.uos.com","Energy",145000,"World's third largest oil and gas company.","08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,5600000000
+"0015g00000qBXqu","sForce",,,"The Landmark @ One Market","San Francisco","CA",94087,"US",,,,,,"(415) 901-7000","www.sforce.com",,,,"08/29/2022 00:00:00","Informatica","08/29/2022 00:00:00","Informatica",,
+"0015g0000131GJH","Farmers Coop. of Florida",,,"321 Westcott Building","Tallahassee","FL",32306,"USA",,,,,,"(850) 644-4200",,"Agriculture",,,"11/15/2022 00:00:00","Informatica","11/15/2022 00:00:00","Informatica",,900750000
+"0015g000014DYT2","S-XX-Test",,,,,,,,,,,,,,,,,,"12/01/2022 00:00:00","Informatica","12/01/2022 00:00:00","Informatica",,
+"0015g00000qHSgh","American Banking Corp.",,,,,"PA",,"USA",,,,,,"(610) 265-9100",,,,,"09/05/2022 00:00:00","Informatica","09/05/2022 00:00:00","Informatica",,

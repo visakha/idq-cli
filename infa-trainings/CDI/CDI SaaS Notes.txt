@@ -1,0 +1,12 @@
+CDI SaaS Notes
+
+march 18 2025
+
+
+Login:
+	https://dm-us.informaticacloud.com/identity-service/home
+	user name iics_training_dev_205  geo@8235763448wlr_
+	This will take you to CDI SaaS
+	In the Explore -- goto your Project and Folder
+	
+	

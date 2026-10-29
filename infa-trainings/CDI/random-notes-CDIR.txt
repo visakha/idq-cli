@@ -1,0 +1,25 @@
+https://success.informatica.com/content/experience-fragments/informatica-cxp/xperience-lounge/experience-lounge141.html
+
+    implement Change Data Capture through Cloud Data Ingestion & Replication. 
+    This demo will showcase how to effectively use Cloud Data Ingestion and Replication (CDIR) to incrementally ingest data
+    from SQL Server to Snowflake Data Cloud using Snowflake's Superpipe capability.
+
+
+NOTE: Even though the ChuckLet says CDIR --> when clicked it takes you to CDIR  
+    from there you click New Asset --> App | DB | File | Stream ingestion
+        Load Type : Ini | Incr | Ini & Incr
+
+CDC can be 
+    Log | CDC Table | Query based
+
+    Next is the Generation of the SQL Script, this can be either done in the UI or backend 
+    if done in the UI, you have an option to download the SQL generated for the source control
+
+if using SnowFlake as the target, you get use the SnowPipe, also you get to config the schema drift
+    (note schema drift is applicable to the Single table def only)
+        - Choose one of these for each of Drift Types [Add Col, Mod Col, Drop Col, Rename Col]
+            * Replicate | Ignore | Stop Job | Stop table
+You can also *Transform  *Default values  along the Transformations
+
+
+

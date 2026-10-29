@@ -1,0 +1,48 @@
+#PRODUCT_ID|GROUP_ID|PRODUCT_DESC|GROUP_DESC|DIVISION_DESC
+2000|1|Caverra GTS Coupe|Sports|Vehicles
+2001|2|Sportiva Turbo|SUV|Vehicles
+2002|1|V6 Roadster|Sports|Vehicles
+2003|1|Caverra Cabriolet|Sports|Vehicles
+2004|2|Sportiva|SUV|Vehicles
+86501|11|Roof Box|Touring|Accessories
+86503|11|Ski/Snowboard Carrier|Touring|Accessories
+86504|11|Luggage Retainer|Touring|Accessories
+86505|11|Roof Transport System|Touring|Accessories
+86506|11|Racing Bike Carrier|Touring|Accessories
+86507|11|Rear-Mounted Rack System|Touring|Accessories
+86508|13|Sportiva Tail Pipe|Sports|Accessories
+86509|13|Sports Exhaust System|Sports|Accessories
+86510|13|GTS Sports Tail Pipes|Sports|Accessories
+86511|16|Roadster Aerokit II|Exterior|Accessories
+86512|16|Sportiva Aerokit|Exterior|Accessories
+86513|16|Careeva Rear Spolier|Exterior|Accessories
+86514|16|GTS Side Trims|Exterior|Accessories
+86515|16|Careeva Side Skirts|Exterior|Accessories
+86516|17|18" SportDesign Wheel|Wheels|Accessories
+86517|17|17" Roadster S Wheel|Wheels|Accessories
+86518|17|17" Sportiva Wheel|Wheels|Accessories
+86519|17|17" Sportiva I Wheel|Wheels|Accessories
+86520|17|Anti-Theft Wheel Bolts|Wheels|Accessories
+86521|17|18" Careeva Wheels|Wheels|Accessories
+86522|17|17" Careeva Wheels|Wheels|Accessories
+86523|16|Hard Top|Exterior|Accessories
+86524|18|Hard Top Cover|Wind and Weather|Accessories
+86525|18|Wind deflectos|Wind and Weather|Accessories
+86526|11|Hard Top Rack|Touring|Accessories
+86527|18|Car Cover|Wind and Weather|Accessories
+86528|18|Leather Mirror Covers|Wind and Weather|Accessories
+86529|18|Sportiva Bra|Wind and Weather|Accessories
+86530|15|Carbon Package|Interior|Accessories
+86531|16|Door Entry Guards|Exterior|Accessories
+86532|15|Cup Holder|Interior|Accessories
+86533|15|Dark Burr Maple Package|Interior|Accessories
+86534|15|Light Burr Maple Package|Interior|Accessories
+86535|15|Floor Mats|Interior|Accessories
+86536|14|CD Autochanger|Audio and Communications|Accessories
+86537|14|TrafficPro Navigation System|Audio and Communications|Accessories
+86538|14|Table|Audio and Communications|Accessories
+86539|14|Audio System|Audio and Communications|Accessories
+86540|14|Tweeter/Midrange System|Audio and Communications|Accessories
+86541|12|Rain sensor|Safety and Security|Accessories
+86542|12|Rechargable Flashlight|Safety and Security|Accessories
+86543|10|Litronic Kit|Performance|Accessories

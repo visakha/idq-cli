@@ -1,0 +1,32 @@
+DEALERSHIP_ID,DEALERSHIP_MANAGER_ID,DEALERSHIP_DESC,DEALERSHIP_LOCATION,DEALERSHIP_STATE,DEALERSHIP_REGION,DEALERSHIP_COUNTRY
+1,86415,Carlsson Mersche,San Francisco,California,West,USA
+2,86423,Pacific Mersche,San Diego,California,West,USA
+3,86414,Barrier Mersche,Seattle,Washington,West,USA
+4,86412,Mersche North Scottsdale,Scottsdale,Arizona,West,USA
+5,86406,Beverly Hills Mersche,Los Angeles,California,West,USA
+6,86424,Newport Beach Mersche,Newport Beach,California,West,USA
+7,86427,Prestige Imports, Inc.,Denver,Colorado,West,USA
+8,86428,Niello Mersche,Sacramento,California,West,USA
+9,86411,Stephen Creak Mersche,San Jose,California,West,USA
+10,86407,Negherbon Mersche,,California,West,USA
+11,86433,Park Place Mersche,Dallas,Texas,Central,USA
+12,86435,Mersche Center,Houston,Texas,,USA
+13,86438,Roger Beastly Mersche,Austin,Texas,Central,USA
+14,86451,Boardwalk Mersche,Chicago,Illinois,Central,USA
+15,86455,Lynch Motor Werks,Minneapolis,Minnesota,Central,USA
+16,86457,Howard Schepper Mersche,Ann Arbour,Michigan,Central,USA
+17,86460,Williams Auto World,Houston,Texas,Central,USA
+18,86462,Autobahn Motors,Detroit,Michigan,Central,USA
+19,86468,Manhattan Motors,New York,New York,East,USA
+20,86469,Crown Mersche,Baltimore,Maryland,East,USA
+21,86475,Wass and Weiss,Boston,Massachusetts,East,USA
+22,86477,South Beach Mersche,Miami,Florida,East,USA
+23,86479,Fredericks Mersche,Fairfax,Virginia,East,USA
+24,86482,Bert Wolfe,Charleston,West Virginia,East,USA
+25,86486,Haarhaus Motors,Atlanta,Georgia,,USA
+26,86493,Eurosport Mersche,West Palm Beach,Florida,East,USA
+27,86494,Mersche Technics,,Arizona,West,USA
+28,86495,Ala Moana Mersche,Honolulu,Hawaii,,USA
+29,86496,Angel Autos,Indianapolis,Indiana,Central,USA
+30,86497,Greenwich Mersche,,Connecticut,East,
+31,86498,Largent Motors,Atlanta,Georgia,East,USA

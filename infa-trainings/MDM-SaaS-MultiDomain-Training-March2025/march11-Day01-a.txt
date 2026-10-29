@@ -1,0 +1,49 @@
+https://informatica.csod.com/LMS/UserTranscript/ILTSessionView.aspx?qs=%5e%5e%5ehYFIG00ygrDb%2b2NDqBG%2fQ8zSoxvSFmNTJjyoOrN9edx0ODdpR%2bWsQQ5oGISptaXqGwjPS1nl58mU0i1aM8HrATgA7p0tqEAmC%2bsSM9fDVIDtnK9FBIvS6XueIp3lJtE6
+
+infatraining34@gmail.com
+
+infaMarch!!
+
+token:
+k7UxoAAAACMAAAACAQAAAAEBAgAAAAxfDdzkkIQlcIEtkvIUjU_gD5Ov67gfTIq3XuPOUT8xE8NRP74IYm6PW5m7mwjHE9tJxQ==acvjYh5nKu6cJFpbBJTPk6
+k7UxoAAAACMAAAACAQAAAAEBAgAAAAwI2_n9Njr4Kgy9td_4oHjE6dNCywsgmPS0R3Jv4Qtc7LzGEriVe1I0bJoODfu4Hfum6Q==0ZU5ETlCTrVf1ode5JgWsu  --> Student
+k7UxoAAAACMAAAACAQAAAAEBAgAAAAxgGyZ3ltxp10fvOJPP6vpcB58TC5qthxes6nuyTDXAogxJvG0EZssZyIysPuB5L5Z7VA==7CAD0bzprSZdvZfY7yl4mj    --> Student
+
+stanley
+sanity123
+
+for the infa login
+	user:  infatraining34@gmail.com/	infa_March!!
+	https://dmp-us.informaticacloud.com/identity-service/home OR
+	https://usw1.dmp-us.informaticacloud.com/cloudUI/products
+	user:  vamsistudent010/Multidomain360
+	Multidomain360
+	
+United
+Confirmation: PMVZMG
+Expedia itinerary: 73071229807245
+	
+	
+ascension
+	877-348-7072 (to dispute the bill / or cust svc)
+	
+Tasks Week 1 	
+	Study Links
+		- https://dataladder.com/master-data-management-guide/
+		
+
+	- B360
+	- Multidomain MDM
+	
+	Fields: Number of tires | Make | Model
+	Field Group: Where do you park this vehicle
+		? what address
+		Name: ParkingAddress
+			Street Num , Street Name, City, State, Postal Code
+	
+	
+	
+SQL Server
+	user MDM /  pwd  MDM
+	
+	adam.bartolomeo@globalss.com

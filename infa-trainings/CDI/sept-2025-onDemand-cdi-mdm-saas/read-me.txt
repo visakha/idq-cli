@@ -1,0 +1,7 @@
+name of the course:
+	Implementation Advanced Topic: MDM SaaS CDI Ingestion
+	
+
+
+https://informatica.csod.com/ui/training/app/targetUser/731141/trainingID/662d75ec-cd98-40e2-a790-dc4fc863f42d?trainingType=Course&action=2&isM6ILT=true&isM7Patch2=true&isM7Patch3=true&isOCSE=true&isRFE=true&isM8=true&isSDV=true&isIPVPF=true&isM9=true&isZeroRegNumFix=true&isChildPostWorkAvailFix=true&back=&postBackGuid=662d75ec-cd98-40e2-a790-dc4fc863f42d
+

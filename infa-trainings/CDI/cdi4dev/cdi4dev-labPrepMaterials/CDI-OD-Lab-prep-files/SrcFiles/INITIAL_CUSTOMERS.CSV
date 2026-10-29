@@ -1,0 +1,11 @@
+CUST_ID,FIRST_NAME,LAST_NAME,ADDR1,ADDR2,CITY,STATE,POSTAL_CODE,PHONE,EMAIL
+1,Neil,Armstrong,100 Maple St,,Cincinatti,OH,45634-3478,4582347809,apollo11commander@nasa.gov
+2,Michael,Collins,3612 Broadway,Box 278,New York,NY,05354-4563,2124635563,columbiapilot@gmail.com
+3,Buzz,Aldrin,453 Galaxy Way,,Reno,NV,45323-0000,NOYB,NOYB
+4,Edward,Mitchell,1290 Paranormal Ave.,,San Pedro,CA,90345-3489,4574329087,edmitchell@aol.com
+5,John,Glenn,456 Valley Way,,Houston,TX,45342-5622,6783346723,bigjohn@outlook.com
+6,John,Young,74 Harrison Ave,,West Orange,NJ,07052-0000,3491238976,shuttlepilot@nasa.gov
+7,Alan,Shepard,3000 Park Ave,Box 4588,New York,NY,08934-3482,3462219754,golfball@gmail.com
+8,Harry,Schmitt,8944 William St.,,Naples,FL,43890-0000,4904357623,harrysmoonwalker@aol.com
+9,Pete,Conrad,23 Cherry St.,,Dallas,TX,53555-3422,5692345612,gaptooth@nasa.com
+10,Frank,Borman,3856 King St.,,Honolulu,HW,99345-0000,5672349065,apollo8man@nasa.gov

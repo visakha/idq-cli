@@ -1,0 +1,28 @@
+https://success.informatica.com/content/experience-fragments/informatica-cxp/xperience-lounge/xperience-lounge80.plain.html
+
+The data quality process involves four steps:
+Discover: Identify data quality issues and assess the current state of data quality.
+Define: Establish data quality rules, standards, and metrics to define the desired state of data quality.
+Apply: Implement data quality measures, such as data cleansing and validation, to improve data accuracy, completeness, and consistency.
+Monitor: Continuously monitor data quality metrics, perform regular audits, and take corrective actions to ensure sustained data quality over time.
+
+Assets
+    There are 7 different types of DQ assets in Cloud Data Quality that cater to different functionalities:
+        Cleanse - to standardize, and enrich data
+        Dictionary - to add reference data
+        Rule Specification - build rules & logics to improve data accuracy and reliability
+        Verifier - to verify and enrich the address related fields
+        Parse - interprets and processes structured data, extracting meaningful information according to specified rules
+        Labeller - helps in labelling or categorization of data in the input
+        Deduplication - helps in identifying duplicates and consolidating them
+        Lets explore Cleanse DQ asset. Click on Cleanse DQ asset.
+
+Note: his there are several pre-built Cleanse asset. Under the Asset References
+
+Parser:
+    https://success.informatica.com/content/experience-fragments/informatica-cxp/xperience-lounge/xperience-lounge62.plain.html
+
+DeDupe:
+    https://success.informatica.com/content/experience-fragments/informatica-cxp/xperience-lounge/xperience-lounge63.plain.html
+
+    

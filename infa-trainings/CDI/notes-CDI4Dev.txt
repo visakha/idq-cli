@@ -1,0 +1,105 @@
+#About
+
+Cloud Data Integration for Developers - 2024/10 Release (onDemand)
+https://now.informatica.com/Cloud-Data-Integration-for-Developers-onDemand.html
+
+
+Welcome to the onDemand course for Cloud Data Integration for Developers. 
+    This is a self-paced course with 14 modules. 
+    Here’s the list of modules in the course, and the number of lab activities associated with each module.
+
+    Module 1: Informatica Cloud Overview (1 Lab)
+    Module 2: Introduction to Data Integration Service (2 Labs)
+    Module 3: Synchronization Task (6 Labs)
+    Module 4: Data Transfer Task (1 Lab) 
+    Module 5: Basics of Cloud Mapping Designer (No Labs) 
+    Module 6: IICS Transformations (5 Labs) 
+    Module 7: Joiner and Lookup Transformations (2 Labs)
+    Module 8: Mapplets (3 Labs)
+    Module 9: Mapping Parameterization (2 Labs)
+    Module 10: Mapping Task ( 1 Lab)
+    Module 11: Replication Task (1 Lab)
+    Module 12: Masking Task (2 Labs)
+    Module 13: Taskflows (2 Labs)
+    Module 14: IICS REST APIs (4 Labs)
+
+    As you progress with the modules, you will come across a Lab Activity section 
+    that will help you find the associated lab activity in the Lab Guide.
+
+Required Software on your laptop:
+    A) MS SQL Server 2022 (Express edition or Developer edition)
+        Remember the Instance name: in my case the host name is :   .\MYLOCLEN23  --> use this when using Azure Data Studio
+    B) 
+
+
+Prepare SQL Server  
+    A) Login in as Windows Auth  len23\vamsi (admin)
+    B) create a login  IICS_SQL  pwd   IICS_SQL
+    B.2) Provide these privileges
+        [
+            EXEC master..sp_addsrvrolemember @loginame = N'IICS_SQL', @rolename = N'dbcreator'
+            
+            GO
+        ]
+    C) logout
+    D) login in as IICS_SQL
+    E) create 2 databases named CDI, and CDI_STUDENT
+
+Download the lab guides from the learning portal (the page where you accessed this course)
+on your local system. The Lab Guide contains all the lab activities for the course.
+
+    - Create your Informatica Cloud Trial Account
+
+Salesforce dev acc
+    url: 
+    userName : viz.ply540@agentforce.com  
+    pwd: GSS789_abc
+    Username: viz.ply540@agentforce.com
+    Security token (case-sensitive): TQThkdzCJ0KxW4pjthSM598Pj
+
+
+Trail Acc started on March 5th - valid for 90 days
+    Org Name: Global Soft
+    Org Id:   8SS1YjTSQAufFoYSkNcii5
+
+vamsi.vegi@globalss.com
+vizK@nTrail1
+https://dm-us.informaticacloud.com/ma/home
+https://use4.dm-us.informaticacloud.com/cloudshell/resources/trial.html
+https://use4.dm-us.informaticacloud.com/cloudUI/products/administer/main/organization
+
+LAB:
+    C:\IICSLabFiles
+    Git: C:\Users\vamsi\wrk-infa-train\infa-training-notes-2025\cdi4dev
+
+
+    
+Secure Agent (Len23)
+    k7UxoAAAACMAAAACAQAAAAEBAgAAAAywqyFCV3AJp5vHELGz2zbDSgklGT86fX0PJV3f86jaoGBe12ELGeEdD5-UcQ-usrOKjA==616P4EC2TFZhRoBiftqmcd
+
+
+
+Connections created
+    SalesForce : XX_FirstName_SFDCDeveloper
+    MS SQL Server: CDI_SQL_Src  (userName IICS_SQL/IICS_SQL, hostname: .\MYLOCLEN23)
+
+We will learn the below by following the PDF: cdi4dev-labGuide
+    
+
+Module 1: Informatica Cloud Overview
+    Informatica Intelligent Cloud Services (IICS) as an iPaaS solution
+    Using IICS for ETL
+    Informatica Cloud Terminologies
+    Informatica Cloud Architecture
+    IICS Interface Walkthrough
+    IICS Services
+    Lab: Navigating the IICS Interface
+
+Module 2: Introduction to Data Integration Service
+    Discuss Data Integration Service
+    Pre-requisites to work with Data Integration Service
+    Discuss CDI Assets
+    Describe CDI Components
+    Lab: Installing Secure Agent
+    Lab: Creating Flat File Connections
+
