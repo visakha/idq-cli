@@ -1,0 +1,46 @@
+Artifacts generated since last commit 39e9741 (2026-10-27 10:50 CDT)
+Export date: 2026-10-28 (America/Chicago)
+Cutoff: files modified after 2026-10-27 10:50:43 -0500; internal proactive_messages notes excluded; no credentials, keys, or .env files included.
+
+00eeba94f084e33f2123b64730536ea9383e89aa36867c1132885d2ee8c96799  2538661  ./audio/address-doctor-gate-check-voice.mp3
+6f2e3516d65050b6cb49ce16c7264c57c8495b837c1a5586cdf0674062d392d4  2118181  ./audio/adr-empty-address-voice.mp3
+95e1dde82d395b6d143b8e06129cd50b2a79d2392a6cbc357bb868d13b49c298  3798757  ./audio/cre-member-merge-voice.mp3
+10b6b722d920d5e8892caf891c5687a1cd3470aee9a725ba7cc81a5a83f4b96f  393253  ./audio/dqm-rerun-noted-voice.mp3
+b8e2e7171bc31b4e6522d976576f4eaae23acadcdb25227e7d02b9df5091487c  2515813  ./audio/dqm-vs-exc-explained-voice.mp3
+a14abec169f4efeb88bedce45ebc34eafa9241e1c66a60e5328bb317eb24ad3a  1872613  ./audio/exc-catalog-feedback-voice.mp3
+bfae73fdeb55165df24bf136b45591db3f0ec9cb376041ee9705f5d4c3625b7a  1110373  ./audio/next-gap-cre-voice.mp3
+be5a4193129a968a74177f1c43ce7aa3e940560c1ffc7a4591fe13db872f72df  961381  ./audio/next-gap-dqm-rerun-voice.mp3
+4147be2b9a3683f560630abb6d1ee525d71f1956aaecc50445be90bf906fd881  1549093  ./audio/next-gap-exc-catalog-voice.mp3
+a131d9cc411828fad734c877d336f09291b5be5f3381caeab3b2b375b44a7081  1307941  ./audio/next-gap-nonspine-gate-voice.mp3
+990d5119b00524da37f131e877328fd84e80887c748c24862164d20ae77b73f0  1076197  ./audio/next-gap-parity-run-voice.mp3
+6e0a3f153c8cb0a6d440af9a1907759391bccc83d43a147488fef741d8e52f32  928741  ./audio/next-gap-view-cutover-voice.mp3
+ab63b53da7925959aeffd1f3e68ff92c3f7e542f8ed486af6583bbcbce2dc45e  921061  ./audio/next-gap-voice.mp3
+1338a73a34cbec1156ecc6667a84922efb087c73d24f0d43a756bda14829e2ab  2135653  ./audio/nonspine-gate-thoughts-voice.mp3
+b265782a92106b4ebe56bfd3c59d3226fd73c6e06c001eef1a5915e89d5cfb19  1547941  ./audio/parity-run-explained-voice.mp3
+a4de9f347e356300980ecdd0a21f0f8e0da9eec0c31570ca98b031cf046780b9  2466853  ./audio/pty-ismember-voice.mp3
+eecbde6c64152b9232d13ace7bc0f0a2f631df0f5c67c0b028809734a05ee1e2  1726693  ./audio/spine-filter-flag-voice.mp3
+2198c4cd4fa187911cd6e0cd4960395ed17334dbc9549258e39d875ee9ce2de6  2135077  ./audio/spine-first-maturity-voice.mp3
+b0a9d6dd5b6a8439f94c1e42db69f31c445e43c35aed153b3b2b5afad7105896  970597  ./audio/v3-delivery-voice.mp3
+dc27f48d102bc9024cadb9b166f1f858253bc6b305afed3d71a1b055be7dd964  2109733  ./audio/v3-proposal-thoughts-voice.mp3
+a2f2874eee9c7dc13d229878dab69c36c022bd455137fbfb136bc2244786e34d  4981093  ./audio/walkback-hub-minus-one-voice.mp3
+2428c5b5d5959fca9794e4a2adedbae85f1c83cd0f6787e8212e24a43b6aefab  559028  ./code-zips/Snowflake_All_Sources_Bare_Bones_v2.1_PATCHED.zip
+42120bdab35cf8d075594d21e4bb381dc1de08af4dd53838a40d3c8213d11f2f  341221  ./code-zips/Snowflake_Spine_First_Common_CS_v3_Flags_Raw_Views.zip
+d56bf17c43fd385d7579d5cdd6e52af473346cf785ca570a17c836bec6161f2d  385721  ./code-zips/Snowflake_Spine_First_Common_CS_v3_Flags_Raw_Views_DIAG.zip
+a93760a580a8778aa73bd865e05de2a7a2471c4fc9b8896dcaa23aff60b941ba  395234  ./code-zips/Snowflake_Spine_First_Common_CS_v3_Flags_Raw_Views_DIAG_CRE.zip
+c5529ece14562b13c4b92ad55a2bd092fdfaa6d823cbcb9f4002e8486acb360e  408304  ./code-zips/Snowflake_Spine_First_Common_CS_v3_Flags_Raw_Views_DIAG_CRE_EXC_CATALOG.zip
+12343c3941ef00086539fc07e463ed9cdffffe79dc95c46866d7374b0741c677  433986  ./code-zips/Snowflake_Spine_First_Common_CS_v3_Flags_Raw_Views_DIAG_CRE_EXC_CATALOG_NONSPINE_GATE.zip
+5fe36df8f3ef13514674cdb61adbf3aee212b9c838ca61eb0a2a7aafa8fdd794  439971  ./code-zips/Snowflake_Spine_First_Common_CS_v3_Flags_Raw_Views_DIAG_CRE_EXC_CATALOG_NONSPINE_GATE_TRS_ADR_DQM.zip
+8b6d4ce8a5041c788e012f892ab9dd5806c1d0ac520e08a03ba6a270ba51020c  370025  ./code-zips/Snowflake_Spine_First_Common_CS_v3_Flags_Raw_Views_PATCHED.zip
+fd6b00c536e53337fa8d9eb48aa44e2b1d2124227414f29eb2ee9dcaf2219f11  17951  ./markdown/CRE_MEMBER_MERGE.md
+52e07c18e7bd9531b5b7b1ed16bd8ca0d4622e70ed4963915d344146fce00d29  10794  ./markdown/ECI_MANIFEST_DIAGRAMS_ADDENDUM.md
+95fd5283f2bedd4bacfa0cc02614b09308805267464d7e1fb6fb3466b283f407  36765  ./markdown/PARITY_RUN_RUNBOOK.md
+79461db8139723146231acd075b46552cc5f454fdb1eeff0177f09c2ffdb8c96  16493  ./markdown/SEVEN_REFERENCE_OBJECTS.md
+074f2bbee5a000cd0684bc34ed606f89af44e2042b2c3c16586e727fcd46832b  9861  ./markdown/WALKBACK_CRE_HUB_MINUS_ONE.md
+12290a844f2162f9b0bd3c7fb9fb20a959ec916810057c55e9a3113953bc09f1  9409  ./markdown/WALKBACK_ECI_WIC_HUB_MINUS_ONE.md
+615d829d77abfc2ad74385c8271521860d27295387d3c485c814af39a300be0a  7587  ./markdown/WALKBACK_FSS_HUB_MINUS_ONE.md
+380ac153d605917fcf2aef28593defe484758dc2066789bfeed43949acd11396  12344  ./markdown/WALKBACK_TRS_HUB_MINUS_ONE.md
+feff8cf74ae1dfdf0069f6f1c9164293fe1f862561f24eec1ba73191f86aa4c0  7732  ./markdown/WALKBACK_TTF_HUB_MINUS_ONE.md
+84d25b9bf4e017f1e9e8b476a577d677b5a38e450b82c24f6bf16be6bdeb8a0f  5556  ./scripts/reference_objects_for_barebones_install.sql
+5464ff5d43f13b024640b574d41235acb5270ed8d550adeb4ead6f5918d78e5f  4312  ./view-cutover/CHECKLIST.md
+ba4aa344c72e421cacb589588ec2faa860f05a934ac4f77afe8d77c206681bb2  19955  ./view-cutover/VIEW_CUTOVER_NOTES.md
+678623c3eb610e868f192188ba96a654f22700c8ca4839fbb6a6f6d8e497ae1e  134976  ./view-cutover/verify_view_cutover.sql
