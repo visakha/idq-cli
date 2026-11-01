@@ -1,0 +1,29 @@
+MANIFEST — artifacts 2026-11-01 check-in (idq-cli, work since 2026-10-28 pm check-in)
+Generated: 2026-11-01
+
+File | Bytes | SHA-256
+V2_VS_V3_WORKING_TABLES.md | 9126 | bc8e3f5cebd61978c32a3e0d7ce83accf9e2b386a081e6efbc8ad10421f8fc30
+V3_TABLE_PROCEDURE_MATRIX.md | 19509 | e2d5a3542155ce81c28a945aa81abb590728485cab7422ebfd33252559efd635
+VERSIONING_TECHNICAL_DEBT.md | 14960 | c83a604d320453ba02556ff1bbd7351c7424bd5966c3466c4c3fecfdeda59e8e
+boundary-presentation-understanding-voice.mp3 | 1566181 | 960fa421de3f7d7a67691c1f5ba512b0d4f721027e03e0fa2ac6d8418487150c
+change-spots-discussion-voice.mp3 | 1886821 | 189c67cf4307ba2aac1b8db8f60bd5fefce0d6fc8ff851056475f5bde275f7b2
+no-delete-change-summary-voice.mp3 | 1456933 | e43a3b03faff6afde7b05650850bf58a4c83b67f5f94dc4f1cce6aee36f2a3f4
+repeat-back-no-delete-views-voice.mp3 | 742117 | 717bd7d7d2f6ad074e19e9c355b514800ede2d703f3d00b68613661d6f100062
+spine-load-bearing-elaboration-voice.mp3 | 1208101 | 07f949902b4c6a712a9a6b3327214edcf9893eb6e0b325cc34fc908361820aa9
+spine-nonspine-boundary-guide/spine-nonspine-boundary-guide.md | 11382 | 8f96d01630013b8f038a7a595b913c4bed49ddfcf68fa9d4d0251460a558248f
+spine-nonspine-boundary-presentation/spine-nonspine-boundary-presentation.pptx | 2902121 | 84597a7cde11a253782f06de9c238634674183406f225b4c4fe5bc1fe6eb318b
+spine-nonspine-boundary-presentation/spine-nonspine-boundary.md | 5867 | fd7287fed7f8ac8a5a07e426f2568c00e7d9bde29ede63a276c4e68f9443f487
+spine-story-guide/spine-story-guide.md | 9779 | f30655cd7fd8f5e38beccce97f66f218b4bda5b76420d4406ad76a702c66058e
+spine-story-presentation/spine-and-non-spine-story.md | 8850 | a006e24f7086435cda1b529566319f0c385e9d94c48666bdceb25dd9c0dc213d
+spine-story-presentation/spine-story-presentation.pptx | 2163211 | 8e79fc7baf319e89392c69717d343b1acbceab4d50d264028a2eb45b8a846189
+two-approaches-document/two-approaches-document.md | 14209 | 326f8072fae9955ce9a5db833f3bbe14a0e1214ed282d1287fecc4afa5a45a4b
+two-approaches-presentation/two-approaches-presentation.pptx | 5017310 | 1a7c3ed397aec58eac01cd75b05451fb50da54af8bcb6ee8c7019feb91743654
+two-approaches-presentation/two-etl-approaches.md | 8569 | 3328a8d39ecdfed0e4cb7eaeec879cceff82601f1567c4d810134e98343aebd0
+v2-vs-v3-working-tables-audio.mp3 | 3258853 | d95cb569d982b1caf650046f8a6f93f406d6776434e4f825c58faee8aea45389
+versioning-debt-audio.mp3 | 3978661 | 5612fe22f6fb68ee66d84ffb60b6dcc0c343b4009204904de431e1ca9bcd617d
+
+Notes:
+- Team docs/decks: two ETL approaches (flags/views angle), spine/non-spine boundary angle, spine story angle.
+- Audio notes: no-delete-views repeat-back, change-spots discussion, no-delete summary, boundary understanding, spine load-bearing elaboration.
+- Analysis: versioning-as-technical-debt write-up + audio; v2-vs-v3 working tables + audio; v3 table-procedure matrix.
+- Excluded by design: SnowRunner_OracleMirror_Java.zip (belongs to the snow-runner repo decision, not idq-cli); the OCI wallet (never committed to any new location); artifact-builder .src/meta.json sidecars.
